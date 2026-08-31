@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Users, Upload, Download, Plus, Search, Trash2, Pencil, X, Save, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { Siswa } from "../types";
-import { saveDocument, deleteDocument, batchSaveDocuments, COLLECTIONS } from "../lib/firebase";
+import { saveDocument, deleteDocument, batchSaveDocuments, COLLECTIONS } from "../lib/supabase";
 import { 
   notifySimpanSuccess, 
   notifySimpanError, 

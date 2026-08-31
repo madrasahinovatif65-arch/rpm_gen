@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Star, Save, CheckCircle2, History, Pencil, Trash2, Search, Filter, X, Check } from "lucide-react";
 import { Siswa, Mapel, DataNilai, Pengaturan } from "../types";
-import { saveDocument, deleteDocument, batchSaveDocuments, COLLECTIONS } from "../lib/firebase";
+import { saveDocument, deleteDocument, batchSaveDocuments, COLLECTIONS } from "../lib/supabase";
 import { 
   notifySimpanSuccess, 
   notifySimpanError, 

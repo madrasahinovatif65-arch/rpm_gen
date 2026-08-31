@@ -126,7 +126,7 @@ Peserta didik mampu menulis gagasan, pikiran, pandangan, arahan atau pesan tertu
     setGeneratingProgress(`Menyusun ${docMeta?.fullTitle || targetType}...`);
 
     try {
-      const res = await fetch("/api/ai/generate-perangkat-ajar", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -164,7 +164,7 @@ Peserta didik mampu menulis gagasan, pikiran, pandangan, arahan atau pesan tertu
       setGeneratingProgress(`[${i + 1}/${types.length}] Menyusun ${docMeta?.fullTitle}...`);
 
       try {
-        const res = await fetch("/api/ai/generate-perangkat-ajar", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

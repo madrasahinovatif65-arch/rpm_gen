@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
@@ -15,7 +16,13 @@ dotenv.config();
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000;
+
+  // Izinkan request CORS dari Frontend Vercel
+  app.use(cors({
+    origin: process.env.VITE_FRONTEND_URL || "*",
+    credentials: true
+  }));
 
   app.use(express.json({ limit: "10mb" }));
 

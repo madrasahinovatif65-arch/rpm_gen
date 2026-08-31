@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { ClipboardCheck, Camera, CheckCircle2, Save, UserCheck, AlertCircle, History, BarChart3, Pencil, Trash2, Search, Filter, X, Check } from "lucide-react";
 import jsQR from "jsqr";
 import { Siswa, Mapel, LogAbsensi, Pengaturan } from "../types";
-import { saveDocument, deleteDocument, batchSaveDocuments, COLLECTIONS } from "../lib/firebase";
+import { saveDocument, deleteDocument, batchSaveDocuments, COLLECTIONS } from "../lib/supabase";
 import { 
   notifySimpanSuccess, 
   notifySimpanError, 

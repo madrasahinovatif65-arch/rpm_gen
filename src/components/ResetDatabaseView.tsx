@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Trash2, AlertTriangle, ShieldAlert, RefreshCw, Layers } from "lucide-react";
-import { clearAllDatabaseCollections } from "../lib/firebase";
+import { clearAllDatabaseCollections } from "../lib/supabase";
 import { notifyHapusSuccess, notifyHapusError, confirmDeleteAlert } from "../lib/swal";
 
 interface ResetDatabaseViewProps {
