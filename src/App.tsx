@@ -48,7 +48,7 @@ import {
   batchSaveDocuments, 
   savePengaturan,
   COLLECTIONS 
-} from "./lib/supabase";
+} from "./lib/firebase";
 
 import { 
   Siswa, 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Settings, Save, ShieldCheck, School, UserCheck, Trash2, ShieldAlert, KeyRound, Eye, EyeOff } from "lucide-react";
 import { Pengaturan } from "../types";
-import { savePengaturan } from "../lib/supabase";
+import { savePengaturan } from "../lib/firebase";
 import { notifySimpanSuccess, notifySimpanError } from "../lib/swal";
 
 interface PengaturanViewProps {

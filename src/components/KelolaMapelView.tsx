@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BookOpen, Plus, Trash2, Pencil, X, Save, CheckCircle2 } from "lucide-react";
 import { Mapel } from "../types";
-import { saveDocument, deleteDocument, COLLECTIONS } from "../lib/supabase";
+import { saveDocument, deleteDocument, COLLECTIONS } from "../lib/firebase";
 import { 
   notifySimpanSuccess, 
   notifySimpanError, 

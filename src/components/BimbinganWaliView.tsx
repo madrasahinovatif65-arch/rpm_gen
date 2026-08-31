@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { HeartHandshake, Plus, Trash2, Pencil, X, Save, CheckCircle2, UserPlus, History, Search, Filter } from "lucide-react";
 import { BimbinganWali, SiswaBimbingan, Siswa, Pengaturan } from "../types";
-import { saveDocument, deleteDocument, COLLECTIONS } from "../lib/supabase";
+import { saveDocument, deleteDocument, COLLECTIONS } from "../lib/firebase";
 import { 
   notifySimpanSuccess, 
   notifySimpanError, 
