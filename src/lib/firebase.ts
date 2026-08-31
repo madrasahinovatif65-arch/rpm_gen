@@ -36,8 +36,11 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
+// Determine if we are using the original template project or a custom user project
+const isCustomProject = !!import.meta.env.VITE_FIREBASE_PROJECT_ID || !!import.meta.env.VITE_PENGATURAN_FIREBASE_PROJECT_ID;
+
 // Use explicit firestoreDatabaseId with auto detect long polling for iframe stability
-const dbId = import.meta.env.VITE_FIREBASE_DATABASE_ID || firebaseConfigData.firestoreDatabaseId || "(default)";
+const dbId = import.meta.env.VITE_FIREBASE_DATABASE_ID || (isCustomProject ? "(default)" : (firebaseConfigData.firestoreDatabaseId || "(default)"));
 
 // Original Owner & Master Database Identifiers
 const PRIMARY_DATABASE_ID = firebaseConfigData.firestoreDatabaseId || "ai-studio-remixaplikasigur-4d5db868-1009-49e3-a00a-533e542f4bc0";
