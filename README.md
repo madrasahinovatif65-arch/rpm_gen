@@ -1,1 +1,1 @@
-# apk_gen
+# rpm_gen
