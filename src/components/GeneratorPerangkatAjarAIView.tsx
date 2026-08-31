@@ -16,6 +16,7 @@ import {
   UserCheck
 } from "lucide-react";
 import { Pengaturan } from "../types";
+import { generatePerangkatAjarAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 
 interface GeneratorPerangkatAjarAIViewProps {
@@ -126,25 +127,17 @@ Peserta didik mampu menulis gagasan, pikiran, pandangan, arahan atau pesan tertu
     setGeneratingProgress(`Menyusun ${docMeta?.fullTitle || targetType}...`);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          docType: targetType,
-          formData
-        })
-      });
+      const res = await generatePerangkatAjarAPI(targetType, formData);
 
-      const data = await res.json();
-      if (data.status === "success" && data.html) {
-        const cleanedHtml = sanitizeHtmlForOutput(data.html);
+      if (res.status === "success" && res.html) {
+        const cleanedHtml = sanitizeHtmlForOutput(res.html);
         setGeneratedDocs((prev) => ({
           ...prev,
           [targetType]: cleanedHtml
         }));
         notifySimpanSuccess(`${docMeta?.fullTitle || "Dokumen"} berhasil dibuat!`);
       } else {
-        throw new Error(data.message || "Gagal menghasilkan dokumen");
+        throw new Error(res.message || "Gagal menghasilkan dokumen");
       }
     } catch (err: any) {
       console.error(err);
@@ -164,22 +157,16 @@ Peserta didik mampu menulis gagasan, pikiran, pandangan, arahan atau pesan tertu
       setGeneratingProgress(`[${i + 1}/${types.length}] Menyusun ${docMeta?.fullTitle}...`);
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            docType: t,
-            formData
-          })
-        });
+        const res = await generatePerangkatAjarAPI(t, formData);
 
-        const data = await res.json();
-        if (data.status === "success" && data.html) {
-          const cleanedHtml = sanitizeHtmlForOutput(data.html);
+        if (res.status === "success" && res.html) {
+          const cleanedHtml = sanitizeHtmlForOutput(res.html);
           setGeneratedDocs((prev) => ({
             ...prev,
             [t]: cleanedHtml
           }));
+        } else {
+          console.warn(`Gagal menyusun ${t}:`, res.message);
         }
       } catch (err) {
         console.error(`Gagal pada ${t}:`, err);

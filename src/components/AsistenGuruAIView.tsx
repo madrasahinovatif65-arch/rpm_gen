@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { Bot, Send, User, Sparkles, Copy, Check, Loader2 } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Bot, Send, User, Sparkles, Copy, Check, Loader2, Lightbulb, CheckCircle2, ChevronRight, GraduationCap } from "lucide-react";
 import { ChatMessage, Pengaturan } from "../types";
+import { chatAssistantAPI } from "../lib/geminiClient";
 
 interface AsistenGuruAIViewProps {
   config: Pengaturan;
@@ -51,29 +52,21 @@ export const AsistenGuruAIView: React.FC<AsistenGuruAIViewProps> = ({ config }) 
     setLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/chat-asisten`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: query.trim(),
-          context: {
-            guru: config.Nama_Guru,
-            sekolah: config.Nama_Sekolah
-          }
-        })
+      const res = await chatAssistantAPI(query.trim(), {
+        guru: config.Nama_Guru,
+        sekolah: config.Nama_Sekolah
       });
 
-      const data = await res.json();
-      if (data.status === "success") {
+      if (res.status === "success" && res.reply) {
         const assistantMsg: ChatMessage = {
           id: (Date.now() + 1).toString(),
           sender: "assistant",
-          text: cleanAiText(data.reply),
+          text: cleanAiText(res.reply),
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         };
         setMessages((prev) => [...prev, assistantMsg]);
       } else {
-        throw new Error(data.message || "Gagal mendapatkan respon.");
+        throw new Error(res.message || "Gagal mendapatkan respon");
       }
     } catch (err: any) {
       setMessages((prev) => [

@@ -20,6 +20,7 @@ import {
   LayoutList
 } from "lucide-react";
 import { Pengaturan } from "../types";
+import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 
 interface PerangkatAjarKBCViewProps {
@@ -197,25 +198,17 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
     const payloadData = isModulType ? formDataModul : formData;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          docType: targetType,
-          formData: payloadData
-        })
-      });
+      const res = await generatePerangkatAjarKBCAPI(targetType, payloadData);
 
-      const data = await res.json();
-      if (data.status === "success" && data.html) {
-        const cleanedHtml = sanitizeHtmlForOutput(data.html);
+      if (res.status === "success" && res.html) {
+        const cleanedHtml = sanitizeHtmlForOutput(res.html);
         setGeneratedDocs((prev) => ({
           ...prev,
           [targetType]: cleanedHtml
         }));
         notifySimpanSuccess(`${docMeta?.fullTitle || "Dokumen"} KBC berhasil dibuat!`);
       } else {
-        throw new Error(data.message || "Gagal menghasilkan dokumen KBC");
+        throw new Error(res.message || "Gagal menghasilkan dokumen KBC");
       }
     } catch (err: any) {
       console.error(err);
@@ -239,18 +232,10 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
       setGeneratingProgress(`[${i + 1}/3] Menyusun ${t.title}...`);
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            docType: t.id,
-            formData: formDataModul
-          })
-        });
+        const res = await generatePerangkatAjarKBCAPI(t.id, formDataModul);
 
-        const data = await res.json();
-        if (data.status === "success" && data.html) {
-          const cleanedHtml = sanitizeHtmlForOutput(data.html);
+        if (res.status === "success" && res.html) {
+          const cleanedHtml = sanitizeHtmlForOutput(res.html);
           setGeneratedDocs((prev) => ({
             ...prev,
             [t.id]: cleanedHtml
@@ -279,22 +264,16 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
       const payloadData = isModulType ? formDataModul : formData;
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            docType: t,
-            formData: payloadData
-          })
-        });
+        const res = await generatePerangkatAjarKBCAPI(t, payloadData);
 
-        const data = await res.json();
-        if (data.status === "success" && data.html) {
-          const cleanedHtml = sanitizeHtmlForOutput(data.html);
+        if (res.status === "success" && res.html) {
+          const cleanedHtml = sanitizeHtmlForOutput(res.html);
           setGeneratedDocs((prev) => ({
             ...prev,
             [t]: cleanedHtml
           }));
+        } else {
+          console.warn(`Gagal menyusun ${t}:`, res.message);
         }
       } catch (err) {
         console.error(`Gagal pada ${t}:`, err);
