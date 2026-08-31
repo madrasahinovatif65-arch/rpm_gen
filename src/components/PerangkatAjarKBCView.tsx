@@ -197,7 +197,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
     const payloadData = isModulType ? formDataModul : formData;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -239,7 +239,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
       setGeneratingProgress(`[${i + 1}/3] Menyusun ${t.title}...`);
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -279,7 +279,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
       const payloadData = isModulType ? formDataModul : formData;
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/generate-perangkat-ajar-kbc`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
