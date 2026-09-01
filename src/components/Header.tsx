@@ -25,7 +25,6 @@ const TAB_TITLES: Record<string, string> = {
   agenda: "Jurnal Agenda Mengajar",
   bimbingan: "Catatan Bimbingan Guru Wali",
   downloadperangkat: "Download Perangkat Ajar (Deep Learning)",
-  perangkat_ai: "Generator Perangkat Ajar AI (Analisis CP, TP, ATP, Prota, Prosem, KKTP)",
   modulai: "Generator Modul Ajar AI (Deep Learning)",
   asistenai: "Asisten AI Pendamping Guru",
   lkpdai: "Generator LKPD AI (Lembar Kerja Peserta Didik)",

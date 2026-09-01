@@ -38,14 +38,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200"
     },
     {
-      id: "perangkat_ai",
-      title: "Generator Perangkat Ajar AI",
-      desc: "Buat RPP & ATP otomatis dengan AI.",
-      icon: FileCheck,
-      badge: "AI Pro",
-      color: "bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400 border-purple-200"
-    },
-    {
       id: "modulai",
       title: "Modul Ajar Deep Learning AI",
       desc: "Generator RPP Deep Learning Kurikulum Merdeka (hingga 5 pertemuan).",
