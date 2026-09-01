@@ -1,5 +1,12 @@
 
 
+export interface CpTemplate {
+  id: string;
+  name: string;
+  rasional: string;
+  elemen: string;
+}
+
 export interface Pengaturan {
   Nama_Guru: string;
   NIP_Guru: string;
@@ -14,6 +21,7 @@ export interface Pengaturan {
   username?: string;
   password?: string;
   isDatabaseCleared?: boolean;
+  cpTemplates?: CpTemplate[];
 }
 
 export interface ModulFormState {

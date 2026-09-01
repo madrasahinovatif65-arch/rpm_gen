@@ -22,6 +22,7 @@ import {
   LayoutList
 } from "lucide-react";
 import { Pengaturan } from "../types";
+import { savePengaturan } from "../lib/firebase";
 import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { useKbcState, defaultKbcState } from "../store/kbcState";
@@ -145,6 +146,17 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       }
     }));
     notifySimpanSuccess("Berhasil menyalin data dari Profil Madrasah!");
+  };
+
+  const handleFillTemplateCP = () => {
+    updateState(s => ({
+      ...s,
+      cp: {
+        rasional: "Mata pelajaran ini diarahkan untuk membentuk karakter unggul dengan mengintegrasikan nilai-nilai Panca Cinta (Cinta Allah, Cinta Rasulullah, Cinta Al-Qur'an, Cinta Sesama, Cinta Tanah Air) serta menginternalisasi 10 Nilai Profil Pelajar Rahmatan Lil 'Alamin (PPRA). Pembelajaran disusun sedemikian rupa agar siswa mampu bernalar kritis, kreatif, serta mengaplikasikan ilmu pengetahuan dalam kehidupan nyata yang moderat dan toleran.",
+        elemen: "Elemen Pemahaman Konsep: Peserta didik mampu menganalisis dan menjelaskan ruang lingkup materi secara mendalam dan komprehensif.\n\nElemen Keterampilan Proses: Peserta didik mampu mengamati, menanya, mengeksplorasi, merumuskan kesimpulan, serta mengkomunikasikan hasil karya secara lisan maupun tulisan."
+      }
+    }));
+    notifySimpanSuccess("Template CP Kemenag berhasil dimuat!");
   };
 
   const handleSubjectChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
@@ -474,12 +486,37 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Fase / Kelas</label>
-              <input
-                type="text"
-                value={formData.level}
-                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-              />
+              {!["Fase A (Kelas 1-2)", "Fase B (Kelas 3-4)", "Fase C (Kelas 5-6)", "Fase D (Kelas 7-9)", "Fase E (Kelas 10)", "Fase F (Kelas 11-12)"].includes(formData.level) && formData.level !== "" && !["Lainnya"].includes(formData.level) ? (
+                <input
+                  type="text"
+                  value={formData.level}
+                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
+                  placeholder="Ketik fase/kelas manual..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+                />
+              ) : (
+                <select
+                  value={["Fase A (Kelas 1-2)", "Fase B (Kelas 3-4)", "Fase C (Kelas 5-6)", "Fase D (Kelas 7-9)", "Fase E (Kelas 10)", "Fase F (Kelas 11-12)"].includes(formData.level) ? formData.level : (formData.level === "" ? "" : "Lainnya")}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "Lainnya") {
+                      updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: "" } }));
+                    } else {
+                      updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: val } }));
+                    }
+                  }}
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold cursor-pointer"
+                >
+                  <option value="" disabled>Pilih Fase...</option>
+                  <option value="Fase A (Kelas 1-2)">Fase A (Kelas 1-2) - MI</option>
+                  <option value="Fase B (Kelas 3-4)">Fase B (Kelas 3-4) - MI</option>
+                  <option value="Fase C (Kelas 5-6)">Fase C (Kelas 5-6) - MI</option>
+                  <option value="Fase D (Kelas 7-9)">Fase D (Kelas 7-9) - MTs</option>
+                  <option value="Fase E (Kelas 10)">Fase E (Kelas 10) - MA</option>
+                  <option value="Fase F (Kelas 11-12)">Fase F (Kelas 11-12) - MA</option>
+                  <option value="Lainnya">Lainnya (Ketik Manual)...</option>
+                </select>
+              )}
             </div>
 
             <div>
@@ -578,10 +615,19 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
-            <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                CP Umum / Rasional KBC (Panca Cinta & PPRA)
-              </label>
+            <div className="flex flex-col h-full">
+              <div className="flex justify-between items-center mb-1">
+                <label className="font-bold text-slate-700 dark:text-slate-300">
+                  CP Umum / Rasional KBC (Panca Cinta & PPRA)
+                </label>
+                <button
+                  onClick={handleFillTemplateCP}
+                  className="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-0.5 rounded-md font-bold transition"
+                  title="Isi dengan template bawaan KBC"
+                >
+                  📝 Isi Template
+                </button>
+              </div>
               <textarea
                 rows={4}
                 value={formData.cpRasional}
@@ -590,10 +636,19 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               />
             </div>
 
-            <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                Capaian Pembelajaran (CP) Per Elemen
-              </label>
+            <div className="flex flex-col h-full">
+              <div className="flex justify-between items-center mb-1">
+                <label className="font-bold text-slate-700 dark:text-slate-300">
+                  Capaian Pembelajaran (CP) Per Elemen
+                </label>
+                <button
+                  onClick={handleFillTemplateCP}
+                  className="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-0.5 rounded-md font-bold transition"
+                  title="Isi dengan template bawaan KBC"
+                >
+                  📝 Isi Template
+                </button>
+              </div>
               <textarea
                 rows={4}
                 value={formData.cpElemen}
