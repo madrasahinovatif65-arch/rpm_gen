@@ -22,6 +22,7 @@ import {
 import { Pengaturan } from "../types";
 import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
+import { useKbcState, defaultKbcState } from "../store/kbcState";
 
 interface PerangkatAjarKBCViewProps {
   config: Pengaturan;
@@ -50,55 +51,21 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     rubrik: ""
   });
 
-  // Data Form untuk Administrasi (Dokumen 1-6: ACP, TP, ATP, Prota, Prosem, KKTP)
-  const [formData, setFormData] = useState({
-    schoolName: config.Nama_Sekolah || "MAN 1 Kerinci",
-    kemenagOffice: "KANTOR KEMENTERIAN AGAMA KABUPATEN KERINCI",
-    subject: "Akidah Akhlak",
-    singkatanMapel: "AA",
-    level: "Fase E / Kelas X",
-    year: "2026/2027",
-    totalJp: "72 JP / Tahun",
-    jpPerMinggu: "2 JP/Minggu",
-    teacher: config.Nama_Guru || "Drs. Yefri Haryanto, M.Pd.",
-    nipTeacher: config.NIP_Guru || "19850312 201001 1 008",
-    cityDate: `${config.Tempat_Tanda_Tangan || "Kerinci"}, 14 Juli 2026`,
-    principal: config.Nama_Kepsek || "Hamdani, S.Pd., M.Si.",
-    nipPrincipal: config.NIP_Kepsek || "19780514 200212 1 003",
-    learningModel: "Discovery Learning",
-    cpRasional: "Kurikulum Berbasis Cinta (KBC) mengintegrasikan Panca Cinta Kemenag (Cinta Allah & Rasul, Cinta Diri & Sesama, Cinta Ilmu, Cinta Bangsa & Negara, Cinta Alam) serta 10 Nilai PPRA (Ta'addub, Qudwah, Muwaṭanah, Tawassuṭ, Tawāzun, I'tidāl, Musāwah, Syūrā, Tasāmuh, Tathawwur wa Ibtikār). Membentuk peserta didik madrasah yang berkeadaban, bernalar kritis, dan berakhlak mulia.",
-    cpElemen: `Elemen 1 — Akidah:
-Peserta didik mampu menganalisis sifat-sifat Allah Swt., konsep tauhid, dan Asmaul Husna secara mendalam serta menginternalisasi nilai kasih sayang dan keagungan Allah dalam kehidupan sehari-hari.
+  const [state, updateState] = useKbcState();
 
-Elemen 2 — Akhlak:
-Peserta didik mampu menganalisis dan membiasakan akhlak terpuji (mahmudah) seperti ta'addub, tasamuh, dan qudwah, serta menghindari akhlak tercela (mazmumah) dalam interaksi sosial dan digital.
+  // Alias for ease of transition
+  const formData = {
+    ...state.school,
+    ...state.curriculum,
+    ...state.cp
+  };
 
-Elemen 3 — Adab:
-Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manusia, serta lingkungan hidup berbasis kepedulian dan cinta kasih sesama.`
-  });
+  const formDataModul = {
+    ...state.school,
+    ...state.curriculum,
+    ...state.module
+  };
 
-  // Data Form KHUSUS Modul Ajar, LKPD, & Rubrik (Dokumen 7-9)
-  const [formDataModul, setFormDataModul] = useState({
-    kemenagOffice: "KANTOR KEMENTERIAN AGAMA KABUPATEN KERINCI",
-    schoolName: config.Nama_Sekolah || "MAN 1 Kerinci",
-    schoolAddress: "Jl. Raya Semurup No. 45, Semurup, Kabupaten Kerinci",
-    subject: "Akidah Akhlak",
-    level: "Fase E / Kelas X",
-    year: "2026/2027",
-    teacher: config.Nama_Guru || "Drs. Yefri Haryanto, M.Pd.",
-    nipTeacher: config.NIP_Guru || "19850312 201001 1 008",
-    cityDate: `${config.Tempat_Tanda_Tangan || "Kerinci"}, 14 Juli 2026`,
-    principal: config.Nama_Kepsek || "Hamdani, S.Pd., M.Si.",
-    nipPrincipal: config.NIP_Kepsek || "19780514 200212 1 003",
-    kodeTp: "TP.AA.ELE.10.01",
-    rumusanTp: "Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
-    elemenCp: "Akidah",
-    learningModel: "Discovery Learning",
-    sintakModel: "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
-    jumlahPertemuan: "3",
-    jpPerPertemuan: "2",
-    topikLokal: "Pelestarian Lingkungan Hutan TNKS & Budaya Adat Mudik Kerinci (Panca Cinta & PPRA)"
-  });
 
   const docTypeList = [
     { id: "analisis_cp", label: "1. Analisis CP", fullTitle: "Analisis Capaian Pembelajaran (ACP) KBC", icon: BookOpen },
@@ -122,56 +89,20 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
   };
 
   const handleFillSample = () => {
-    setFormData({
-      schoolName: config.Nama_Sekolah || "MAN 1 Kerinci",
-      kemenagOffice: "KANTOR KEMENTERIAN AGAMA KABUPATEN KERINCI",
-      subject: "Akidah Akhlak",
-      singkatanMapel: "AA",
-      level: "Fase E / Kelas X",
-      year: "2026/2027",
-      totalJp: "72 JP / Tahun",
-      jpPerMinggu: "2 JP/Minggu",
-      teacher: config.Nama_Guru || "Drs. Yefri Haryanto, M.Pd.",
-      nipTeacher: config.NIP_Guru || "19850312 201001 1 008",
-      cityDate: `${config.Tempat_Tanda_Tangan || "Kerinci"}, 14 Juli 2026`,
-      principal: config.Nama_Kepsek || "Hamdani, S.Pd., M.Si.",
-      nipPrincipal: config.NIP_Kepsek || "19780514 200212 1 003",
-      learningModel: "Discovery Learning",
-      cpRasional: "Kurikulum Berbasis Cinta (KBC) mengintegrasikan Panca Cinta Kemenag (Cinta Allah & Rasul, Cinta Diri & Sesama, Cinta Ilmu, Cinta Bangsa & Negara, Cinta Alam) serta 10 Nilai PPRA (Ta'addub, Qudwah, Muwaṭanah, Tawassuṭ, Tawāzun, I'tidāl, Musāwah, Syūrā, Tasāmuh, Tathawwur wa Ibtikār). Membentuk peserta didik madrasah yang berkeadaban, bernalar kritis, dan berakhlak mulia.",
-      cpElemen: `Elemen 1 — Akidah:
-Peserta didik mampu menganalisis sifat-sifat Allah Swt., konsep tauhid, dan Asmaul Husna secara mendalam serta menginternalisasi nilai kasih sayang dan keagungan Allah dalam kehidupan sehari-hari.
-
-Elemen 2 — Akhlak:
-Peserta didik mampu menganalisis dan membiasakan akhlak terpuji (mahmudah) seperti ta'addub, tasamuh, dan qudwah, serta menghindari akhlak tercela (mazmumah) dalam interaksi sosial dan digital.
-
-Elemen 3 — Adab:
-Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manusia, serta lingkungan hidup berbasis kepedulian dan cinta kasih sesama.`
-    });
+    updateState((prev) => ({
+      ...prev,
+      school: defaultKbcState.school,
+      curriculum: defaultKbcState.curriculum,
+      cp: defaultKbcState.cp
+    }));
     notifySimpanSuccess("Contoh data Administrasi KBC berhasil dimuat!");
   };
 
   const handleFillSampleModul = () => {
-    setFormDataModul({
-      kemenagOffice: "KANTOR KEMENTERIAN AGAMA KABUPATEN KERINCI",
-      schoolName: config.Nama_Sekolah || "MAN 1 Kerinci",
-      schoolAddress: "Jl. Raya Semurup No. 45, Semurup, Kabupaten Kerinci",
-      subject: "Akidah Akhlak",
-      level: "Fase E / Kelas X",
-      year: "2026/2027",
-      teacher: config.Nama_Guru || "Drs. Yefri Haryanto, M.Pd.",
-      nipTeacher: config.NIP_Guru || "19850312 201001 1 008",
-      cityDate: `${config.Tempat_Tanda_Tangan || "Kerinci"}, 14 Juli 2026`,
-      principal: config.Nama_Kepsek || "Hamdani, S.Pd., M.Si.",
-      nipPrincipal: config.NIP_Kepsek || "19780514 200212 1 003",
-      kodeTp: "TP.AA.ELE.10.01",
-      rumusanTp: "Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
-      elemenCp: "Akidah",
-      learningModel: "Discovery Learning",
-      sintakModel: "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
-      jumlahPertemuan: "3",
-      jpPerPertemuan: "2",
-      topikLokal: "Pelestarian Lingkungan Hutan TNKS & Budaya Adat Mudik Kerinci (Panca Cinta & PPRA)"
-    });
+    updateState((prev) => ({
+      ...prev,
+      module: defaultKbcState.module
+    }));
     notifySimpanSuccess("Contoh data Khusus Modul Ajar, LKPD & Rubrik KBC berhasil dimuat!");
   };
 
@@ -569,7 +500,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.kemenagOffice}
-                onChange={(e) => setFormData({ ...formData, kemenagOffice: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, kemenagOffice: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -579,7 +510,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.schoolName}
-                onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, schoolName: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -589,7 +520,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, subject: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -599,7 +530,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.singkatanMapel}
-                onChange={(e) => setFormData({ ...formData, singkatanMapel: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, singkatanMapel: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -609,7 +540,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.level}
-                onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -619,7 +550,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, year: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -627,9 +558,9 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Alokasi Waktu Total</label>
               <input
-                type="text"
+                type="number"
                 value={formData.totalJp}
-                onChange={(e) => setFormData({ ...formData, totalJp: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, totalJp: Number(e.target.value) || 0 } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -637,9 +568,9 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">JP per Minggu</label>
               <input
-                type="text"
+                type="number"
                 value={formData.jpPerMinggu}
-                onChange={(e) => setFormData({ ...formData, jpPerMinggu: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, jpPerMinggu: Number(e.target.value) || 0 } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -648,7 +579,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Model Pembelajaran Sintaks</label>
               <select
                 value={formData.learningModel}
-                onChange={(e) => setFormData({ ...formData, learningModel: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, learningModel: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold cursor-pointer"
               >
                 <option value="Discovery Learning">Discovery Learning</option>
@@ -663,7 +594,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.teacher}
-                onChange={(e) => setFormData({ ...formData, teacher: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, teacher: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -673,7 +604,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.nipTeacher}
-                onChange={(e) => setFormData({ ...formData, nipTeacher: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, nipTeacher: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -683,7 +614,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.cityDate}
-                onChange={(e) => setFormData({ ...formData, cityDate: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, cityDate: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -693,7 +624,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.principal}
-                onChange={(e) => setFormData({ ...formData, principal: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, principal: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -703,7 +634,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <input
                 type="text"
                 value={formData.nipPrincipal}
-                onChange={(e) => setFormData({ ...formData, nipPrincipal: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, nipPrincipal: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
             </div>
@@ -717,7 +648,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <textarea
                 rows={4}
                 value={formData.cpRasional}
-                onChange={(e) => setFormData({ ...formData, cpRasional: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, rasional: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
               />
             </div>
@@ -729,7 +660,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <textarea
                 rows={4}
                 value={formData.cpElemen}
-                onChange={(e) => setFormData({ ...formData, cpElemen: e.target.value })}
+                onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, elemen: e.target.value } }))}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
               />
             </div>
@@ -772,7 +703,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.kodeTp}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, kodeTp: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, kodeTp: e.target.value } }))}
                   placeholder="misal: TP.IPA.KPS.7.01 / TP.AA.ELE.10.01"
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold text-emerald-700 dark:text-emerald-400"
                 />
@@ -783,7 +714,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.elemenCp}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, elemenCp: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, elemenCp: e.target.value } }))}
                   placeholder="misal: Akidah / Pemahaman IPA"
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
@@ -796,7 +727,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <textarea
                   rows={3}
                   value={formDataModul.rumusanTp}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, rumusanTp: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, rumusanTp: e.target.value } }))}
                   placeholder="Rumusan lengkap TP yang akan dicapai..."
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold text-slate-900 dark:text-slate-100 leading-relaxed"
                 />
@@ -809,7 +740,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Model Pembelajaran</label>
                 <select
                   value={formDataModul.learningModel}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, learningModel: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, learningModel: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold text-emerald-700 dark:text-emerald-400 cursor-pointer"
                 >
                   <option value="Discovery Learning">Discovery Learning</option>
@@ -823,9 +754,9 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <div>
                 <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Jumlah Pertemuan</label>
                 <input
-                  type="text"
+                  type="number"
                   value={formDataModul.jumlahPertemuan}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, jumlahPertemuan: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, jumlahPertemuan: Number(e.target.value) || 0 } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold"
                 />
               </div>
@@ -833,9 +764,9 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
               <div>
                 <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Alokasi JP Per Pertemuan</label>
                 <input
-                  type="text"
+                  type="number"
                   value={formDataModul.jpPerPertemuan}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, jpPerPertemuan: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, jpPerPertemuan: Number(e.target.value) || 0 } }))}
                   placeholder="misal: 2 JP (2 x 45 menit)"
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold"
                 />
@@ -847,8 +778,8 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 </label>
                 <input
                   type="text"
-                  value={formDataModul.sintakModel}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, sintakModel: e.target.value })}
+                  value={formDataModul.sintakModel as string}
+                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, sintakModel: e.target.value } }))}
                   placeholder="Urutan sintaks lengkap..."
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold text-slate-800 dark:text-slate-200"
                 />
@@ -861,7 +792,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <textarea
                   rows={2}
                   value={formDataModul.topikLokal}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, topikLokal: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, topikLokal: e.target.value } }))}
                   placeholder="misal: Isu lingkungan Hutan TNKS Kerinci, Budaya Gotong Royong Adat Kerinci, Tradisi Mudik Kerinci..."
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold leading-relaxed"
                 />
@@ -875,7 +806,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.kemenagOffice}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, kemenagOffice: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, kemenagOffice: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -885,7 +816,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.schoolName}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, schoolName: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, schoolName: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -895,7 +826,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.schoolAddress}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, schoolAddress: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, schoolAddress: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -905,7 +836,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.subject}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, subject: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, subject: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -915,7 +846,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.level}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, level: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -925,7 +856,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.year}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, year: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, year: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -935,7 +866,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.teacher}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, teacher: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, teacher: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -945,7 +876,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.nipTeacher}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, nipTeacher: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, nipTeacher: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -955,7 +886,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.cityDate}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, cityDate: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, cityDate: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -965,7 +896,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.principal}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, principal: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, principal: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
@@ -975,7 +906,7 @@ Peserta didik mampu menerapkan adab islami terhadap orang tua, guru, sesama manu
                 <input
                   type="text"
                   value={formDataModul.nipPrincipal}
-                  onChange={(e) => setFormDataModul({ ...formDataModul, nipPrincipal: e.target.value })}
+                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, nipPrincipal: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>

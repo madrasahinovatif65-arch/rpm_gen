@@ -79,7 +79,8 @@ export const firestore = firestoreInstance;
 
 // Collections references
 export const COLLECTIONS = {
-  PENGATURAN: "pengaturan"
+  PENGATURAN: "pengaturan",
+  KBC_STATE: "kbc_state"
 };
 
 // Helpers for isolated local storage fallback when running in a remixed environment
@@ -282,6 +283,66 @@ export function subscribePengaturan(callback: (config: Pengaturan) => void) {
     },
     (error) => {
       console.warn("Firestore pengaturan subscription notice:", error?.message || error);
+    }
+  );
+}
+
+// KBC State special helper (Doc ID: "main") with isolated database connection
+export async function saveKbcState(state: any) {
+  if (isIsolatedRemix()) {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("edadmin_remix_db_kbc_state", JSON.stringify(state));
+      window.dispatchEvent(new CustomEvent("edadmin_remix_db_update_kbc_state", { detail: state }));
+    }
+    return;
+  }
+
+  try {
+    const docRef = doc(firestore, COLLECTIONS.KBC_STATE, "main");
+    await setDoc(docRef, { ...state, updatedAt: Date.now() }, { merge: true });
+    if (typeof window !== "undefined") {
+      localStorage.setItem("edadmin_kbc_state_isolated", JSON.stringify(state));
+    }
+  } catch (err: any) {
+    console.error("Error saving kbc state:", err);
+    throw err;
+  }
+}
+
+export function subscribeKbcState(callback: (state: any) => void) {
+  if (isIsolatedRemix()) {
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("edadmin_remix_db_kbc_state") || localStorage.getItem("edadmin_kbc_state_isolated");
+      if (cached) {
+        try {
+          callback(JSON.parse(cached));
+        } catch (e) {
+          console.warn("Could not parse isolated local kbc state cache:", e);
+        }
+      }
+      const handleUpdate = (e: any) => {
+        if (e.detail) callback(e.detail);
+      };
+      window.addEventListener("edadmin_remix_db_update_kbc_state", handleUpdate);
+      return () => window.removeEventListener("edadmin_remix_db_update_kbc_state", handleUpdate);
+    }
+    return () => {};
+  }
+
+  const docRef = doc(firestore, COLLECTIONS.KBC_STATE, "main");
+  return onSnapshot(
+    docRef, 
+    (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        callback(data);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("edadmin_kbc_state_isolated", JSON.stringify(data));
+        }
+      }
+    },
+    (error) => {
+      console.warn("Firestore kbc state subscription notice:", error?.message || error);
     }
   );
 }
