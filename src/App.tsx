@@ -133,6 +133,7 @@ export default function App() {
         onLoginSuccess={() => setIsAuthenticated(true)}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+        config={config}
       />
     );
   }

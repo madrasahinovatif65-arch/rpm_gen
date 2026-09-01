@@ -7,14 +7,16 @@ interface LoginViewProps {
   onLoginSuccess: () => void;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
+  config?: any;
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({
   onLoginSuccess,
   isDarkMode,
   onToggleDarkMode,
+  config
 }) => {
-  const [username, setUsername] = useState("www.yefriharyanto.id");
+  const [username, setUsername] = useState("madrasahinovatif");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -31,7 +33,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
     setErrorMsg(null);
 
     try {
-      let validUsername = "www.yefriharyanto.id";
+      let validUsername = "madrasahinovatif";
       let validPassword = "123456";
 
       try {
@@ -46,19 +48,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
         console.warn("Notice: Using fallback credentials due to Firestore config fetch notice:", dbErr);
       }
 
-      const inputUsername = String(username).trim().toUpperCase();
-      const expectedUsername = String(validUsername).trim().toUpperCase();
-      const isUsernameMatch = inputUsername === expectedUsername || inputUsername === "ARDI YOKA" || inputUsername === "WWW.YEFRIHARYANTO.ID";
+        const inputUsername = String(username).trim().toLowerCase();
+        const expectedUsername = String(validUsername).trim().toLowerCase();
+        const isUsernameMatch = inputUsername === expectedUsername || inputUsername === "ardi yoka" || inputUsername === "madrasahinovatif";
 
-      if (isUsernameMatch && String(password).trim() === validPassword) {
-        const timestamp = Date.now();
-        const token = btoa(`${String(username).trim()}:${timestamp}:edadmin_pro_secure_session`);
-        localStorage.setItem("edadmin_auth_token", token);
-        localStorage.setItem("edadmin_user", JSON.stringify({
-          username: "www.yefriharyanto.id",
-          nama: "www.yefriharyanto.id",
-          role: "Administrator Guru"
-        }));
+        if (isUsernameMatch && String(password).trim() === validPassword) {
+          const timestamp = Date.now();
+          const token = btoa(`${String(username).trim()}:${timestamp}:edadmin_pro_secure_session`);
+          localStorage.setItem("edadmin_auth_token", token);
+          localStorage.setItem("edadmin_user", JSON.stringify({
+            username: "madrasahinovatif",
+            nama: "Madrasah Inovatif",
+            role: "Administrator Guru"
+          }));
         onLoginSuccess();
       } else {
         setErrorMsg("Username atau Password yang Anda masukkan tidak valid.");
@@ -73,9 +75,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-4 sm:p-6 transition-colors font-sans relative overflow-hidden">
-      {/* Background Decorative Blur Spheres */}
-      <div className="absolute top-[-10%] left-[-10%] w-[450px] h-[450px] bg-blue-500/10 dark:bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-500/10 dark:bg-emerald-600/15 rounded-full blur-3xl pointer-events-none" />
+      {/* Background Decorative Blur Spheres - Madrasah Green Theme */}
+      <div className="absolute top-[-10%] left-[-10%] w-[450px] h-[450px] bg-emerald-500/10 dark:bg-emerald-600/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-500/10 dark:bg-teal-600/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Bar Theme Toggle */}
       <div className="absolute top-4 right-4 z-20">
@@ -103,8 +105,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <div className="w-full max-w-md z-10 space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-400 text-slate-950 font-black shadow-lg shadow-amber-400/20 transform hover:scale-105 transition-transform">
-            <GraduationCap className="w-10 h-10 text-slate-950" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white shadow-lg shadow-emerald-400/20 transform hover:scale-105 transition-transform overflow-hidden">
+            {config?.Logo_Kiri ? (
+              <img src={config.Logo_Kiri} alt="Logo" className="w-full h-full object-contain p-2" />
+            ) : (
+              <GraduationCap className="w-10 h-10 text-emerald-600" />
+            )}
           </div>
 
           <div>
@@ -121,7 +127,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
         <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-2xl space-y-6">
           <div className="space-y-1">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <LogIn className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <LogIn className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               <span>Masuk Akses Terotentikasi</span>
             </h2>
           </div>
@@ -169,7 +175,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-11 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm transition-all font-medium"
+                  className="w-full pl-10 pr-11 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-sm transition-all font-medium"
                 />
                 <button
                   type="button"
@@ -186,7 +192,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-500/25 active:scale-95 transition-all flex items-center justify-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 active:scale-95 transition-all flex items-center justify-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <>
@@ -211,7 +217,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
         {/* Footer Credit */}
         <p className="text-center text-[11px] text-slate-500 dark:text-slate-500 font-medium">
-          Hak Cipta &copy; {new Date().getFullYear()} EdAdmin Pro &bull; www.yefriharyanto.id
+          Hak Cipta &copy; {new Date().getFullYear()} Aplikasi Guru AI &bull; Madrasah Inovatif
         </p>
       </div>
     </div>
