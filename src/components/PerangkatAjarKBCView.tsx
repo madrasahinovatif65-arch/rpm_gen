@@ -35,9 +35,10 @@ import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 
 interface PerangkatAjarKBCViewProps {
   config?: Pengaturan;
+  onNavigateToCP?: () => void;
 }
 
-export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ config }) => {
+export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ config, onNavigateToCP }) => {
   const [activeDoc, setActiveDoc] = useState<
     "analisis_cp" | "tp" | "atp" | "prota" | "prosem" | "kktp" | "modul_ajar" | "lkpd" | "rubrik"
   >("analisis_cp");
@@ -158,36 +159,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         elemen: "Elemen Pemahaman Konsep: Peserta didik mampu menganalisis dan menjelaskan ruang lingkup materi secara mendalam dan komprehensif.\n\nElemen Keterampilan Proses: Peserta didik mampu mengamati, menanya, mengeksplorasi, merumuskan kesimpulan, serta mengkomunikasikan hasil karya secara lisan maupun tulisan."
       }
     }));
-    notifySimpanSuccess("Template CP Kemenag berhasil dimuat!");
-  };
-
-  const handleSaveCpTemplate = async () => {
-    if (!config) {
-      notifySimpanError("Gagal menyimpan: Konfigurasi Firebase tidak ditemukan.");
-      return;
-    }
-    const templateName = window.prompt("Masukkan nama untuk template CP ini (misal: 'CP Fikih Fase E'):");
-    if (!templateName) return;
-
-    const newTemplate = {
-      id: Date.now().toString(),
-      name: templateName,
-      rasional: formData.cpRasional,
-      elemen: formData.cpElemen
-    };
-
-    const updatedConfig = {
-      ...config,
-      cpTemplates: [...(config.cpTemplates || []), newTemplate]
-    };
-
-    try {
-      await savePengaturan(updatedConfig);
-      notifySimpanSuccess(`Template "${templateName}" berhasil disimpan ke Firebase!`);
-    } catch (err) {
-      notifySimpanError("Gagal menyimpan template CP ke Firebase.");
-      console.error(err);
-    }
   };
 
   const handleSelectCpTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -211,25 +182,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       notifySimpanSuccess(`Template "${template.name}" berhasil dimuat!`);
     }
     e.target.value = "";
-  };
-
-  const handleDeleteCpTemplate = async (templateId: string, templateName: string) => {
-    if (!config) return;
-    const confirm = window.confirm(`Apakah Anda yakin ingin menghapus template "${templateName}" dari Firebase?`);
-    if (!confirm) return;
-
-    const updatedConfig = {
-      ...config,
-      cpTemplates: config.cpTemplates?.filter(t => t.id !== templateId) || []
-    };
-
-    try {
-      await savePengaturan(updatedConfig);
-      notifySimpanSuccess(`Template "${templateName}" berhasil dihapus.`);
-    } catch (err) {
-      notifySimpanError("Gagal menghapus template CP dari Firebase.");
-      console.error(err);
-    }
   };
 
 
@@ -693,20 +645,11 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               </label>
               <div className="flex items-center gap-2 mt-2 sm:mt-0">
                 <select 
-                  onChange={(e) => {
-                    if (e.target.value.startsWith('del_')) {
-                      const id = e.target.value.replace('del_', '');
-                      const t = config?.cpTemplates?.find(x => x.id === id);
-                      if (t) handleDeleteCpTemplate(id, t.name);
-                    } else {
-                      handleSelectCpTemplate(e);
-                    }
-                    e.target.value = "";
-                  }}
+                  onChange={handleSelectCpTemplate}
                   className="text-xs px-2 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-slate-700 dark:text-slate-300"
                   defaultValue=""
                 >
-                  <option value="" disabled>📝 Pilih / Kelola Template...</option>
+                  <option value="" disabled>📝 Pilih CP dari Database...</option>
                   <option value="default_kbc">🔄 Template Bawaan KBC</option>
                   {config?.cpTemplates && config.cpTemplates.length > 0 && (
                     <optgroup label="Template Tersimpan">
@@ -715,21 +658,14 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                       ))}
                     </optgroup>
                   )}
-                  {config?.cpTemplates && config.cpTemplates.length > 0 && (
-                    <optgroup label="Hapus Template">
-                      {config.cpTemplates.map(t => (
-                        <option key={`del_${t.id}`} value={`del_${t.id}`}>❌ Hapus: {t.name}</option>
-                      ))}
-                    </optgroup>
-                  )}
                 </select>
                 <button
-                  onClick={handleSaveCpTemplate}
-                  className="text-[10px] bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 px-2 py-1.5 rounded-lg font-bold transition flex items-center space-x-1 border border-emerald-300 dark:border-emerald-800"
-                  title="Simpan teks CP ini sebagai template baru"
+                  onClick={onNavigateToCP}
+                  className="text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1.5 rounded-lg font-bold transition flex items-center space-x-1 border border-slate-300 dark:border-slate-600"
+                  title="Kelola Database CP Elemen"
                 >
-                  <Save className="w-3 h-3" />
-                  <span>Simpan Template</span>
+                  <Settings className="w-3 h-3" />
+                  <span className="hidden sm:inline">Kelola Database</span>
                 </button>
               </div>
             </div>

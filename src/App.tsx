@@ -11,7 +11,8 @@ import {
   Wand2,
   Bot,
   Globe,
-  HeartHandshake
+  HeartHandshake,
+  Database
 } from "lucide-react";
 import { Sidebar } from "./components/Sidebar";
 import { Header } from "./components/Header";
@@ -22,6 +23,7 @@ import { ModulAjarAIView } from "./components/ModulAjarAIView";
 import { AsistenGuruAIView } from "./components/AsistenGuruAIView";
 import { GeneratorLkpdAIView } from "./components/GeneratorLkpdAIView";
 import { GeneratorAILainnyaView } from "./components/GeneratorAILainnyaView";
+import { CPDatabaseView } from "./components/CPDatabaseView";
 import { PengaturanView } from "./components/PengaturanView";
 import { ResetDatabaseView } from "./components/ResetDatabaseView";
 import { LoginView } from "./components/LoginView";
@@ -49,6 +51,7 @@ const DEFAULT_CONFIG: Pengaturan = {
 const AI_TOOLS_ITEMS = [
   { id: "downloadperangkat", label: "Download Perangkat Ajar", icon: Download, desc: "Download RPP/Modul Ajar terlengkap", badge: "Download" },
   { id: "perangkat_kbc", label: "Perangkat Ajar KBC", icon: HeartHandshake, desc: "ACP, TP, ATP, Prota, Prosem, KKTP, Modul, LKPD & Rubrik KBC", badge: "KBC" },
+  { id: "cp_database", label: "Database CP Elemen", icon: Database, desc: "Kelola template Capaian Pembelajaran", badge: "Database" },
   { id: "modulai", label: "Modul Ajar AI", icon: Wand2, desc: "Susun Modul Ajar Deep Learning Kurikulum Merdeka", badge: "Deep Learning" },
   { id: "asistenai", label: "Asisten Guru AI", icon: Bot, desc: "Tanya jawab & konsultasi materi mengajar", badge: "Chatbot" },
   { id: "lkpdai", label: "Generator LKPD AI", icon: Sparkles, desc: "Buat Lembar Kerja Peserta Didik interaktif", badge: "LKPD" },
@@ -200,7 +203,8 @@ export default function App() {
           )}
 
           {activeTab === "downloadperangkat" && <DownloadPerangkatAjarView />}
-          {activeTab === "perangkat_kbc" && <PerangkatAjarKBCView config={config} />}
+          {activeTab === "perangkat_kbc" && <PerangkatAjarKBCView config={config} onNavigateToCP={() => setActiveTab("cp_database")} />}
+          {activeTab === "cp_database" && <CPDatabaseView config={config} />}
           {activeTab === "modulai" && <ModulAjarAIView config={config} />}
           {activeTab === "asistenai" && <AsistenGuruAIView config={config} />}
           {activeTab === "lkpdai" && <GeneratorLkpdAIView config={config} />}
