@@ -332,12 +332,53 @@ export const ProsemRenderer: React.FC<RendererProps> = ({ data, context }) => {
                 <Td align="center"><strong>{item.kodeTp}</strong></Td>
                 <Td>{item.rumusanTp}</Td>
                 <Td align="center"><strong>{item.alokasiJp}</strong></Td>
-                <Td>
-                  {Object.entries(item.bulanMinggu || {}).map(([bulan, m]) => (
-                    <div key={bulan} style={{ marginBottom: '4px' }}>
-                      <strong>{bulan}:</strong> M1({m[0]||0}), M2({m[1]||0}), M3({m[2]||0}), M4({m[3]||0}), M5({m[4]||0})
-                    </div>
-                  ))}
+                <Td style={{ padding: 0 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <tbody>
+                      {Object.entries(item.bulanMinggu || {}).map(([bulan, m], idx) => (
+                        <tr key={bulan}>
+                          <td style={{ width: '80px', padding: '4px', fontSize: '10px', borderRight: '1px solid #ddd', borderBottom: idx < Object.keys(item.bulanMinggu || {}).length - 1 ? '1px solid #ddd' : 'none' }}>
+                            <strong>{bulan}</strong>
+                          </td>
+                          {[0, 1, 2, 3, 4].map(weekIdx => {
+                            const jpVal = m[weekIdx] || 0;
+                            // Matrix styling
+                            let bgColor = 'transparent';
+                            let textColor = '#000';
+                            
+                            if (jpVal > 0) {
+                              bgColor = '#10b981'; // emerald-500
+                              textColor = '#fff';
+                            } else if (jpVal === 0 && (bulan.toLowerCase().includes('juli') && weekIdx < 2)) {
+                              bgColor = '#ef4444'; // red-500 (Libur)
+                            } else if (jpVal === 0 && (bulan.toLowerCase().includes('desember') && weekIdx > 2)) {
+                              bgColor = '#ef4444'; // Libur
+                            } else if (jpVal === 0) {
+                              bgColor = '#f1f5f9'; // slate-100 (Kosong/Abu)
+                            }
+
+                            return (
+                              <td 
+                                key={weekIdx} 
+                                style={{ 
+                                  width: '20%', 
+                                  textAlign: 'center', 
+                                  backgroundColor: bgColor,
+                                  color: textColor,
+                                  borderRight: weekIdx < 4 ? '1px solid #ddd' : 'none',
+                                  borderBottom: idx < Object.keys(item.bulanMinggu || {}).length - 1 ? '1px solid #ddd' : 'none',
+                                  padding: '4px'
+                                }}
+                                title={`Minggu ${weekIdx + 1}: ${jpVal} JP`}
+                              >
+                                {jpVal > 0 ? jpVal : ''}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </Td>
               </tr>
             ))}

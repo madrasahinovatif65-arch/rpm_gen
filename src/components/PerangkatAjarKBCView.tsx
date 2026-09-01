@@ -567,38 +567,73 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900">
-              <div>
-                <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Kode TP</label>
-                <input
-                  type="text"
+              <div className="md:col-span-3">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="font-bold text-slate-800 dark:text-slate-200">
+                    Pilih Tujuan Pembelajaran (Sumber Data: Tab Administrasi KBC)
+                  </label>
+                  {generatedJson["tp"] ? (
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center">
+                      <CheckCircle className="w-3 h-3 mr-1" /> Tersinkronisasi
+                    </span>
+                  ) : (
+                    <span className="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center">
+                      <AlertTriangle className="w-3 h-3 mr-1" /> TP Belum Digenerate
+                    </span>
+                  )}
+                </div>
+                
+                <select
                   value={formDataModul.kodeTp}
-                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, kodeTp: e.target.value } }))}
-                  placeholder="misal: TP.IPA.KPS.7.01 / TP.AA.ELE.10.01"
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold text-emerald-700 dark:text-emerald-400"
-                />
+                  disabled={!generatedJson["tp"]?.daftarTp}
+                  onChange={(e) => {
+                    const selectedKode = e.target.value;
+                    const tpList = generatedJson["tp"]?.daftarTp || [];
+                    const selectedTp = tpList.find((t: any) => t.kodeTp === selectedKode);
+                    if (selectedTp) {
+                      updateState(s => ({ 
+                        ...s, 
+                        module: { 
+                          ...s.module, 
+                          kodeTp: selectedTp.kodeTp,
+                          elemenCp: selectedTp.elemen,
+                          rumusanTp: selectedTp.rumusanTp
+                        } 
+                      }));
+                    }
+                  }}
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold text-emerald-700 dark:text-emerald-400 cursor-pointer disabled:opacity-50"
+                >
+                  <option value="">-- {generatedJson["tp"]?.daftarTp ? "Silakan Pilih TP..." : "Generate TP di Tab 1 Terlebih Dahulu"} --</option>
+                  {(generatedJson["tp"]?.daftarTp || []).map((tp: any, i: number) => (
+                    <option key={i} value={tp.kodeTp}>
+                      [{tp.kodeTp}] - {tp.elemen} - {tp.rumusanTp.substring(0, 100)}...
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
-                <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Elemen CP</label>
+                <label className="font-bold text-slate-500 dark:text-slate-400 block mb-1">Elemen CP (Read-Only)</label>
                 <input
                   type="text"
                   value={formDataModul.elemenCp}
-                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, elemenCp: e.target.value } }))}
-                  placeholder="misal: Akidah / Pemahaman IPA"
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+                  readOnly
+                  placeholder="Terisi otomatis dari TP..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 font-semibold text-slate-500"
                 />
               </div>
 
-              <div className="md:col-span-3">
-                <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
-                  Rumusan Lengkap Tujuan Pembelajaran (TP)
+              <div className="md:col-span-2">
+                <label className="font-bold text-slate-500 dark:text-slate-400 block mb-1">
+                  Rumusan Lengkap Tujuan Pembelajaran (Read-Only)
                 </label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={formDataModul.rumusanTp}
-                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, rumusanTp: e.target.value } }))}
-                  placeholder="Rumusan lengkap TP yang akan dicapai..."
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold text-slate-900 dark:text-slate-100 leading-relaxed"
+                  readOnly
+                  placeholder="Terisi otomatis dari TP..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 font-semibold text-slate-500 leading-relaxed"
                 />
               </div>
             </div>
