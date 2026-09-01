@@ -28,9 +28,10 @@ import { useKbcState, defaultKbcState } from "../store/kbcState";
 import { subscribeToJobs, enqueueJob, AIJob } from "../lib/aiJobManager";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
 import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
+import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 
 interface PerangkatAjarKBCViewProps {
-  config: Pengaturan;
+  config?: Pengaturan;
 }
 
 export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ config }) => {
@@ -123,6 +124,44 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       module: defaultKbcState.module
     }));
     notifySimpanSuccess("Contoh data Khusus Modul Ajar, LKPD & Rubrik KBC berhasil dimuat!");
+  };
+
+  const handleAutofillFromProfile = () => {
+    if (!config) {
+      notifySimpanError("Gagal mengambil data profil pengaturan.");
+      return;
+    }
+    updateState((prev) => ({
+      ...prev,
+      school: {
+        ...prev.school,
+        kemenagOffice: config.Pemerintah || prev.school.kemenagOffice,
+        schoolName: config.Nama_Sekolah || prev.school.schoolName,
+        teacherName: config.Nama_Guru || prev.school.teacherName,
+        teacherNip: config.NIP_Guru || prev.school.teacherNip,
+        headmasterName: config.Nama_Kepsek || prev.school.headmasterName,
+        headmasterNip: config.NIP_Kepsek || prev.school.headmasterNip,
+        cityDate: `${config.Tempat_Tanda_Tangan || "Kota"}, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`
+      }
+    }));
+    notifySimpanSuccess("Berhasil menyalin data dari Profil Madrasah!");
+  };
+
+  const handleSubjectChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const value = e.target.value;
+    updateState(s => {
+      let newState = { ...s, curriculum: { ...s.curriculum, subject: value } };
+      
+      // Auto-fill singkatan jika mapel terdaftar
+      const foundMapel = DATA_MAPEL_KEMENAG.find(m => m.namaMapel === value);
+      if (foundMapel) {
+        newState.curriculum.singkatanMapel = foundMapel.singkatan;
+      } else if (value === "Lainnya") {
+        newState.curriculum.subject = ""; // Reset let user type
+      }
+      
+      return newState;
+    });
   };
 
   const sanitizeHtmlForOutput = (rawHtml: string) => {
@@ -358,13 +397,23 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               <Building2 className="w-5 h-5 text-emerald-600" />
               <span>Data Identitas Madrasah & Capaian Pembelajaran (Dokumen Administrasi 1-6)</span>
             </h3>
-            <button
-              onClick={handleFillSample}
-              className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1.5 cursor-pointer"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Isi Contoh Administrasi</span>
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAutofillFromProfile}
+                className="bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1.5 cursor-pointer border border-amber-300 dark:border-amber-800"
+                title="Isi Otomatis dari Tab Pengaturan"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Isi dari Profil</span>
+              </button>
+              <button
+                onClick={handleFillSample}
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1.5 cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Isi Contoh Manual</span>
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
@@ -390,12 +439,27 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Mata Pelajaran</label>
-              <input
-                type="text"
-                value={formData.subject}
-                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, subject: e.target.value } }))}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-              />
+              {!DATA_MAPEL_KEMENAG.some(m => m.namaMapel === formData.subject) && formData.subject !== "" && !["Lainnya"].includes(formData.subject) ? (
+                <input
+                  type="text"
+                  value={formData.subject}
+                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, subject: e.target.value } }))}
+                  placeholder="Ketik nama mapel lokal..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+                />
+              ) : (
+                <select
+                  value={DATA_MAPEL_KEMENAG.some(m => m.namaMapel === formData.subject) ? formData.subject : (formData.subject === "" ? "" : "Lainnya")}
+                  onChange={handleSubjectChange}
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+                >
+                  <option value="" disabled>Pilih Mata Pelajaran...</option>
+                  {DATA_MAPEL_KEMENAG.map(m => (
+                    <option key={m.id} value={m.namaMapel}>{m.namaMapel}</option>
+                  ))}
+                  <option value="Lainnya">Lainnya (Ketik Manual)...</option>
+                </select>
+              )}
             </div>
 
             <div>
