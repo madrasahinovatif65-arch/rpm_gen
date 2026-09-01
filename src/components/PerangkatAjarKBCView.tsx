@@ -137,10 +137,10 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         ...prev.school,
         kemenagOffice: config.Pemerintah || prev.school.kemenagOffice,
         schoolName: config.Nama_Sekolah || prev.school.schoolName,
-        teacherName: config.Nama_Guru || prev.school.teacherName,
-        teacherNip: config.NIP_Guru || prev.school.teacherNip,
-        headmasterName: config.Nama_Kepsek || prev.school.headmasterName,
-        headmasterNip: config.NIP_Kepsek || prev.school.headmasterNip,
+        teacher: config.Nama_Guru || prev.school.teacher,
+        nipTeacher: config.NIP_Guru || prev.school.nipTeacher,
+        principal: config.Nama_Kepsek || prev.school.principal,
+        nipPrincipal: config.NIP_Kepsek || prev.school.nipPrincipal,
         cityDate: `${config.Tempat_Tanda_Tangan || "Kota"}, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`
       }
     }));
