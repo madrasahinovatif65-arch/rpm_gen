@@ -11,17 +11,7 @@ import {
   writeBatch
 } from "firebase/firestore";
 import firebaseConfigData from "../../firebase-applet-config.json";
-import { 
-  Siswa, 
-  Mapel, 
-  Jadwal, 
-  LogAbsensi, 
-  DataNilai, 
-  JurnalAgenda, 
-  SiswaBimbingan, 
-  BimbinganWali, 
-  Pengaturan 
-} from "../types";
+import { Pengaturan } from "../types";
 
 // Firebase Configuration dynamically resolved from Environment Variables
 const firebaseConfig = {
@@ -89,14 +79,6 @@ export const firestore = firestoreInstance;
 
 // Collections references
 export const COLLECTIONS = {
-  SISWA: "data_siswa",
-  MAPEL: "mapel",
-  JADWAL: "jadwal",
-  LOG_ABSENSI: "log_absensi",
-  DATA_NILAI: "data_nilai",
-  JURNAL_AGENDA: "jurnal_agenda",
-  SISWA_BIMBINGAN: "siswa_bimbingan",
-  BIMBINGAN_WALI: "bimbingan_wali",
   PENGATURAN: "pengaturan"
 };
 
@@ -308,16 +290,7 @@ export function subscribePengaturan(callback: (config: Pengaturan) => void) {
 export async function clearAllDatabaseCollections() {
   localStorage.setItem("edadmin_database_cleared", "true");
 
-  const collectionsToClear = [
-    COLLECTIONS.SISWA,
-    COLLECTIONS.MAPEL,
-    COLLECTIONS.JADWAL,
-    COLLECTIONS.LOG_ABSENSI,
-    COLLECTIONS.DATA_NILAI,
-    COLLECTIONS.JURNAL_AGENDA,
-    COLLECTIONS.SISWA_BIMBINGAN,
-    COLLECTIONS.BIMBINGAN_WALI
-  ];
+  const collectionsToClear: string[] = [];
 
   // 1. Always purge local storage fallback for all collections & dispatch update events
   collectionsToClear.forEach((colName) => {

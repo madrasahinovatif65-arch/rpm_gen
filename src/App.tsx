@@ -1,35 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { 
   PieChart, 
-  GraduationCap, 
   Sparkles, 
-  Printer,
-  Clock, 
-  ClipboardCheck, 
-  Star, 
-  Calendar, 
-  HeartHandshake, 
-  Download, 
-  FileCheck, 
-  Wand2, 
-  Bot, 
-  Globe, 
   Settings,
   ChevronRight,
   X,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Download,
+  FileCheck,
+  Wand2,
+  Bot,
+  Globe,
+  HeartHandshake
 } from "lucide-react";
 import { Sidebar } from "./components/Sidebar";
 import { Header } from "./components/Header";
 import { DashboardView } from "./components/DashboardView";
-import { KelolaSiswaView } from "./components/KelolaSiswaView";
-import { CetakKartuQRView } from "./components/CetakKartuQRView";
-import { KelolaMapelView } from "./components/KelolaMapelView";
-import { JadwalMengajarView } from "./components/JadwalMengajarView";
-import { InputAbsensiView } from "./components/InputAbsensiView";
-import { InputPenilaianView } from "./components/InputPenilaianView";
-import { AgendaMengajarView } from "./components/AgendaMengajarView";
-import { BimbinganWaliView } from "./components/BimbinganWaliView";
 import { DownloadPerangkatAjarView } from "./components/DownloadPerangkatAjarView";
 import { PerangkatAjarKBCView } from "./components/PerangkatAjarKBCView";
 import { GeneratorPerangkatAjarAIView } from "./components/GeneratorPerangkatAjarAIView";
@@ -37,30 +23,16 @@ import { ModulAjarAIView } from "./components/ModulAjarAIView";
 import { AsistenGuruAIView } from "./components/AsistenGuruAIView";
 import { GeneratorLkpdAIView } from "./components/GeneratorLkpdAIView";
 import { GeneratorAILainnyaView } from "./components/GeneratorAILainnyaView";
-import { PusatLaporanView } from "./components/PusatLaporanView";
 import { PengaturanView } from "./components/PengaturanView";
 import { ResetDatabaseView } from "./components/ResetDatabaseView";
 import { LoginView } from "./components/LoginView";
 
 import { 
-  subscribeCollection, 
   subscribePengaturan, 
-  batchSaveDocuments, 
   savePengaturan,
-  COLLECTIONS 
 } from "./lib/firebase";
 
-import { 
-  Siswa, 
-  Mapel, 
-  Jadwal, 
-  LogAbsensi, 
-  DataNilai, 
-  JurnalAgenda, 
-  SiswaBimbingan, 
-  BimbinganWali, 
-  Pengaturan 
-} from "./types";
+import { Pengaturan } from "./types";
 
 const DEFAULT_CONFIG: Pengaturan = {
   Nama_Guru: "Drs. Yefri Haryanto, M.Pd.",
@@ -75,17 +47,8 @@ const DEFAULT_CONFIG: Pengaturan = {
   Logo_Kanan: "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU"
 };
 
-// Sub-Menu Categories Definitions for Complete Android Navigation
-const AKADEMIK_ITEMS = [
-  { id: "jadwal", label: "Jadwal Mengajar", icon: Clock, desc: "Kelola & cetak jadwal pelajaran" },
-  { id: "absensi", label: "Input Absensi", icon: ClipboardCheck, desc: "Pencatatan kehadiran harian siswa" },
-  { id: "penilaian", label: "Input Penilaian", icon: Star, desc: "Rekap & input nilai formatif/sumatif" },
-  { id: "agenda", label: "Agenda Mengajar", icon: Calendar, desc: "Jurnal kegiatan belajar harian guru" },
-  { id: "bimbingan", label: "Bimbingan Guru Wali", icon: HeartHandshake, desc: "Catatan bimbingan & konseling wali kelas" },
-  { id: "downloadperangkat", label: "Download Perangkat Ajar", icon: Download, desc: "Download RPP/Modul Ajar terlengkap" },
-];
-
 const AI_TOOLS_ITEMS = [
+  { id: "downloadperangkat", label: "Download Perangkat Ajar", icon: Download, desc: "Download RPP/Modul Ajar terlengkap", badge: "Download" },
   { id: "perangkat_kbc", label: "Perangkat Ajar KBC", icon: HeartHandshake, desc: "ACP, TP, ATP, Prota, Prosem, KKTP, Modul, LKPD & Rubrik KBC", badge: "KBC" },
   { id: "perangkat_ai", label: "Generator Perangkat Ajar AI", icon: FileCheck, desc: "Buat RPP & ATP otomatis dengan AI", badge: "AI Pro" },
   { id: "modulai", label: "Modul Ajar AI", icon: Wand2, desc: "Susun Modul Ajar Deep Learning Kurikulum Merdeka", badge: "Deep Learning" },
@@ -94,18 +57,13 @@ const AI_TOOLS_ITEMS = [
   { id: "ailainnya", label: "Generator AI Lainnya", icon: Globe, desc: "Generator Soal, Silabus, Rubrik Asesmen & Media", badge: "Multi-Tool" },
 ];
 
-const LAPORAN_ITEMS = [
-  { id: "laporan", label: "Pusat Laporan", icon: Printer, desc: "Cetak Rekap Absensi, Leger & Jurnal PDF" },
-  { id: "pengaturan", label: "Pengaturan Profil & Kop", icon: Settings, desc: "Atur data guru, sekolah & kop dokumen" },
-];
-
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return Boolean(localStorage.getItem("edadmin_auth_token"));
   });
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeCategorySheet, setActiveCategorySheet] = useState<"akademik" | "ai" | "laporan" | null>(null);
+  const [activeCategorySheet, setActiveCategorySheet] = useState<"ai" | null>(null);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     return localStorage.getItem("edadmin_theme") === "dark";
   });
@@ -124,58 +82,17 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // Firestore Data Collections
-  const [siswaList, setSiswaList] = useState<Siswa[]>([]);
-  const [mapelList, setMapelList] = useState<Mapel[]>([]);
-  const [jadwalList, setJadwalList] = useState<Jadwal[]>([]);
-  const [absensiList, setAbsensiList] = useState<LogAbsensi[]>([]);
-  const [nilaiList, setNilaiList] = useState<DataNilai[]>([]);
-  const [agendaList, setAgendaList] = useState<JurnalAgenda[]>([]);
-  const [siswaBimbinganList, setSiswaBimbinganList] = useState<SiswaBimbingan[]>([]);
-  const [bimbinganList, setBimbinganList] = useState<BimbinganWali[]>([]);
   const [config, setConfig] = useState<Pengaturan>(DEFAULT_CONFIG);
 
   // Subscribe to Firebase real-time collections
   useEffect(() => {
     let unsubs: Array<() => void> = [];
 
-    unsubs.push(subscribeCollection<Siswa>(COLLECTIONS.SISWA, (data) => {
-      setSiswaList(data);
-      setIsConnected(true);
-    }));
-
-    unsubs.push(subscribeCollection<Mapel>(COLLECTIONS.MAPEL, (data) => {
-      setMapelList(data);
-    }));
-
-    unsubs.push(subscribeCollection<Jadwal>(COLLECTIONS.JADWAL, (data) => {
-      setJadwalList(data);
-    }));
-
-    unsubs.push(subscribeCollection<LogAbsensi>(COLLECTIONS.LOG_ABSENSI, (data) => {
-      setAbsensiList(data);
-    }));
-
-    unsubs.push(subscribeCollection<DataNilai>(COLLECTIONS.DATA_NILAI, (data) => {
-      setNilaiList(data);
-    }));
-
-    unsubs.push(subscribeCollection<JurnalAgenda>(COLLECTIONS.JURNAL_AGENDA, (data) => {
-      setAgendaList(data);
-    }));
-
-    unsubs.push(subscribeCollection<SiswaBimbingan>(COLLECTIONS.SISWA_BIMBINGAN, (data) => {
-      setSiswaBimbinganList(data);
-    }));
-
-    unsubs.push(subscribeCollection<BimbinganWali>(COLLECTIONS.BIMBINGAN_WALI, (data) => {
-      setBimbinganList(data);
-    }));
-
     unsubs.push(subscribePengaturan((cfg) => {
       if (cfg && Object.keys(cfg).length > 0) {
         setConfig((prev) => ({ ...prev, ...cfg }));
       }
+      setIsConnected(true);
     }));
 
     return () => {
@@ -183,10 +100,9 @@ export default function App() {
     };
   }, []);
 
-  // Seed sample initial data if database is empty on first boot
+  // Save initial config if empty
   useEffect(() => {
     const seedInitialData = async () => {
-      // Do not re-seed sample data if database was explicitly cleared/wiped by user
       if (
         localStorage.getItem("edadmin_database_cleared") === "true" ||
         config?.isDatabaseCleared === true
@@ -194,56 +110,15 @@ export default function App() {
         return;
       }
 
-      // Seed Siswa if empty
-      if (siswaList.length === 0 && isConnected) {
-        const sampleSiswa: Siswa[] = [
-          { id: "1001", nisn: "0012345678", nama: "Ahmad Fulan", kelas: "VII A" },
-          { id: "1002", nisn: "0012345679", nama: "Siti Aminah", kelas: "VII A" },
-          { id: "1003", nisn: "0012345680", nama: "Budi Pratama", kelas: "VII B" },
-          { id: "1004", nisn: "0012345681", nama: "Rizky Febrian", kelas: "VII B" }
-        ];
-        await batchSaveDocuments(COLLECTIONS.SISWA, sampleSiswa);
-      }
-
-      // Seed Mapel if empty
-      if (mapelList.length === 0 && isConnected) {
-        const sampleMapel: Mapel[] = [
-          { id: "m1", namaMapel: "Informatika", semester: "Ganjil", tahunAjaran: "2026/2027" },
-          { id: "m2", namaMapel: "Matematika", semester: "Ganjil", tahunAjaran: "2026/2027" },
-          { id: "m3", namaMapel: "Bahasa Indonesia", semester: "Ganjil", tahunAjaran: "2026/2027" },
-          { id: "m4", namaMapel: "IPA Terpadu", semester: "Ganjil", tahunAjaran: "2026/2027" }
-        ];
-        await batchSaveDocuments(COLLECTIONS.MAPEL, sampleMapel);
-      }
-
-      // Seed Jadwal if empty
-      if (jadwalList.length === 0 && isConnected) {
-        const sampleJadwal: Jadwal[] = [
-          { id: "j1", hari: "Senin", jam: "07:30 - 09:00", kelas: "VII A", mapel: "Informatika" },
-          { id: "j2", hari: "Selasa", jam: "09:15 - 10:45", kelas: "VII B", mapel: "Informatika" }
-        ];
-        await batchSaveDocuments(COLLECTIONS.JADWAL, sampleJadwal);
-      }
-
-      // Save initial config if empty
       if (!config.Nama_Guru && isConnected) {
         await savePengaturan(DEFAULT_CONFIG);
       }
     };
-
     seedInitialData();
-  }, [isConnected, siswaList.length, mapelList.length, jadwalList.length, config.Nama_Guru, config.isDatabaseCleared]);
+  }, [isConnected, config.Nama_Guru, config.isDatabaseCleared]);
 
   const handleSuccessReset = () => {
     setConfig((prev) => ({ ...prev, isDatabaseCleared: true }));
-    setSiswaList([]);
-    setMapelList([]);
-    setJadwalList([]);
-    setAbsensiList([]);
-    setNilaiList([]);
-    setAgendaList([]);
-    setSiswaBimbinganList([]);
-    setBimbinganList([]);
   };
 
   const handleLogout = () => {
@@ -285,39 +160,6 @@ export default function App() {
           onLogout={handleLogout}
         />
 
-        {/* Sub-Header Pill Navigation Bar for Complete Mobile Module Navigation */}
-        {AKADEMIK_ITEMS.some(item => item.id === activeTab) && (
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center space-x-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
-            <button 
-              onClick={() => setActiveCategorySheet("akademik")}
-              className="flex items-center space-x-1 pr-2 border-r border-slate-200 dark:border-slate-800 shrink-0 text-blue-600 dark:text-blue-400 font-extrabold text-xs active:scale-95 transition-transform cursor-pointer"
-              title="Buka Laci Menu Akademik"
-            >
-              <GraduationCap className="w-4 h-4" />
-              <span>Akademik:</span>
-              <SlidersHorizontal className="w-3 h-3 text-slate-400 ml-0.5" />
-            </button>
-            {AKADEMIK_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer active:scale-95 ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-xs"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
         {AI_TOOLS_ITEMS.some(item => item.id === activeTab) && (
           <div className="bg-amber-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-amber-200/50 dark:border-slate-800 px-3 py-2 flex items-center space-x-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
             <button 
@@ -350,125 +192,20 @@ export default function App() {
           </div>
         )}
 
-        {LAPORAN_ITEMS.some(item => item.id === activeTab) && (
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center space-x-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
-            <button 
-              onClick={() => setActiveCategorySheet("laporan")}
-              className="flex items-center space-x-1 pr-2 border-r border-slate-200 dark:border-slate-800 shrink-0 text-slate-700 dark:text-slate-300 font-extrabold text-xs active:scale-95 transition-transform cursor-pointer"
-              title="Buka Laci Menu Laporan"
-            >
-              <Printer className="w-4 h-4" />
-              <span>Laporan:</span>
-              <SlidersHorizontal className="w-3 h-3 text-slate-400 ml-0.5" />
-            </button>
-            {LAPORAN_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer active:scale-95 ${
-                    isActive
-                      ? "bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
         <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-8 custom-scrollbar pb-24 lg:pb-8">
           {activeTab === "dashboard" && (
             <DashboardView
-              siswaList={siswaList}
-              mapelList={mapelList}
-              absensiList={absensiList}
-              nilaiList={nilaiList}
-              jadwalList={jadwalList}
               onNavigate={(tab) => setActiveTab(tab)}
             />
           )}
 
-          {activeTab === "siswa" && <KelolaSiswaView siswaList={siswaList} />}
-
-          {activeTab === "kartu" && <CetakKartuQRView siswaList={siswaList} config={config} />}
-
-          {activeTab === "mapel" && <KelolaMapelView mapelList={mapelList} />}
-
-          {activeTab === "jadwal" && (
-            <JadwalMengajarView
-              jadwalList={jadwalList}
-              mapelList={mapelList}
-              siswaList={siswaList}
-            />
-          )}
-
-          {activeTab === "absensi" && (
-            <InputAbsensiView
-              siswaList={siswaList}
-              mapelList={mapelList}
-              absensiList={absensiList}
-              config={config}
-            />
-          )}
-
-          {activeTab === "penilaian" && (
-            <InputPenilaianView
-              siswaList={siswaList}
-              mapelList={mapelList}
-              nilaiList={nilaiList}
-              config={config}
-            />
-          )}
-
-          {activeTab === "agenda" && (
-            <AgendaMengajarView
-              agendaList={agendaList}
-              mapelList={mapelList}
-              siswaList={siswaList}
-              config={config}
-            />
-          )}
-
-          {activeTab === "bimbingan" && (
-            <BimbinganWaliView
-              bimbinganList={bimbinganList}
-              siswaBimbinganList={siswaBimbinganList}
-              siswaList={siswaList}
-              config={config}
-            />
-          )}
-
           {activeTab === "downloadperangkat" && <DownloadPerangkatAjarView />}
-
           {activeTab === "perangkat_kbc" && <PerangkatAjarKBCView config={config} />}
-
           {activeTab === "perangkat_ai" && <GeneratorPerangkatAjarAIView config={config} />}
-
           {activeTab === "modulai" && <ModulAjarAIView config={config} />}
-
           {activeTab === "asistenai" && <AsistenGuruAIView config={config} />}
-
           {activeTab === "lkpdai" && <GeneratorLkpdAIView config={config} />}
-
           {activeTab === "ailainnya" && <GeneratorAILainnyaView />}
-
-          {activeTab === "laporan" && (
-            <PusatLaporanView
-              siswaList={siswaList}
-              mapelList={mapelList}
-              absensiList={absensiList}
-              nilaiList={nilaiList}
-              agendaList={agendaList}
-              bimbinganList={bimbinganList}
-              config={config}
-            />
-          )}
 
           {activeTab === "pengaturan" && (
             <PengaturanView
@@ -482,7 +219,7 @@ export default function App() {
           )}
         </main>
 
-        {/* Native Android Bottom Navigation Bar (4 Utama Menu: Dashboard, Akademik, AI Tools, Laporan) */}
+        {/* Native Android Bottom Navigation Bar */}
         <nav 
           className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 z-30 px-2 py-1.5 pb-safe shadow-lg flex items-center justify-around transition-colors select-none"
           aria-label="Navigasi Bawah Android"
@@ -504,26 +241,9 @@ export default function App() {
 
           <button
             onClick={() => {
-              setActiveCategorySheet(activeCategorySheet === "akademik" ? null : "akademik");
-              if (!AKADEMIK_ITEMS.some(i => i.id === activeTab)) {
-                setActiveTab("absensi");
-              }
-            }}
-            className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
-              AKADEMIK_ITEMS.some(i => i.id === activeTab)
-                ? "text-blue-600 dark:text-blue-400 font-bold"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
-          >
-            <GraduationCap className={`w-5 h-5 ${AKADEMIK_ITEMS.some(i => i.id === activeTab) ? "scale-110" : ""}`} />
-            <span className="text-[11px] mt-0.5 tracking-tight truncate">Akademik</span>
-          </button>
-
-          <button
-            onClick={() => {
               setActiveCategorySheet(activeCategorySheet === "ai" ? null : "ai");
               if (!AI_TOOLS_ITEMS.some(i => i.id === activeTab)) {
-                setActiveTab("perangkat_ai");
+                setActiveTab("modulai");
               }
             }}
             className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
@@ -538,24 +258,22 @@ export default function App() {
 
           <button
             onClick={() => {
-              setActiveCategorySheet(activeCategorySheet === "laporan" ? null : "laporan");
-              if (!LAPORAN_ITEMS.some(i => i.id === activeTab)) {
-                setActiveTab("laporan");
-              }
+              setActiveCategorySheet(null);
+              setActiveTab("pengaturan");
             }}
             className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
-              LAPORAN_ITEMS.some(i => i.id === activeTab)
-                ? "text-blue-600 dark:text-blue-400 font-bold"
+              activeTab === "pengaturan" || activeTab === "resetdb"
+                ? "text-slate-800 dark:text-white font-bold"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
-            <Printer className={`w-5 h-5 ${LAPORAN_ITEMS.some(i => i.id === activeTab) ? "scale-110" : ""}`} />
-            <span className="text-[11px] mt-0.5 tracking-tight truncate">Laporan</span>
+            <Settings className={`w-5 h-5 ${activeTab === "pengaturan" || activeTab === "resetdb" ? "scale-110" : ""}`} />
+            <span className="text-[11px] mt-0.5 tracking-tight truncate">Pengaturan</span>
           </button>
         </nav>
 
         {/* Android Native Bottom Sheet Chooser Modal */}
-        {activeCategorySheet && (
+        {activeCategorySheet === "ai" && (
           <div className="fixed inset-0 z-50 flex flex-col justify-end select-none">
             {/* Dark Backdrop */}
             <div 
@@ -571,31 +289,15 @@ export default function App() {
               {/* Sheet Header Title */}
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center space-x-2.5">
-                  {activeCategorySheet === "akademik" && (
-                    <div className="w-9 h-9 bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
-                      <GraduationCap className="w-5 h-5" />
-                    </div>
-                  )}
-                  {activeCategorySheet === "ai" && (
-                    <div className="w-9 h-9 bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                  )}
-                  {activeCategorySheet === "laporan" && (
-                    <div className="w-9 h-9 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl flex items-center justify-center shrink-0">
-                      <Printer className="w-5 h-5" />
-                    </div>
-                  )}
+                  <div className="w-9 h-9 bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
                   <div>
                     <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
-                      {activeCategorySheet === "akademik" && "Pilih Menu Akademik Lengkap"}
-                      {activeCategorySheet === "ai" && "Pilih Tool AI Lengkap"}
-                      {activeCategorySheet === "laporan" && "Pilih Laporan & Sistem"}
+                      Pilih Tool AI Lengkap
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {activeCategorySheet === "akademik" && "Semua modul administrasi akademik guru"}
-                      {activeCategorySheet === "ai" && "Seluruh generator & kecerdasan buatan AI Pro"}
-                      {activeCategorySheet === "laporan" && "Rekapitulasi cetak PDF & pengaturan"}
+                      Seluruh generator & kecerdasan buatan AI Pro
                     </p>
                   </div>
                 </div>
@@ -610,39 +312,7 @@ export default function App() {
 
               {/* Item List Options */}
               <div className="space-y-2.5">
-                {activeCategorySheet === "akademik" && AKADEMIK_ITEMS.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setActiveCategorySheet(null);
-                      }}
-                      className={`w-full flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.99] cursor-pointer ${
-                        isActive
-                          ? "bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-800 text-blue-900 dark:text-blue-100 font-bold"
-                          : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3 min-w-0">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          isActive ? "bg-blue-600 text-white" : "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400"
-                        }`}>
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-extrabold text-xs sm:text-sm truncate">{item.label}</div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{item.desc}</div>
-                        </div>
-                      </div>
-                      <ChevronRight className={`w-5 h-5 shrink-0 ${isActive ? "text-blue-600" : "text-slate-400"}`} />
-                    </button>
-                  );
-                })}
-
-                {activeCategorySheet === "ai" && AI_TOOLS_ITEMS.map((item) => {
+                {AI_TOOLS_ITEMS.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
                   return (
@@ -675,38 +345,6 @@ export default function App() {
                         </div>
                       </div>
                       <ChevronRight className={`w-5 h-5 shrink-0 ${isActive ? "text-amber-500" : "text-slate-400"}`} />
-                    </button>
-                  );
-                })}
-
-                {activeCategorySheet === "laporan" && LAPORAN_ITEMS.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setActiveCategorySheet(null);
-                      }}
-                      className={`w-full flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.99] cursor-pointer ${
-                        isActive
-                          ? "bg-slate-100 dark:bg-slate-800 border-slate-400 dark:border-slate-600 text-slate-900 dark:text-white font-bold"
-                          : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3 min-w-0">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          isActive ? "bg-slate-800 text-white" : "bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-                        }`}>
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-extrabold text-xs sm:text-sm truncate">{item.label}</div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{item.desc}</div>
-                        </div>
-                      </div>
-                      <ChevronRight className={`w-5 h-5 shrink-0 ${isActive ? "text-slate-800 dark:text-white" : "text-slate-400"}`} />
                     </button>
                   );
                 })}

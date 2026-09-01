@@ -1,18 +1,10 @@
 import React from "react";
 import { 
   PieChart, 
-  Users, 
-  IdCard, 
-  BookOpen, 
-  Clock, 
-  ClipboardCheck, 
-  Star, 
-  Calendar, 
   HeartHandshake, 
   Wand2, 
   Bot, 
   Sparkles,
-  Printer, 
   Settings, 
   GraduationCap,
   Trash2,
@@ -40,25 +32,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       group: "MENU UTAMA",
       items: [
         { id: "dashboard", label: "Dashboard", icon: PieChart },
-        { id: "siswa", label: "Kelola Siswa", icon: Users },
-        { id: "kartu", label: "Cetak Kartu QR", icon: IdCard },
-        { id: "mapel", label: "Kelola Mapel", icon: BookOpen },
-      ]
-    },
-    {
-      group: "AKADEMIK",
-      items: [
-        { id: "jadwal", label: "Jadwal Mengajar", icon: Clock },
-        { id: "absensi", label: "Input Absensi", icon: ClipboardCheck },
-        { id: "penilaian", label: "Input Penilaian", icon: Star },
-        { id: "agenda", label: "Agenda Mengajar", icon: Calendar },
-        { id: "bimbingan", label: "Bimbingan Guru Wali", icon: HeartHandshake },
-        { id: "downloadperangkat", label: "Download Perangkat Ajar", icon: Download },
       ]
     },
     {
       group: "KECERDASAN BUATAN (AI)",
       items: [
+        { id: "downloadperangkat", label: "Download Perangkat Ajar", icon: Download },
         { id: "perangkat_kbc", label: "Perangkat Ajar KBC", icon: HeartHandshake, highlight: true },
         { id: "perangkat_ai", label: "Generator Perangkat Ajar AI", icon: FileCheck, highlight: true },
         { id: "modulai", label: "Modul Ajar AI", icon: Wand2, highlight: true },
@@ -68,11 +47,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ]
     },
     {
-      group: "SISTEM & OUTPUT",
+      group: "SISTEM & PENGATURAN",
       items: [
-        { id: "laporan", label: "Pusat Laporan", icon: Printer },
-        { id: "pengaturan", label: "Pengaturan", icon: Settings },
-        { id: "resetdb", label: "Hapus Isi Database", icon: Trash2, dangerous: true },
+        { id: "pengaturan", label: "Pengaturan & Kop", icon: Settings },
+        { id: "resetdb", label: "Hapus Pengaturan", icon: Trash2, dangerous: true },
       ]
     }
   ];
@@ -103,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="font-extrabold text-lg tracking-tight text-white block leading-none">
                 Aplikasi Guru AI
               </span>
-              <span className="text-[10px] text-slate-400 font-medium block mt-1">Administrasi Guru Terpadu</span>
+              <span className="text-[10px] text-slate-400 font-medium block mt-1">Generator Perangkat Cerdas</span>
             </div>
           </div>
 
@@ -164,7 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Footer info */}
         <div className="p-4 border-t border-slate-800 text-center text-[11px] text-slate-400 bg-slate-950/50">
           <p className="font-semibold text-slate-300">Aplikasi Guru AI &copy; 2026</p>
-          <p className="text-[10px] text-slate-500 mt-0.5">Sistem Administrasi Guru Terpadu</p>
+          <p className="text-[10px] text-slate-500 mt-0.5">Sistem Generator Perangkat Ajar</p>
         </div>
       </aside>
     </>
