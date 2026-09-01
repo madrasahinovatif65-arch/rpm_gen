@@ -7,6 +7,8 @@ import {
   BookOpen, 
   Loader2, 
   CheckCircle2, 
+  CheckCircle,
+  AlertTriangle,
   Layers, 
   Calendar, 
   Award,
