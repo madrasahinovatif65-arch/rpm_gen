@@ -23,6 +23,7 @@ import { Pengaturan } from "../types";
 import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { useKbcState, defaultKbcState } from "../store/kbcState";
+import { subscribeToJobs, enqueueJob, AIJob } from "../lib/aiJobManager";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
 import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 
@@ -42,6 +43,31 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
   const [generatedDocs, setGeneratedDocs] = useState<Record<string, string>>({});
   const [generatedJson, setGeneratedJson] = useState<Record<string, any>>({});
+  const [jobs, setJobs] = useState<Record<string, AIJob>>({});
+
+  React.useEffect(() => {
+    const unsubscribe = subscribeToJobs((updatedJobs) => {
+      setJobs(updatedJobs);
+      
+      const newJson: Record<string, any> = {};
+      const newHtml: Record<string, string> = {};
+      let isAnyRunning = false;
+      
+      Object.keys(updatedJobs).forEach(id => {
+        if (updatedJobs[id].status === "running") isAnyRunning = true;
+        if (updatedJobs[id].data) {
+          newJson[id] = updatedJobs[id].data;
+          // Legacy support for older docs mapping
+          newHtml[id] = "<div>Dimuat dari state AI Job Manager</div>";
+        }
+      });
+      
+      setGeneratedJson(prev => ({...prev, ...newJson}));
+      setGeneratedDocs(prev => ({...prev, ...newHtml}));
+      setIsGenerating(isAnyRunning);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const [state, updateState] = useKbcState();
 
@@ -112,115 +138,53 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   };
 
   const handleGenerateDoc = async (targetType: string) => {
-    setIsGenerating(true);
     const docMeta = docTypeList.find((d) => d.id === targetType);
-    setGeneratingProgress(`Menyusun ${docMeta?.fullTitle || targetType}...`);
+    setGeneratingProgress(`Antre menyusun ${docMeta?.fullTitle || targetType}...`);
 
     const isModulType = targetType === "modul_ajar" || targetType === "lkpd" || targetType === "rubrik";
     const payloadData = isModulType ? formDataModul : formData;
 
-    try {
-      const res = await generatePerangkatAjarKBCAPI(targetType, payloadData);
-
-      if (res.status === "success" && res.html) {
-        const cleanedHtml = sanitizeHtmlForOutput(res.html);
-        setGeneratedDocs((prev) => ({
-          ...prev,
-          [targetType]: cleanedHtml
-        }));
-        if (res.data) {
-          setGeneratedJson((prev) => ({
-            ...prev,
-            [targetType]: res.data
-          }));
-        }
-        notifySimpanSuccess(`${docMeta?.fullTitle || "Dokumen"} KBC berhasil dibuat!`);
-      } else {
-        throw new Error(res.message || "Gagal menghasilkan dokumen KBC");
+    if (targetType === "modul_ajar") {
+      enqueueJob("modul_ajar_umum", "modul_ajar_umum", payloadData);
+      const jmlPertemuan = parseInt(payloadData.jumlahPertemuan || "1", 10);
+      for (let i = 1; i <= jmlPertemuan; i++) {
+        enqueueJob(`modul_ajar_meeting_${i}`, `modul_ajar_meeting_${i}`, payloadData);
       }
-    } catch (err: any) {
-      console.error(err);
-      notifySimpanError(`Gagal membuat ${docMeta?.fullTitle}: ` + (err?.message || "Terjadi kesalahan server."));
-    } finally {
-      setIsGenerating(false);
+    } else {
+      enqueueJob(targetType, targetType, payloadData);
     }
+    notifySimpanSuccess(`${docMeta?.fullTitle || "Dokumen"} telah ditambahkan ke antrean.`);
   };
 
   const handleGenerate3ModulDocs = async () => {
-    setIsGenerating(true);
-    const modulTypes = [
-      { id: "modul_ajar", title: "Modul Ajar Deep Learning KBC" },
-      { id: "lkpd", title: "LKPD KBC" },
-      { id: "rubrik", title: "Rubrik Penilaian Formatif & Sumatif KBC" }
-    ];
-
-    for (let i = 0; i < modulTypes.length; i++) {
-      const t = modulTypes[i];
-      setGeneratingProgress(`[${i + 1}/3] Menyusun ${t.title}...`);
-
-      try {
-        const res = await generatePerangkatAjarKBCAPI(t.id, formDataModul);
-
-        if (res.status === "success" && res.html) {
-          const cleanedHtml = sanitizeHtmlForOutput(res.html);
-          setGeneratedDocs((prev) => ({
-            ...prev,
-            [t.id]: cleanedHtml
-          }));
-          if (res.data) {
-            setGeneratedJson((prev) => ({
-              ...prev,
-              [t.id]: res.data
-            }));
-          }
-        }
-      } catch (err) {
-        console.error(`Gagal pada ${t.id}:`, err);
-      }
+    enqueueJob("modul_ajar_umum", "modul_ajar_umum", formDataModul);
+    const jmlPertemuan = parseInt(formDataModul.jumlahPertemuan || "1", 10);
+    for (let i = 1; i <= jmlPertemuan; i++) {
+      enqueueJob(`modul_ajar_meeting_${i}`, `modul_ajar_meeting_${i}`, formDataModul);
     }
-
-    setIsGenerating(false);
+    enqueueJob("lkpd", "lkpd", formDataModul);
+    enqueueJob("rubrik", "rubrik", formDataModul);
     setActiveDoc("modul_ajar");
-    notifySimpanSuccess("Paket 3 Dokumen (Modul Ajar, LKPD, & Rubrik KBC) Berhasil Dibuat!");
+    notifySimpanSuccess("3 Dokumen Modul Ajar telah ditambahkan ke antrean!");
   };
 
   const handleGenerateAllDocs = async () => {
-    setIsGenerating(true);
     const types = docTypeList.map((d) => d.id);
-
-    for (let i = 0; i < types.length; i++) {
-      const t = types[i];
-      const docMeta = docTypeList.find((d) => d.id === t);
-      setGeneratingProgress(`[${i + 1}/${types.length}] Menyusun ${docMeta?.fullTitle}...`);
-
+    types.forEach(t => {
       const isModulType = t === "modul_ajar" || t === "lkpd" || t === "rubrik";
       const payloadData = isModulType ? formDataModul : formData;
-
-      try {
-        const res = await generatePerangkatAjarKBCAPI(t, payloadData);
-
-        if (res.status === "success" && res.html) {
-          const cleanedHtml = sanitizeHtmlForOutput(res.html);
-          setGeneratedDocs((prev) => ({
-            ...prev,
-            [t]: cleanedHtml
-          }));
-          if (res.data) {
-            setGeneratedJson((prev) => ({
-              ...prev,
-              [t]: res.data
-            }));
-          }
-        } else {
-          console.warn(`Gagal menyusun ${t}:`, res.message);
+      
+      if (t === "modul_ajar") {
+        enqueueJob("modul_ajar_umum", "modul_ajar_umum", payloadData);
+        const jmlPertemuan = parseInt(payloadData.jumlahPertemuan || "1", 10);
+        for (let i = 1; i <= jmlPertemuan; i++) {
+          enqueueJob(`modul_ajar_meeting_${i}`, `modul_ajar_meeting_${i}`, payloadData);
         }
-      } catch (err) {
-        console.error(`Gagal pada ${t}:`, err);
+      } else {
+        enqueueJob(t, t, payloadData);
       }
-    }
-
-    setIsGenerating(false);
-    notifySimpanSuccess("Seluruh 9 Dokumen Administrasi Perangkat Ajar KBC Berhasil Dibuat!");
+    });
+    notifySimpanSuccess("Ke-9 Dokumen telah ditambahkan ke antrean AI secara berurutan!");
   };
 
   const handlePrintA4 = () => {
@@ -301,7 +265,17 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       case 'prota': return <ProtaRenderer data={data} context={state} />;
       case 'prosem': return <ProsemRenderer data={data} context={state} />;
       case 'kktp': return <KktpRenderer data={data} context={state} />;
-      case 'modul_ajar': return <ModulAjarRenderer data={data} context={state} />;
+      case 'modul_ajar': {
+        const umum = generatedJson['modul_ajar_umum'];
+        const meetings: any[] = [];
+        const jml = parseInt(state.module.jumlahPertemuan || "1", 10);
+        for (let i = 1; i <= jml; i++) {
+          if (generatedJson[`modul_ajar_meeting_${i}`]) {
+            meetings.push(generatedJson[`modul_ajar_meeting_${i}`]);
+          }
+        }
+        return <ModulAjarRenderer umum={umum} meetings={meetings} context={state} />;
+      }
       case 'lkpd': return <LkpdRenderer data={data} context={state} />;
       case 'rubrik': return <RubrikRenderer data={data} context={state} />;
       default: return <div dangerouslySetInnerHTML={{ __html: generatedDocs[docType] || "" }} />;
@@ -832,31 +806,38 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2">
           {docTypeList.map((doc) => {
             const Icon = doc.icon;
-            const isTabActive = activeDoc === doc.id;
-            const isDone = Boolean(generatedDocs[doc.id]);
-            const isSpecialModul = doc.id === "modul_ajar" || doc.id === "lkpd" || doc.id === "rubrik";
+            
+            let jobStatus = jobs[doc.id]?.status;
+            let isFinished = jobStatus === "success" || !!generatedJson[doc.id];
 
+            if (doc.id === "modul_ajar") {
+              const umumStatus = jobs["modul_ajar_umum"]?.status;
+              const anyMeetingRunning = Object.keys(jobs).some(k => k.startsWith("modul_ajar_meeting_") && jobs[k].status === "running");
+              if (umumStatus === "running" || anyMeetingRunning) jobStatus = "running";
+              else if (umumStatus === "success") isFinished = true;
+            }
+            
             return (
               <button
                 key={doc.id}
                 onClick={() => handleSelectDoc(doc.id)}
-                className={`flex flex-col items-center text-center p-2.5 rounded-xl border text-[11px] font-bold transition-all relative cursor-pointer ${
-                  isTabActive
-                    ? isSpecialModul
-                      ? "bg-amber-600 text-white border-amber-600 shadow-md scale-102"
-                      : "bg-emerald-600 text-white border-emerald-600 shadow-md scale-102"
-                    : isDone
-                    ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100"
-                    : isSpecialModul
-                    ? "bg-amber-50/70 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100"
-                    : "bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${
+                  activeDoc === doc.id
+                    ? "bg-emerald-50 dark:bg-emerald-900/50 border-emerald-500 dark:border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 hover:border-emerald-300"
                 }`}
+                title={doc.fullTitle}
               >
-                <Icon className={`w-4 h-4 mb-1 ${isTabActive ? "text-white" : isDone ? "text-emerald-600" : isSpecialModul ? "text-amber-600 dark:text-amber-400" : "text-slate-500"}`} />
-                <span className="truncate w-full leading-tight">{doc.label}</span>
-                {isDone && (
-                  <CheckCircle2 className="w-3 h-3 absolute top-1 right-1 text-emerald-600 dark:text-emerald-400" />
-                )}
+                <div className="relative">
+                  <Icon className={`w-5 h-5 mb-1 ${activeDoc === doc.id ? "text-emerald-600" : "text-slate-400"}`} />
+                  {jobStatus === "running" && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-yellow-400 rounded-full animate-ping"></span>
+                  )}
+                  {isFinished && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white"></span>
+                  )}
+                </div>
+                <span className="text-[10px] font-medium text-center leading-tight mt-1">{doc.label}</span>
               </button>
             );
           })}
@@ -864,11 +845,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       </div>
 
       {isGenerating && (
-        <div className="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 p-6 rounded-2xl flex items-center justify-center space-x-4 animate-pulse">
-          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-          <div>
-            <p className="font-extrabold text-emerald-900 dark:text-emerald-200 text-sm md:text-base">
-              {generatingProgress || "Sedang memproses AI Perangkat Ajar KBC..."}
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 rounded-xl flex items-center space-x-4">
+          <Loader2 className="w-5 h-5 text-yellow-600 animate-spin" />
+          <div className="text-left">
+            <h4 className="font-bold text-yellow-800 dark:text-yellow-400 text-sm">AI Sedang Memproses Antrean...</h4>
+            <p className="text-xs text-yellow-700 dark:text-yellow-500">
+              {Object.values(jobs).filter(j => j.status === 'running').map(j => j.progressMessage).join(', ') || "Silakan tunggu..."}
             </p>
           </div>
         </div>

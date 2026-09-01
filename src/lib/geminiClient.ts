@@ -467,15 +467,55 @@ Gunakan format HTML murni tanpa markdown, lengkapi kop sekolah dan tanda tangan 
 
 export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any) => {
   const ai = getAiClient();
-  const schema = KbcSchemas[docType];
+  
+  let schemaKey = docType;
+  let meetingNumber = 0;
+  
+  if (docType.startsWith("modul_ajar_meeting_")) {
+    schemaKey = "modul_ajar_meeting";
+    meetingNumber = parseInt(docType.split("_")[3], 10);
+  }
+
+  const schema = KbcSchemas[schemaKey];
   
   if (!schema) {
     return { status: "error", message: `Schema untuk dokumen ${docType} tidak ditemukan.` };
   }
 
-  const generalKbcRules = `Kamu adalah Ahli Kurikulum & Pengembang Perangkat Ajar Kemenag RI, menguasai "Kurikulum Berbasis Cinta (KBC)" (Panca Cinta Kemenag & 10 Nilai PPRA: Ta'addub, Qudwah, Muwaṭanah, Tawassuṭ, Tawāzun, I'tidāl, Musāwah, Syūrā, Tasāmuh, Tathawwur wa Ibtikār).`;
+  const generalKbcRules = `Kamu adalah Ahli Kurikulum & Pengembang Perangkat Ajar Kemenag RI, menguasai "Kurikulum Berbasis Cinta (KBC)" (Panca Cinta Kemenag & 10 Nilai PPRA).`;
 
-  let userPrompt = `Buatkan konten untuk dokumen ${docType} berdasarkan data berikut:\n${JSON.stringify(formData, null, 2)}\n\nPastikan data terisi lengkap, akurat, dan kaya akan nilai PPRA & Panca Cinta Kemenag.`;
+  let userPrompt = `Buatkan konten JSON untuk dokumen ${docType} berdasarkan data berikut:\n${JSON.stringify(formData, null, 2)}\n\nPastikan data terisi lengkap, akurat, dan kaya akan nilai PPRA & Panca Cinta Kemenag.`;
+
+  // Context Builder untuk Dokumen Administratif (TP, ATP, Prota, Prosem)
+  if (["tp", "atp", "prota", "prosem"].includes(schemaKey)) {
+    userPrompt = `Buatkan konten JSON untuk dokumen ${docType} berdasarkan data pendukung berikut:
+${JSON.stringify(formData, null, 2)}
+
+PENTING:
+- Fokus utama Anda adalah merumuskan (reasoning) materi pokok, kompetensi, dan memecah Capaian Pembelajaran.
+- ABAIKAN kalkulasi matematika presisi terkait "Alokasi JP" atau "kodeTp" karena sistem kami memiliki Data Normalizer yang akan menimpa angka JP dan kode TP tersebut. Anda cukup memberi estimasi nilai (misal 1 atau 2).
+- Pastikan setiap array terisi dengan struktur yang valid.`;
+  }
+
+  // Context Builder untuk Modul Ajar Umum
+  if (schemaKey === "modul_ajar_umum") {
+    userPrompt = `Buatkan struktur MODUL AJAR UMUM (Informasi Umum, Komponen Inti dasar, Asesmen, dan Lampiran) untuk topik: ${formData.topik}. \nData pendukung:\n${JSON.stringify(formData, null, 2)}\n\n(Jangan masukkan detail kegiatan skenario per pertemuan, karena itu akan digenerate terpisah).`;
+  }
+  
+  // Context Builder khusus untuk Pertemuan
+  if (schemaKey === "modul_ajar_meeting" && meetingNumber > 0) {
+    userPrompt = `Buatkan Skenario Kegiatan Belajar Mengajar (KBM) KHUSUS HANYA UNTUK PERTEMUAN KE-${meetingNumber} (dari total ${formData.jumlahPertemuan || 1} pertemuan).
+Topik Utama: ${formData.topik}
+Sub Topik/Fokus Pertemuan ini: Bebas tentukan oleh AI berdasarkan silabus logis untuk pertemuan ke-${meetingNumber}.
+Model Pembelajaran: ${formData.model || 'Problem Based Learning (PBL)'}
+Metode: ${formData.metode || 'Diskusi, Ceramah Interaktif'}
+
+Penting:
+- Berikan judul pertemuan yang relevan.
+- Fokus sintak harus berisi nama fase model ${formData.model} yang akan dijalankan pada pertemuan ini.
+- Untuk kegiatan Pendahuluan, Inti, dan Penutup: berikan skenario rinci (ucapan/aktivitas guru & siswa) yang mencerminkan nilai PPRA Kemenag.
+- "pertemuanKe" WAJIB diisi dengan angka ${meetingNumber}.`;
+  }
 
   try {
     const data = await generateJsonWithRepair(ai, generalKbcRules, userPrompt, schema, 2);

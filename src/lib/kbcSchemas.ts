@@ -25,13 +25,7 @@ export const TpSchema = z.object({
     rumusanTp: z.string(),
     kompetensi: z.string(),
     integrasiNilai: z.string().describe("Integrasi Panca Cinta dan PPRA"),
-    alokasiJp: z.number()
-  })),
-  rekapAlokasi: z.array(z.object({
-    elemen: z.string(),
-    jumlahTp: z.number(),
-    totalJp: z.number(),
-    persentase: z.number()
+    alokasiJp: z.number().describe("Estimasi JP untuk TP ini (jangan pusingkan total akhir)")
   }))
 });
 export type TpType = z.infer<typeof TpSchema>;
@@ -53,15 +47,6 @@ export type AtpType = z.infer<typeof AtpSchema>;
 
 // 4. Program Tahunan (Prota)
 export const ProtaSchema = z.object({
-  distribusiMinggu: z.array(z.object({
-    semester: z.number(),
-    bulan: z.string(),
-    mingguKalender: z.number(),
-    tidakEfektif: z.number(),
-    efektif: z.number(),
-    jp: z.number(),
-    keterangan: z.string()
-  })),
   programTahunan: z.array(z.object({
     kodeTp: z.string(),
     rumusanTp: z.string(),
@@ -100,8 +85,8 @@ export const KktpSchema = z.object({
 });
 export type KktpType = z.infer<typeof KktpSchema>;
 
-// 7. Modul Ajar (Modul Pembelajaran KBC)
-export const ModulAjarSchema = z.object({
+// 7A. Modul Ajar UMUM (Identitas, Asesmen, Lampiran)
+export const ModulAjarUmumSchema = z.object({
   informasiUmum: z.object({
     kesiapanPesertaDidik: z.string(),
     karakteristikMateri: z.string(),
@@ -122,14 +107,6 @@ export const ModulAjarSchema = z.object({
       nonKognitif: z.array(z.string()),
       kognitif: z.array(z.string())
     }),
-    skenarioPertemuan: z.array(z.object({
-      pertemuanKe: z.number(),
-      judul: z.string(),
-      fokusSintak: z.array(z.string()),
-      kegiatanPendahuluan: z.array(z.object({ guru: z.string(), siswa: z.string(), anotasiPpra: z.string() })),
-      kegiatanInti: z.array(z.object({ sintak: z.string(), guru: z.string(), siswa: z.string(), anotasiPpra: z.string() })),
-      kegiatanPenutup: z.array(z.object({ guru: z.string(), siswa: z.string(), anotasiPpra: z.string() }))
-    })),
     asesmenFormatif: z.array(z.object({ teknik: z.string(), instrumen: z.string(), aspek: z.string() })),
     asesmenSumatif: z.array(z.object({ deskripsi: z.string(), bobot: z.number() })),
     pengayaanRemedial: z.object({
@@ -146,7 +123,18 @@ export const ModulAjarSchema = z.object({
     daftarPustaka: z.array(z.string())
   })
 });
-export type ModulAjarType = z.infer<typeof ModulAjarSchema>;
+export type ModulAjarUmumType = z.infer<typeof ModulAjarUmumSchema>;
+
+// 7B. Modul Ajar MEETING DETAIL (Skenario per pertemuan)
+export const ModulAjarMeetingSchema = z.object({
+  pertemuanKe: z.number(),
+  judul: z.string(),
+  fokusSintak: z.array(z.string()),
+  kegiatanPendahuluan: z.array(z.object({ guru: z.string(), siswa: z.string(), anotasiPpra: z.string() })),
+  kegiatanInti: z.array(z.object({ sintak: z.string(), guru: z.string(), siswa: z.string(), anotasiPpra: z.string() })),
+  kegiatanPenutup: z.array(z.object({ guru: z.string(), siswa: z.string(), anotasiPpra: z.string() }))
+});
+export type ModulAjarMeetingType = z.infer<typeof ModulAjarMeetingSchema>;
 
 // 8. LKPD (Lembar Kerja Peserta Didik)
 export const LkpdSchema = z.object({
@@ -195,7 +183,8 @@ export const KbcSchemas: Record<string, z.ZodSchema<any>> = {
   "prota": ProtaSchema,
   "prosem": ProsemSchema,
   "kktp": KktpSchema,
-  "modul_ajar": ModulAjarSchema,
+  "modul_ajar_umum": ModulAjarUmumSchema,
+  "modul_ajar_meeting": ModulAjarMeetingSchema,
   "lkpd": LkpdSchema,
   "rubrik": RubrikSchema
 };

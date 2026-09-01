@@ -1,16 +1,20 @@
 import React from 'react';
 import { 
-  ModulAjarType, LkpdType, RubrikType 
+  ModulAjarUmumType, ModulAjarMeetingType, LkpdType, RubrikType 
 } from '../../lib/kbcSchemas';
 import { TableHeader, Td, DocumentHeader, DocumentFooter } from './AdministrasiRenderers';
 
 interface RendererProps {
-  data: any;
+  data?: any;
+  umum?: ModulAjarUmumType;
+  meetings?: ModulAjarMeetingType[];
   context: any;
 }
 
-export const ModulAjarRenderer: React.FC<RendererProps> = ({ data, context }) => {
-  const modul = data as ModulAjarType;
+export const ModulAjarRenderer: React.FC<RendererProps> = ({ umum, meetings, context }) => {
+  if (!umum) return <div>Menunggu data Modul Umum...</div>;
+  
+  const mUmum = umum;
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', color: '#000', lineHeight: 1.5 }}>
       <DocumentHeader context={context} title="MODUL AJAR DEEP LEARNING" subtitle={`Kurikulum Berbasis Cinta (KBC) | Model: ${context.module?.learningModel}`} />
@@ -30,100 +34,125 @@ export const ModulAjarRenderer: React.FC<RendererProps> = ({ data, context }) =>
       </table>
 
       <h4>1. Kesiapan & Karakteristik</h4>
-      <p><strong>Identifikasi Kesiapan:</strong> {modul.kesiapanPesertaDidik}</p>
-      <p><strong>Karakteristik Materi:</strong> {modul.karakteristikMateri}</p>
+      <p><strong>Identifikasi Kesiapan:</strong> {mUmum.informasiUmum?.kesiapanPesertaDidik}</p>
+      <p><strong>Karakteristik Materi:</strong> {mUmum.informasiUmum?.karakteristikMateri}</p>
       
-      <h4>2. Profil Lulusan & Integrasi KBC</h4>
-      <ul>
-        <li><strong>Dimensi Profil:</strong> {modul.profilLulusan?.join(', ')}</li>
-        <li><strong>Panca Cinta Kemenag:</strong> {modul.integrasiKbc?.pancaCinta}</li>
-        <li><strong>Nilai PPRA:</strong> {modul.integrasiKbc?.nilaiPpra}</li>
-      </ul>
+      <h4>2. Target & Kompetensi</h4>
+      <p><strong>Target Reguler:</strong> {mUmum.informasiUmum?.targetPesertaDidik?.reguler?.perlakuan}</p>
+      <p><strong>Kebutuhan Khusus:</strong> {mUmum.informasiUmum?.targetPesertaDidik?.kesulitanBelajar?.perlakuan}</p>
+      <p><strong>Berbakat:</strong> {mUmum.informasiUmum?.targetPesertaDidik?.berbakat?.perlakuan}</p>
 
-      <h4>3. Sarana & Target</h4>
-      <p><strong>Sarana:</strong> {modul.saranaPrasarana?.join(', ')}</p>
-      <p><strong>Target Siswa:</strong> {modul.targetPesertaDidik}</p>
+      <h4>3. Sarana & Prasarana</h4>
+      <ul>
+        {mUmum.informasiUmum?.saranaPrasarana?.map((s, i) => (
+          <li key={i}><strong>{s.kategori}:</strong> {s.rincian}</li>
+        ))}
+      </ul>
       
       <hr />
       
       <h4>B. KOMPONEN INTI</h4>
       <div style={{ backgroundColor: '#f0fdf4', padding: '15px', borderLeft: '4px solid #16a34a', marginBottom: '20px' }}>
         <strong>Pemahaman Bermakna:</strong><br/>
-        {modul.pemahamanBermakna}
+        {mUmum.komponenInti?.pemahamanBermakna}
       </div>
 
       <h4>Pertanyaan Pemantik</h4>
       <ul>
-        {modul.pertanyaanPemantik?.map((p, i) => <li key={i}>{p}</li>)}
+        {mUmum.komponenInti?.pertanyaanPemantik?.map((p, i) => <li key={i}>{p}</li>)}
       </ul>
 
       <h4>Asesmen Diagnostik</h4>
-      <p><strong>Non-Kognitif:</strong> {modul.asesmenDiagnostik?.nonKognitif?.join(', ')}</p>
-      <p><strong>Kognitif:</strong> {modul.asesmenDiagnostik?.kognitif?.join(', ')}</p>
+      <p><strong>Non-Kognitif:</strong> {mUmum.komponenInti?.asesmenDiagnostik?.nonKognitif?.join(', ')}</p>
+      <p><strong>Kognitif:</strong> {mUmum.komponenInti?.asesmenDiagnostik?.kognitif?.join(', ')}</p>
 
-      <h4>C. KEGIATAN PEMBELAJARAN</h4>
-      {modul.kegiatanPembelajaran?.map((pertemuan, i) => (
-        <div key={i} style={{ marginBottom: '30px' }}>
-          <h5 style={{ backgroundColor: '#1e293b', color: 'white', padding: '10px' }}>
-            Pertemuan {pertemuan.pertemuanKe}: {pertemuan.fokusMateri} ({pertemuan.alokasiMenit} Menit)
-          </h5>
-          
-          <strong>1. Kegiatan Pendahuluan ({pertemuan.langkah?.pendahuluan?.durasiMenit} Menit)</strong>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px' }}>
-            <thead>
-              <tr><TableHeader>Aktivitas Guru</TableHeader><TableHeader>Aktivitas Siswa</TableHeader></tr>
-            </thead>
-            <tbody>
-              {pertemuan.langkah?.pendahuluan?.aktivitas?.map((act, idx) => (
-                <tr key={idx}>
-                  <Td>{act.guru}</Td>
-                  <Td>{act.siswa}</Td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <h4>C. SKENARIO PENGALAMAN BELAJAR (PERTEMUAN)</h4>
+      {(!meetings || meetings.length === 0) ? (
+         <div style={{ padding: '10px', backgroundColor: '#fef9c3', color: '#854d0e', fontStyle: 'italic' }}>
+           Skenario pertemuan sedang diproses oleh AI...
+         </div>
+      ) : (
+         meetings.map((pertemuan, i) => (
+          <div key={i} style={{ marginBottom: '30px' }}>
+            <h5 style={{ backgroundColor: '#1e293b', color: 'white', padding: '10px', fontSize: '14px' }}>
+              Pertemuan {pertemuan.pertemuanKe}: {pertemuan.judul}
+            </h5>
+            
+            <p><strong>Fokus Sintak:</strong> {pertemuan.fokusSintak?.join(', ')}</p>
 
-          <strong>2. Kegiatan Inti ({pertemuan.langkah?.inti?.durasiMenit} Menit)</strong>
-          {pertemuan.langkah?.inti?.sintak?.map((sintak, sIdx) => (
-            <div key={sIdx} style={{ marginBottom: '10px' }}>
-              <div style={{ padding: '5px', backgroundColor: '#e2e8f0', fontWeight: 'bold' }}>{sintak.namaSintak}</div>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <tbody>
-                  {sintak.aktivitas?.map((act, actIdx) => (
-                    <tr key={actIdx}>
-                      <Td width="50%">{act.guru}</Td>
-                      <Td width="50%">{act.siswa}</Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
+            <strong>1. Kegiatan Pendahuluan</strong>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', marginTop: '5px' }}>
+              <thead>
+                <tr><TableHeader>Aktivitas Guru</TableHeader><TableHeader>Aktivitas Siswa</TableHeader><TableHeader>PPRA</TableHeader></tr>
+              </thead>
+              <tbody>
+                {pertemuan.kegiatanPendahuluan?.map((act, idx) => (
+                  <tr key={idx}>
+                    <Td>{act.guru}</Td>
+                    <Td>{act.siswa}</Td>
+                    <Td>{act.anotasiPpra}</Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-          <strong>3. Kegiatan Penutup ({pertemuan.langkah?.penutup?.durasiMenit} Menit)</strong>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px' }}>
-            <thead>
-              <tr><TableHeader>Aktivitas Guru</TableHeader><TableHeader>Aktivitas Siswa</TableHeader></tr>
-            </thead>
-            <tbody>
-              {pertemuan.langkah?.penutup?.aktivitas?.map((act, idx) => (
-                <tr key={idx}>
-                  <Td>{act.guru}</Td>
-                  <Td>{act.siswa}</Td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
+            <strong>2. Kegiatan Inti</strong>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', marginTop: '5px' }}>
+              <thead>
+                <tr><TableHeader>Sintak</TableHeader><TableHeader>Aktivitas Guru</TableHeader><TableHeader>Aktivitas Siswa</TableHeader><TableHeader>PPRA</TableHeader></tr>
+              </thead>
+              <tbody>
+                {pertemuan.kegiatanInti?.map((act, idx) => (
+                  <tr key={idx}>
+                    <Td><strong>{act.sintak}</strong></Td>
+                    <Td>{act.guru}</Td>
+                    <Td>{act.siswa}</Td>
+                    <Td>{act.anotasiPpra}</Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-      <h4>D. ASESMEN & REFLEKSI</h4>
-      <p><strong>Asesmen Formatif:</strong> {modul.asesmenFormatif?.join(', ')}</p>
-      <p><strong>Asesmen Sumatif:</strong> {modul.asesmenSumatif?.join(', ')}</p>
+            <strong>3. Kegiatan Penutup</strong>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', marginTop: '5px' }}>
+              <thead>
+                <tr><TableHeader>Aktivitas Guru</TableHeader><TableHeader>Aktivitas Siswa</TableHeader><TableHeader>PPRA</TableHeader></tr>
+              </thead>
+              <tbody>
+                {pertemuan.kegiatanPenutup?.map((act, idx) => (
+                  <tr key={idx}>
+                    <Td>{act.guru}</Td>
+                    <Td>{act.siswa}</Td>
+                    <Td>{act.anotasiPpra}</Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))
+      )}
+
+      <h4>D. ASESMEN & PENGAYAAN</h4>
+      <p><strong>Formatif:</strong></p>
+      <ul>
+        {mUmum.komponenInti?.asesmenFormatif?.map((a, i) => (
+          <li key={i}>{a.teknik} - {a.aspek} ({a.instrumen})</li>
+        ))}
+      </ul>
+      
+      <p><strong>Sumatif:</strong></p>
+      <ul>
+        {mUmum.komponenInti?.asesmenSumatif?.map((a, i) => (
+          <li key={i}>{a.deskripsi} (Bobot: {a.bobot}%)</li>
+        ))}
+      </ul>
+
+      <p><strong>Pengayaan:</strong> {mUmum.komponenInti?.pengayaanRemedial?.pengayaan}</p>
+      <p><strong>Remedial:</strong> {mUmum.komponenInti?.pengayaanRemedial?.remedial}</p>
       
       <h5>Refleksi</h5>
-      <p><strong>Guru:</strong> {modul.refleksi?.guru?.join(' ')}</p>
-      <p><strong>Siswa:</strong> {modul.refleksi?.siswa?.join(' ')}</p>
+      <p><strong>Guru:</strong> {mUmum.komponenInti?.refleksi?.guru?.join(' ')}</p>
+      <p><strong>Siswa:</strong> {mUmum.komponenInti?.refleksi?.siswa?.join(' ')}</p>
 
       <DocumentFooter context={context} />
     </div>
