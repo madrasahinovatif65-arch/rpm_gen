@@ -19,7 +19,9 @@ import {
   FileText,
   CheckSquare,
   BookMarked,
-  LayoutList
+  LayoutList,
+  Trash2,
+  Save
 } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
@@ -158,6 +160,78 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     }));
     notifySimpanSuccess("Template CP Kemenag berhasil dimuat!");
   };
+
+  const handleSaveCpTemplate = async () => {
+    if (!config) {
+      notifySimpanError("Gagal menyimpan: Konfigurasi Firebase tidak ditemukan.");
+      return;
+    }
+    const templateName = window.prompt("Masukkan nama untuk template CP ini (misal: 'CP Fikih Fase E'):");
+    if (!templateName) return;
+
+    const newTemplate = {
+      id: Date.now().toString(),
+      name: templateName,
+      rasional: formData.cpRasional,
+      elemen: formData.cpElemen
+    };
+
+    const updatedConfig = {
+      ...config,
+      cpTemplates: [...(config.cpTemplates || []), newTemplate]
+    };
+
+    try {
+      await savePengaturan(updatedConfig);
+      notifySimpanSuccess(`Template "${templateName}" berhasil disimpan ke Firebase!`);
+    } catch (err) {
+      notifySimpanError("Gagal menyimpan template CP ke Firebase.");
+      console.error(err);
+    }
+  };
+
+  const handleSelectCpTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const templateId = e.target.value;
+    if (!templateId) return;
+    if (templateId === "default_kbc") {
+      handleFillTemplateCP();
+      e.target.value = "";
+      return;
+    }
+    
+    const template = config?.cpTemplates?.find(t => t.id === templateId);
+    if (template) {
+      updateState(s => ({
+        ...s,
+        cp: {
+          rasional: template.rasional,
+          elemen: template.elemen
+        }
+      }));
+      notifySimpanSuccess(`Template "${template.name}" berhasil dimuat!`);
+    }
+    e.target.value = "";
+  };
+
+  const handleDeleteCpTemplate = async (templateId: string, templateName: string) => {
+    if (!config) return;
+    const confirm = window.confirm(`Apakah Anda yakin ingin menghapus template "${templateName}" dari Firebase?`);
+    if (!confirm) return;
+
+    const updatedConfig = {
+      ...config,
+      cpTemplates: config.cpTemplates?.filter(t => t.id !== templateId) || []
+    };
+
+    try {
+      await savePengaturan(updatedConfig);
+      notifySimpanSuccess(`Template "${templateName}" berhasil dihapus.`);
+    } catch (err) {
+      notifySimpanError("Gagal menghapus template CP dari Firebase.");
+      console.error(err);
+    }
+  };
+
 
   const handleSubjectChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const value = e.target.value;
@@ -486,7 +560,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Fase / Kelas</label>
-              {!["Fase A (Kelas 1-2)", "Fase B (Kelas 3-4)", "Fase C (Kelas 5-6)", "Fase D (Kelas 7-9)", "Fase E (Kelas 10)", "Fase F (Kelas 11-12)"].includes(formData.level) && formData.level !== "" && !["Lainnya"].includes(formData.level) ? (
+              {!["Fase A (Kelas 1-2)", "Fase B (Kelas 3-4)", "Fase C (Kelas 5-6)"].includes(formData.level) && formData.level !== "" && !["Lainnya"].includes(formData.level) ? (
                 <input
                   type="text"
                   value={formData.level}
@@ -496,7 +570,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 />
               ) : (
                 <select
-                  value={["Fase A (Kelas 1-2)", "Fase B (Kelas 3-4)", "Fase C (Kelas 5-6)", "Fase D (Kelas 7-9)", "Fase E (Kelas 10)", "Fase F (Kelas 11-12)"].includes(formData.level) ? formData.level : (formData.level === "" ? "" : "Lainnya")}
+                  value={["Fase A (Kelas 1-2)", "Fase B (Kelas 3-4)", "Fase C (Kelas 5-6)"].includes(formData.level) ? formData.level : (formData.level === "" ? "" : "Lainnya")}
                   onChange={(e) => {
                     const val = e.target.value;
                     if (val === "Lainnya") {
@@ -508,12 +582,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold cursor-pointer"
                 >
                   <option value="" disabled>Pilih Fase...</option>
-                  <option value="Fase A (Kelas 1-2)">Fase A (Kelas 1-2) - MI</option>
-                  <option value="Fase B (Kelas 3-4)">Fase B (Kelas 3-4) - MI</option>
-                  <option value="Fase C (Kelas 5-6)">Fase C (Kelas 5-6) - MI</option>
-                  <option value="Fase D (Kelas 7-9)">Fase D (Kelas 7-9) - MTs</option>
-                  <option value="Fase E (Kelas 10)">Fase E (Kelas 10) - MA</option>
-                  <option value="Fase F (Kelas 11-12)">Fase F (Kelas 11-12) - MA</option>
+                  <option value="Fase A (Kelas 1-2)">Fase A (Kelas 1-2)</option>
+                  <option value="Fase B (Kelas 3-4)">Fase B (Kelas 3-4)</option>
+                  <option value="Fase C (Kelas 5-6)">Fase C (Kelas 5-6)</option>
                   <option value="Lainnya">Lainnya (Ketik Manual)...</option>
                 </select>
               )}
@@ -614,47 +685,79 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
-            <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center mb-1">
-                <label className="font-bold text-slate-700 dark:text-slate-300">
-                  CP Umum / Rasional KBC (Panca Cinta & PPRA)
-                </label>
-                <button
-                  onClick={handleFillTemplateCP}
-                  className="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-0.5 rounded-md font-bold transition"
-                  title="Isi dengan template bawaan KBC"
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-700 mt-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 pt-2">
+              <label className="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-emerald-600" />
+                Capaian Pembelajaran (CP)
+              </label>
+              <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                <select 
+                  onChange={(e) => {
+                    if (e.target.value.startsWith('del_')) {
+                      const id = e.target.value.replace('del_', '');
+                      const t = config?.cpTemplates?.find(x => x.id === id);
+                      if (t) handleDeleteCpTemplate(id, t.name);
+                    } else {
+                      handleSelectCpTemplate(e);
+                    }
+                    e.target.value = "";
+                  }}
+                  className="text-xs px-2 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-slate-700 dark:text-slate-300"
+                  defaultValue=""
                 >
-                  📝 Isi Template
+                  <option value="" disabled>📝 Pilih / Kelola Template...</option>
+                  <option value="default_kbc">🔄 Template Bawaan KBC</option>
+                  {config?.cpTemplates && config.cpTemplates.length > 0 && (
+                    <optgroup label="Template Tersimpan">
+                      {config.cpTemplates.map(t => (
+                        <option key={t.id} value={t.id}>Isi: {t.name}</option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {config?.cpTemplates && config.cpTemplates.length > 0 && (
+                    <optgroup label="Hapus Template">
+                      {config.cpTemplates.map(t => (
+                        <option key={`del_${t.id}`} value={`del_${t.id}`}>❌ Hapus: {t.name}</option>
+                      ))}
+                    </optgroup>
+                  )}
+                </select>
+                <button
+                  onClick={handleSaveCpTemplate}
+                  className="text-[10px] bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 px-2 py-1.5 rounded-lg font-bold transition flex items-center space-x-1 border border-emerald-300 dark:border-emerald-800"
+                  title="Simpan teks CP ini sebagai template baru"
+                >
+                  <Save className="w-3 h-3" />
+                  <span>Simpan Template</span>
                 </button>
               </div>
-              <textarea
-                rows={4}
-                value={formData.cpRasional}
-                onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, rasional: e.target.value } }))}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
-              />
             </div>
 
-            <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center mb-1">
-                <label className="font-bold text-slate-700 dark:text-slate-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div className="flex flex-col h-full">
+                <label className="font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  CP Umum / Rasional KBC (Panca Cinta & PPRA)
+                </label>
+                <textarea
+                  rows={4}
+                  value={formData.cpRasional}
+                  onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, rasional: e.target.value } }))}
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
+                />
+              </div>
+
+              <div className="flex flex-col h-full">
+                <label className="font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Capaian Pembelajaran (CP) Per Elemen
                 </label>
-                <button
-                  onClick={handleFillTemplateCP}
-                  className="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-0.5 rounded-md font-bold transition"
-                  title="Isi dengan template bawaan KBC"
-                >
-                  📝 Isi Template
-                </button>
+                <textarea
+                  rows={4}
+                  value={formData.cpElemen}
+                  onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, elemen: e.target.value } }))}
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
+                />
               </div>
-              <textarea
-                rows={4}
-                value={formData.cpElemen}
-                onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, elemen: e.target.value } }))}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
-              />
             </div>
           </div>
         </div>
