@@ -27,7 +27,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       desc: "Download RPP/Modul Ajar terlengkap.",
       icon: Download,
       badge: "Download",
-      color: "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border-blue-200"
+      color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200"
     },
     {
       id: "perangkat_kbc",
@@ -90,7 +90,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto w-full select-none">
       {/* Quick Action Banner */}
-      <div className="bg-gradient-to-r from-blue-800 via-indigo-800 to-purple-900 rounded-3xl p-5 sm:p-6 text-white shadow-lg flex flex-col items-start justify-between gap-4 sm:gap-5 border border-blue-700/50">
+      <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 rounded-3xl p-5 sm:p-6 text-white shadow-lg flex flex-col items-start justify-between gap-4 sm:gap-5 border border-emerald-700/50">
         <div className="space-y-2.5">
           <div className="flex items-center space-x-2">
             <span className="bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
@@ -99,7 +99,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
           </div>
           <h2 className="text-lg sm:text-xl lg:text-2xl font-black leading-snug">Buat Modul Ajar Deep Learning Otomatis</h2>
-          <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+          <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
             Susun modul pembelajaran Kurikulum Merdeka lengkap dengan skenario kegiatan per pertemuan (hingga 5 pertemuan), tabel diagnostik, rubrik asesmen, dan LKPD interaktif siap cetak.
           </p>
         </div>
@@ -116,7 +116,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <div className="space-y-3.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <LayoutGrid className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <LayoutGrid className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             <h3 className="font-extrabold text-sm sm:text-base text-slate-800 dark:text-white tracking-tight">
               Akses Cepat Modul & Menu Administrasi Guru
             </h3>
@@ -144,7 +144,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
 
                   <div>
-                    <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                       {item.title}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
@@ -153,7 +153,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center text-xs font-extrabold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform pt-1">
+                <div className="flex items-center text-xs font-extrabold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform pt-1">
                   <span>Buka Fitur</span>
                   <ArrowRight className="w-3.5 h-3.5 ml-1" />
                 </div>

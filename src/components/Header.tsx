@@ -11,6 +11,7 @@ interface HeaderProps {
   isConnected: boolean;
   config: Pengaturan;
   onLogout?: () => void;
+  onNavigateToDashboard?: () => void;
 }
 
 const TAB_TITLES: Record<string, string> = {
@@ -42,7 +43,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleDarkMode,
   isConnected,
   config,
-  onLogout
+  onLogout,
+  onNavigateToDashboard
 }) => {
   const handleSelectDark = (dark: boolean) => {
     if (onSetDarkMode) {
@@ -64,21 +66,25 @@ export const Header: React.FC<HeaderProps> = ({
           <Menu className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center space-x-2 sm:space-x-2.5 min-w-0 shrink-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-amber-400 rounded-xl flex items-center justify-center text-slate-950 font-bold shrink-0 shadow-xs">
-            <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-slate-950" />
+        <button 
+          onClick={() => onNavigateToDashboard && onNavigateToDashboard()}
+          className="flex items-center space-x-2 sm:space-x-2.5 min-w-0 shrink-0 text-left transition-transform active:scale-95 cursor-pointer"
+          title="Ke Dashboard"
+        >
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
+            <img src="https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds" alt="Logo Madrasah" className="w-full h-full object-contain p-1" />
           </div>
           <div className="flex flex-col min-w-0 leading-tight justify-center shrink-0">
             <span className="font-black text-slate-900 dark:text-white text-sm sm:text-base lg:text-lg tracking-tight block whitespace-nowrap">
               Aplikasi Guru AI
             </span>
             {activeTab !== "dashboard" && TAB_TITLES[activeTab] && (
-              <span className="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 font-semibold truncate max-w-[120px] sm:max-w-xs block">
+              <span className="text-[10px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-semibold truncate max-w-[120px] sm:max-w-xs block">
                 {TAB_TITLES[activeTab]}
               </span>
             )}
           </div>
-        </div>
+        </button>
       </div>
 
       <div className="flex items-center space-x-1 sm:space-x-2 shrink-0 ml-1">
@@ -105,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Teacher profile badge (Andi Yoka / Nama Guru) */}
         <div className="hidden min-[380px]:flex items-center space-x-1 sm:space-x-1.5 bg-slate-100 dark:bg-slate-800 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
-          <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="text-[11px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 max-w-[70px] sm:max-w-[140px] truncate">
             {config.Nama_Guru || "Andi Yoka"}
           </span>
@@ -131,8 +137,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => handleSelectDark(true)}
             className={`p-1.5 sm:p-2 rounded-lg transition-all flex items-center justify-center min-w-[30px] min-h-[30px] sm:min-w-[36px] sm:min-h-[36px] cursor-pointer ${
               isDarkMode
-                ? "bg-indigo-600 text-white shadow-xs font-bold scale-105"
-                : "text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 active:scale-95"
+                ? "bg-teal-600 text-white shadow-xs font-bold scale-105"
+                : "text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 active:scale-95"
             }`}
             title="Bulan Sabit: Aktifkan Tema Gelap (Dark Mode)"
             aria-label="Tema Gelap"

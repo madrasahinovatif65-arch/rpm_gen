@@ -106,11 +106,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
         {/* Brand Header */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white shadow-lg shadow-emerald-400/20 transform hover:scale-105 transition-transform overflow-hidden">
-            {config?.Logo_Kiri ? (
-              <img src={config.Logo_Kiri} alt="Logo" className="w-full h-full object-contain p-2" />
-            ) : (
-              <GraduationCap className="w-10 h-10 text-emerald-600" />
-            )}
+            <img src="https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds" alt="Logo" className="w-full h-full object-contain p-2" />
           </div>
 
           <div>

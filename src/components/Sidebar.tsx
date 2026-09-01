@@ -74,8 +74,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Logo Header */}
         <div className="h-16 flex items-center justify-between px-5 border-b border-slate-800 shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-amber-400 rounded-xl flex items-center justify-center text-slate-950 font-black shadow-lg">
-              <GraduationCap className="w-5 h-5 text-slate-950" />
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-lg overflow-hidden">
+              <img src="https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds" alt="Logo Madrasah" className="w-full h-full object-contain p-1" />
             </div>
             <div>
               <span className="font-extrabold text-lg tracking-tight text-white block leading-none">
@@ -98,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar pb-safe">
           {navItems.map((group, idx) => (
             <div key={idx} className="space-y-1">
-              <p className="px-3 text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-2">
+              <p className="px-3 text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2">
                 {group.group}
               </p>
               {group.items.map((item) => {
@@ -116,19 +116,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         ? (item as any).dangerous
                           ? "bg-red-600 text-white shadow-md font-bold"
                           : item.highlight
-                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md font-bold"
-                          : "bg-blue-600 text-white shadow-md font-bold"
+                          ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md font-bold"
+                          : "bg-emerald-600 text-white shadow-md font-bold"
                         : (item as any).dangerous
                         ? "text-red-400 hover:bg-red-950/50 hover:text-red-300"
                         : item.highlight
-                        ? "text-amber-300 hover:bg-slate-800 hover:text-white"
+                        ? "text-emerald-300 hover:bg-slate-800 hover:text-white"
                         : "text-slate-300 hover:bg-slate-800 hover:text-white"
                     }`}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : (item as any).dangerous ? "text-red-400" : item.highlight ? "text-amber-400" : "text-slate-400"}`} />
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : (item as any).dangerous ? "text-red-400" : item.highlight ? "text-emerald-400" : "text-slate-400"}`} />
                     <span className="truncate">{item.label}</span>
                     {item.highlight && (
-                      <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-bold border border-amber-400/30 shrink-0">
+                      <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-bold border border-emerald-400/30 shrink-0">
                         AI
                       </span>
                     )}

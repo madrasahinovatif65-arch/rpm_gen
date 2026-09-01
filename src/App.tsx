@@ -43,8 +43,8 @@ const DEFAULT_CONFIG: Pengaturan = {
   Nama_Kepsek: "Hamdani, S.Pd., M.Si.",
   NIP_Kepsek: "19780514 200212 1 003",
   Tempat_Tanda_Tangan: "Kerinci",
-  Logo_Kiri: "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
-  Logo_Kanan: "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU"
+  Logo_Kiri: "https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds",
+  Logo_Kanan: "https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds"
 };
 
 const AI_TOOLS_ITEMS = [
@@ -159,18 +159,19 @@ export default function App() {
           isConnected={isConnected}
           config={config}
           onLogout={handleLogout}
+          onNavigateToDashboard={() => setActiveTab("dashboard")}
         />
 
         {AI_TOOLS_ITEMS.some(item => item.id === activeTab) && (
-          <div className="bg-amber-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-amber-200/50 dark:border-slate-800 px-3 py-2 flex items-center space-x-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
+          <div className="bg-emerald-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-emerald-200/50 dark:border-slate-800 px-3 py-2 flex items-center space-x-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
             <button 
               onClick={() => setActiveCategorySheet("ai")}
-              className="flex items-center space-x-1 pr-2 border-r border-amber-200 dark:border-slate-800 shrink-0 text-amber-600 dark:text-amber-400 font-extrabold text-xs active:scale-95 transition-transform cursor-pointer"
+              className="flex items-center space-x-1 pr-2 border-r border-emerald-200 dark:border-slate-800 shrink-0 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs active:scale-95 transition-transform cursor-pointer"
               title="Buka Laci Menu AI Tools"
             >
               <Sparkles className="w-4 h-4" />
               <span>AI Tools:</span>
-              <SlidersHorizontal className="w-3 h-3 text-amber-400 ml-0.5" />
+              <SlidersHorizontal className="w-3 h-3 text-emerald-400 ml-0.5" />
             </button>
             {AI_TOOLS_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -181,8 +182,8 @@ export default function App() {
                   onClick={() => setActiveTab(item.id)}
                   className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer active:scale-95 ${
                     isActive
-                      ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-xs"
-                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100/50 dark:hover:bg-slate-700"
+                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-xs"
+                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-100/50 dark:hover:bg-slate-700"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -232,7 +233,7 @@ export default function App() {
             }}
             className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
               activeTab === "dashboard"
-                ? "text-blue-600 dark:text-blue-400 font-bold"
+                ? "text-teal-600 dark:text-teal-400 font-bold"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
@@ -249,11 +250,11 @@ export default function App() {
             }}
             className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
               AI_TOOLS_ITEMS.some(i => i.id === activeTab)
-                ? "text-amber-500 dark:text-amber-400 font-bold"
-                : "text-slate-500 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400"
+                ? "text-emerald-500 dark:text-emerald-400 font-bold"
+                : "text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400"
             }`}
           >
-            <Sparkles className={`w-5 h-5 ${AI_TOOLS_ITEMS.some(i => i.id === activeTab) ? "scale-110 text-amber-500" : ""}`} />
+            <Sparkles className={`w-5 h-5 ${AI_TOOLS_ITEMS.some(i => i.id === activeTab) ? "scale-110 text-emerald-500" : ""}`} />
             <span className="text-[11px] mt-0.5 tracking-tight truncate">AI Tools</span>
           </button>
 
@@ -290,7 +291,7 @@ export default function App() {
               {/* Sheet Header Title */}
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-9 h-9 bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center shrink-0">
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
@@ -325,27 +326,27 @@ export default function App() {
                       }}
                       className={`w-full flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.99] cursor-pointer ${
                         isActive
-                          ? "bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-100 font-bold"
+                          ? "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100 font-bold"
                           : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
                       }`}
                     >
                       <div className="flex items-center space-x-3 min-w-0">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          isActive ? "bg-amber-500 text-slate-950" : "bg-white dark:bg-slate-700 text-amber-500"
+                          isActive ? "bg-emerald-500 text-white" : "bg-white dark:bg-slate-700 text-emerald-500"
                         }`}>
                           <Icon className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center space-x-2">
                             <span className="font-extrabold text-xs sm:text-sm truncate">{item.label}</span>
-                            <span className="text-[9px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-700 dark:text-amber-300 font-extrabold border border-amber-400/30">
+                            <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-700 dark:text-emerald-300 font-extrabold border border-emerald-400/30">
                               {item.badge}
                             </span>
                           </div>
                           <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{item.desc}</div>
                         </div>
                       </div>
-                      <ChevronRight className={`w-5 h-5 shrink-0 ${isActive ? "text-amber-500" : "text-slate-400"}`} />
+                      <ChevronRight className={`w-5 h-5 shrink-0 ${isActive ? "text-emerald-500" : "text-slate-400"}`} />
                     </button>
                   );
                 })}
