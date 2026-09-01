@@ -1,8 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
+import { ZodSchema } from "zod";
+import {
 import {
   generateModulAjarFallback,
   generateChatAssistantFallback
 } from "./aiGenerators";
+import { KbcSchemas } from "./kbcSchemas";
 
 // Initialize Gemini AI Client safely
 export const getAiClient = () => {
@@ -75,6 +78,38 @@ const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any) =
     }
   }
   throw lastError || new Error("Layanan AI sedang sibuk.");
+};
+
+// Helper for JSON Generation with Zod Validation & Repair Loop
+export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPrompt: string, userPrompt: string, schema: ZodSchema<any>, maxRetries = 2) => {
+  if (!ai) throw new Error("GEMINI_API_KEY tidak dikonfigurasi.");
+  
+  let currentPrompt = `${systemPrompt}\n\nIMPORTANT: You must return a valid JSON object that strictly follows this schema. Do not include markdown blocks like \`\`\`json. Return ONLY the raw JSON string.\n\n${userPrompt}`;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await generateContentWithRetry(ai, [{ role: "user", parts: [{ text: currentPrompt }] }]);
+      let text = response?.text || "";
+      text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      
+      const parsed = JSON.parse(text);
+      const validationResult = schema.safeParse(parsed);
+      
+      if (validationResult.success) {
+        return validationResult.data;
+      } else {
+        // Validation failed, create repair prompt
+        const errorMsg = validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+        console.warn(`JSON validation failed on attempt ${attempt + 1}:`, errorMsg);
+        currentPrompt = `You previously returned invalid JSON. Please fix the following validation errors:\n${errorMsg}\n\nPrevious JSON:\n${text}\n\nReturn ONLY the corrected JSON object.`;
+      }
+    } catch (err) {
+      console.warn(`JSON parsing failed on attempt ${attempt + 1}:`, err);
+      currentPrompt = `You previously returned invalid JSON that could not be parsed. Error: ${String(err)}\n\nPlease ensure your response is ONLY a valid JSON object with no extra text.`;
+    }
+  }
+  
+  throw new Error("Gagal menghasilkan JSON yang valid setelah beberapa kali percobaan perbaikan.");
 };
 
 // Generator Modul Ajar
@@ -460,270 +495,26 @@ export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any
     topikLokal = "Pelestarian Lingkungan Hutan TNKS & Budaya Adat Mudik Kerinci"
   } = formData || {};
 
-  let docPrompt = "";
-  const generalKbcRules = `
-[ATURAN PENTING KBC & KEMENAG]:
-- Kamu adalah Ahli Kurikulum & Pengembang Perangkat Ajar Kemenag RI, menguasai "Kurikulum Berbasis Cinta (KBC)" (turunan Kurikulum Merdeka yang mengintegrasikan Panca Cinta Kemenag & 10 Nilai PPRA: Ta'addub, Qudwah, Muwaṭanah, Tawassuṭ, Tawāzun, I'tidāl, Musāwah, Syūrā, Tasāmuh, Tathawwur wa Ibtikār).
-- Hasil WAJIB MURNI KODE HTML tanpa markdown code fences (\`\`\`html) atau teks pengantar lain.
-- Gunakan CSS internal rapi dengan font sans-serif (Arial/Calibri), header tabel warna biru tua (#1a3a5c) teks putih bold.
-- Tanda tangan penutup 2 kolom sejajar border 0 (Kepala Sekolah & Guru Mata Pelajaran).
-- Tanggal & Kota TTD: ${cityDate}.
-  `;
-
-  if (docType === "analisis_cp") {
-    docPrompt = `
-${generalKbcRules}
-
-TUGAS: Buatkan dokumen "ANALISIS CAPAIAN PEMBELAJARAN (ACP) KURIKULUM BERBASIS CINTA" dengan struktur, urutan, dan format tabel PERSIS seperti kerangka baku di bawah ini. Jangan mengubah urutan bagian (A–H), jangan menghilangkan kolom, dan jangan menyingkat isi tabel.
-
-[DATA IDENTITAS GURU & MADRASAH]:
-- Kantor / Yayasan: ${kemenagOffice}
-- Satuan Pendidikan: ${schoolName}
-- Mata Pelajaran: ${subject} (${singkatanMapel})
-- Fase / Kelas: ${level}
-- Tahun Pelajaran: ${year}
-- Nama Guru: ${teacher} (NIP/NUPTK: ${nipTeacher})
-- Nama Kepala Sekolah: ${principal} (NIP: ${nipPrincipal})
-- Rasional & Elemen CP: ${cpRasional} \n ${cpElemen}
-
-STRUKTUR DOKUMEN (WAJIB PERSIS URUTAN A-H):
-KOP DOKUMEN:
-KEMENTERIAN AGAMA REPUBLIK INDONESIA
-${kemenagOffice}
-${schoolName.toUpperCase()}
-[Alamat Lengkap Madrasah]
-Judul: ANALISIS CAPAIAN PEMBELAJARAN
-Sub-judul: Kurikulum Berbasis Cinta (KBC) | Tahun Pelajaran ${year}
-
-A. IDENTITAS (Tabel 2 kolom: Label | Isi, 6 baris)
-B. RASIONAL MATA PELAJARAN (Tabel 3 kolom: No | Uraian | Deskripsi — 3 baris: 1. Pentingnya Mapel & Panca Cinta, 2. Kaitan dengan 8 Dimensi Profil Lulusan & 10 Nilai PPRA, 3. Orientasi Pembelajaran)
-C. TUJUAN MATA PELAJARAN (Tabel 3 kolom: No | Tujuan | Indikator Umum — 2-3 baris terukur)
-D. KARAKTERISTIK MATA PELAJARAN & ELEMEN CP (Tabel 4 kolom: No | Elemen | Deskripsi Elemen | Cakupan Konten Utama)
-E. CAPAIAN PEMBELAJARAN FASE ${level} (Tabel 4 kolom: Fase | Capaian Pembelajaran | Kompetensi Kunci | Konten/Materi Pokok)
-F. PENJABARAN KATA KERJA OPERASIONAL (KKO) PER ELEMEN (Tabel 3 kolom: No | Elemen | KKO & Arah Tujuan Pembelajaran — sertakan KKO Bloom tinggi, Panca Cinta, & nilai PPRA konkret)
-G. KETERKAITAN DENGAN 10 NILAI PPRA (Tabel 4 kolom: No | Dimensi Profil Lulusan | Elemen Terkait | Relevansi ✔ — WAJIB 10 baris urut: Ta'addub, Qudwah, Muwaṭanah, Tawassuṭ, Tawāzun, I'tidāl, Musāwah, Syūrā, Tasāmuh, Tathawwur wa Ibtikār)
-H. INTEGRASI NILAI PPRA DALAM PEMBELAJARAN (Tabel 4 kolom: No | Nilai PPRA | Deskripsi Nilai | Integrasi dalam Kegiatan Pembelajaran — WAJIB 10 baris urut sesuai Bagian G)
-
-PENUTUP: Tanda tangan sejajar Kepala Sekolah & Guru (${cityDate}).
-Layout: A4 Portrait (@media print { @page { size: A4 portrait; margin: 1.2cm; } }).
-`;
-  } else if (docType === "tp") {
-    docPrompt = `
-${generalKbcRules}
-
-TUGAS: Buatkan dokumen "TUJUAN PEMBELAJARAN (TP) KURIKULUM BERBASIS CINTA" (breakdown CP menjadi TP per elemen, lengkap dengan kode dan alokasi JP), dengan struktur, urutan, dan format tabel PERSIS seperti kerangka baku di bawah ini.
-
-[DATA IDENTITAS]:
-- Satuan Pendidikan: ${schoolName}
-- Mata Pelajaran: ${subject}
-- Singkatan Mapel: ${singkatanMapel}
-- Fase / Kelas: ${level}
-- Tahun Pelajaran: ${year}
-- Alokasi Waktu Total: ${totalJp}
-- Nama Guru: ${teacher} (NIP: ${nipTeacher})
-- Kepala Sekolah: ${principal} (NIP: ${nipPrincipal})
-- CP Elemen: ${cpElemen}
-
-STRUKTUR DOKUMEN WAJIB:
-KOP DOKUMEN KEMENTERIAN AGAMA & MADRASAH
-Judul: TUJUAN PEMBELAJARAN KURIKULUM BERBASIS CINTA | Tahun Pelajaran ${year}
-
-A. IDENTITAS (Tabel 2 kolom dengan format titik dua)
-B. PANDUAN KODE TUJUAN PEMBELAJARAN (Format Kode: [SINGKATAN_MAPEL]-[FASE]-[KODE_ELEMEN]-[NOMOR], Contoh: ${singkatanMapel}-E-ELE-001 & Tabel Kode Elemen)
-C. DAFTAR TUJUAN PEMBELAJARAN (Tabel 6 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran & Aspek Kompetensi | Integrasi Nilai (KBC & PPRA) | JP). Buat 8-12 TP berpola "Peserta didik mampu...", cantumkan Panca Cinta & Nilai PPRA (salah satu dari 10 nilai baku). Total JP = ${totalJp}.
-D. REKAPITULASI ALOKASI WAKTU PER ELEMEN (Tabel 5 kolom: No | Elemen CP | Jumlah TP | Total JP | Persentase %)
-PENUTUP / PENGESAHAN (${cityDate}).
-Layout: A4 Portrait (@media print { @page { size: A4 portrait; margin: 1.2cm; } }).
-`;
-  } else if (docType === "atp") {
-    docPrompt = `
-${generalKbcRules}
-
-TUGAS: Buatkan dokumen "ALUR TUJUAN PEMBELAJARAN (ATP) KURIKULUM BERBASIS CINTA" — pengurutan logis-hierarkis seluruh TP dalam satu fase dengan struktur PERSIS seperti kerangka baku di bawah ini.
-
-[DATA IDENTITAS]:
-- Satuan Pendidikan: ${schoolName}
-- Mata Pelajaran: ${subject}
-- Singkatan Mapel: ${singkatanMapel}
-- Fase / Kelas: ${level}
-- Tahun Pelajaran: ${year}
-- Alokasi Waktu Total: ${totalJp}
-- Nama Guru: ${teacher} (NIP: ${nipTeacher})
-- Kepala Sekolah: ${principal} (NIP: ${nipPrincipal})
-- CP Elemen: ${cpElemen}
-
-STRUKTUR DOKUMEN WAJIB:
-KOP DOKUMEN KEMENTERIAN AGAMA & MADRASAH
-Judul: ALUR TUJUAN PEMBELAJARAN KURIKULUM BERBASIS CINTA (KBC)
-
-A. IDENTITAS (Tabel 2 kolom berdampingan: Kiri & Kanan)
-B. ALUR URUTAN TUJUAN PEMBELAJARAN DALAM SATU FASE (Kotak Diagram Alur Horizontal [KODE-TP-001] → [KODE-TP-002] → ... dihubungkan tanda panah, dilengkapi Legenda ■ Hitam = Pembuka, □ Putih = Lanjutan)
-C. TABEL ALUR TUJUAN PEMBELAJARAN (Tabel 9 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran | Materi Pokok | Aspek Kompetensi | Integrasi Nilai (PC & PPRA) | Alokasi JP | Semester). Dikelompokkan per baris elemen.
-PENUTUP / PENGESAHAN (${cityDate}).
-Layout: A4 Landscape (@media print { @page { size: A4 landscape; margin: 1.2cm; } }).
-`;
-  } else if (docType === "prota") {
-    docPrompt = `
-${generalKbcRules}
-
-TUGAS: Buatkan dokumen "PROGRAM TAHUNAN (PROTA) KURIKULUM BERBASIS CINTA" — pemetaan seluruh TP ke minggu efektif kalender akademik dalam satu tahun ajaran.
-
-[DATA IDENTITAS]:
-- Satuan Pendidikan: ${schoolName}
-- Mata Pelajaran: ${subject}
-- Singkatan Mapel: ${singkatanMapel}
-- Fase / Kelas: ${level}
-- Tahun Pelajaran: ${year}
-- Alokasi Waktu: ${totalJp} (${jpPerMinggu})
-- Nama Guru: ${teacher} (NIP: ${nipTeacher})
-- Kepala Sekolah: ${principal} (NIP: ${nipPrincipal})
-
-STRUKTUR DOKUMEN WAJIB:
-KOP DOKUMEN KEMENTERIAN AGAMA & MADRASAH
-Judul: PROGRAM TAHUNAN | Kurikulum Berbasis Cinta | ${subject} | ${level} | TP ${year}
-
-A. IDENTITAS
-B. DISTRIBUSI MINGGU EFEKTIF — KALENDER PENDIDIKAN (Tabel 7 kolom: Sem. | Bulan | Minggu Kalender | Tdk Efektif | Efektif | JP | Keterangan). Sertakan Subtotal Sem 1, Subtotal Sem 2, & TOTAL KESELURUHAN.
-C. RENCANA PROGRAM TAHUNAN (Tabel 7 kolom: No | Kode TP | Tujuan Pembelajaran & Materi Pokok | Elemen CP | Integrasi Nilai (KBC & PPRA) | Alokasi JP | Semester). Sertakan header kelompok Semester 1 & Semester 2, serta baris CADANGAN.
-PENUTUP / PENGESAHAN (${cityDate}).
-Layout: A4 Portrait (@media print { @page { size: A4 portrait; margin: 1.2cm; } }).
-`;
-  } else if (docType === "prosem") {
-    docPrompt = `
-${generalKbcRules}
-
-TUGAS: Buatkan dokumen "PROGRAM SEMESTER (PROSEM) KURIKULUM BERBASIS CINTA" — jadwal distribusi pembelajaran mingguan per semester.
-
-[DATA IDENTITAS]:
-- Satuan Pendidikan: ${schoolName}
-- Mata Pelajaran: ${subject}
-- Singkatan Mapel: ${singkatanMapel}
-- Fase / Kelas: ${level}
-- Tahun Pelajaran: ${year}
-- JP per Minggu: ${jpPerMinggu}
-- Nama Guru: ${teacher} (NIP: ${nipTeacher})
-- Kepala Sekolah: ${principal} (NIP: ${nipPrincipal})
-
-STRUKTUR DOKUMEN WAJIB:
-KOP DOKUMEN KEMENTERIAN AGAMA & MADRASAH
-Judul: PROGRAM SEMESTER (PROSEM) | Kurikulum Berbasis Cinta | ${subject} | ${level}
-
-BLOK INFORMASI HEADER & Legenda Warna: [■ biru] JP Aktif Pembelajaran, [■ abu] Libur, [■ kuning] PTS, [■ merah] PAS.
-TABEL DISTRIBUSI PEMBELAJARAN (Grid mingguan: No | Kode TP | Tujuan Pembelajaran & Materi Pokok | JP | Integrasi Nilai (KBC & PPRA) | Kolom M1..M5 per bulan Juli-Desember & Januari-Juni).
-KETERANGAN: Catatan minggu tidak efektif per bulan & Catatan Semester.
-PENUTUP / PENGESAHAN (${cityDate}).
-Layout: A4 Landscape (@media print { @page { size: A4 landscape; margin: 1.0cm; } }).
-`;
-  } else if (docType === "kktp") {
-    docPrompt = `
-${generalKbcRules}
-
-TUGAS: Buatkan dokumen "KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP) KURIKULUM BERBASIS CINTA" — rubrik 4 level capaian untuk setiap TP.
-
-[DATA IDENTITAS]:
-- Satuan Pendidikan: ${schoolName}
-- Mata Pelajaran: ${subject}
-- Fase / Kelas: ${level}
-- Tahun Pelajaran: ${year}
-- Nama Guru: ${teacher} (NIP: ${nipTeacher})
-- Kepala Sekolah: ${principal} (NIP: ${nipPrincipal})
-
-STRUKTUR DOKUMEN WAJIB:
-KOP DOKUMEN KEMENTERIAN AGAMA & MADRASAH
-Judul: KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP) | Kurikulum Berbasis Cinta
-
-BLOK INFORMASI HEADER & PARAGRAF DASAR (Mengutip Permendikbudristek & Filosofi KBC / Panca Cinta & PPRA).
-A. DESKRIPSI LEVEL CAPAIAN (Tabel 6 kolom: Level | Skor | Deskripsi Umum | Tindak Lanjut | Rentang Nilai | Predikat — Level 1 Mulai Berkembang 0-55, Level 2 Layak ✓ KKTP 56-70, Level 3 Cakap 71-85, Level 4 Mahir 86-100).
-B. RUBRIK KKTP PER TUJUAN PEMBELAJARAN (Tabel 5 kolom utama dengan sub-kolom 4 level: Mulai Berkembang (1), Layak (2) ✓ KKTP, Cakap (3), Mahir (4)). Tulis deskriptor progresi bertingkat yang kaya nilai PPRA & Panca Cinta.
-CATATAN PENTING AMBANG BATAS KETUNTASAN.
-PENUTUP / PENGESAHAN (${cityDate}).
-Layout: A4 Landscape (@media print { @page { size: A4 landscape; margin: 1.2cm; } }).
-`;
-  } else if (docType === "modul_ajar") {
-    docPrompt = `
-${generalKbcRules}
-
-PERAN & KONTEKS
-Kamu adalah Ahli Kurikulum dan Pengembang Perangkat Ajar berpengalaman di satuan pendidikan naungan Kementerian Agama RI, menguasai penyusunan Modul Ajar berbasis Deep Learning (Mindful, Meaningful, Joyful Learning) yang diintegrasikan penuh dengan Kurikulum Berbasis Cinta (KBC) — Panca Cinta dan 10 Nilai PPRA (Profil Pelajar Rahmatan lil 'Alamin).
-
-TUGAS
-Susun dokumen "PERENCANAAN PEMBELAJARAN (MODUL AJAR DEEP LEARNING - KBC)" untuk Tujuan Pembelajaran [Kode: ${kodeTp}, Rumusan: ${rumusanTp}] mata pelajaran ${subject} kelas ${level} tahun pelajaran ${year}, dengan identitas satuan pendidikan:
-- Kementerian Agama Republik Indonesia
-- ${kemenagOffice}
-- ${schoolName}
-- ${schoolAddress}
-- Penyusun: ${teacher} (NIP: ${nipTeacher}) | Kepala Madrasah: ${principal} (NIP: ${nipPrincipal})
-
-INPUT YANG DIBERIKAN PENGGUNA
-- Rumusan lengkap TP dan Elemen CP: Kode ${kodeTp} - ${rumusanTp} | Elemen: ${elemenCp}
-- Model pembelajaran (${learningModel}) beserta sintaknya: ${sintakModel}
-- Jumlah pertemuan dan alokasi JP per pertemuan: ${jumlahPertemuan} Pertemuan x ${jpPerPertemuan} JP (${Number(jpPerPertemuan) * 45} Menit/Pertemuan)
-- Topik/konteks lokal yang relevan: ${topikLokal}
-
-ATURAN STRUKTUR MODUL AJAR (WAJIB DIIKUTI PERSIS)
-Hasilkan MURNI KODE HTML tanpa markdown code fences (\`\`\`html). Gunakan CSS internal rapi dengan font sans-serif (Arial/Calibri), header tabel warna biru tua (#1a3a5c) teks putih bold.
-
-KOP SURAT DOKUMEN:
-KEMENTERIAN AGAMA REPUBLIK INDONESIA
-${kemenagOffice.toUpperCase()}
-${schoolName.toUpperCase()}
-${schoolAddress}
-
-BAGIAN A — INFORMASI UMUM
-- Tabel identitas: Nama Penyusun, Satuan Pendidikan, Mata Pelajaran, Fase/Kelas, Kode & Judul TP, Elemen CP, Alokasi Waktu, Model Pembelajaran, Moda, Tahun Pelajaran
-- B. Identifikasi Kesiapan Peserta Didik (1 paragraf naratif mengaitkan capaian belajar sebelumnya dengan TP ini)
-- C. Karakteristik Materi Pelajaran (1 paragraf: sifat materi, tingkat kesulitan, relevansi lokal: ${topikLokal})
-- 1. Tujuan Pembelajaran (1 kalimat utuh memuat kompetensi + nilai KBC yang ditumbuhkan)
-- 2. Kompetensi Awal/Prasyarat (tabel: No | Kompetensi Prasyarat | Cara Mengecek)
-- 3. 8 Dimensi Profil Lulusan (pilih 2 dimensi paling relevan; tabel: No | Dimensi | Deskripsi Perwujudan, setiap deskripsi WAJIB diakhiri anotasi "(PC: [Panca Cinta] | PPRA: [Nilai])")
-- 3a. Integrasi KBC: baris terpisah "Panca Cinta: [...]" dan "Nilai PPRA: [...]" (pilih 2-3 nilai paling relevan dari 10 Nilai PPRA)
-- 4. Sarana & Prasarana (tabel: Kategori | Rincian | Keterangan)
-- 5. Target Peserta Didik & Diferensiasi (3 kolom: Reguler/Tipikal | Kesulitan Belajar | Berbakat/Cepat — masing-masing berisi Sasaran & Perlakuan)
-
-BAGIAN B — KOMPONEN INTI
-- 6. Pemahaman Bermakna (kotak bertekstur naratif-reflektif, mengaitkan materi dengan minimal 1 istilah PPRA, misal Tathawwur wa Ibtikār / Syūrā / I'tidāl)
-- 7. Pertanyaan Pemantik (tabel: No | Pertanyaan | Tujuan Pertanyaan, 3 butir)
-- 8. Asesmen Diagnostik:
-  8a. Non-Kognitif (tabel: No | Pertanyaan Refleksi | Tujuan Diagnostik, 3 butir)
-  8b. Kognitif (tabel: No | Indikator | Bentuk Soal | Tindak Lanjut, 3 butir) + 5 contoh soal campuran (isian, PG, terbuka)
-- 9. KEGIATAN PEMBELAJARAN — cantumkan nama model (${learningModel}) & urutan sintak lengkap (${sintakModel}) di awal.
-  UNTUK SETIAP PERTEMUAN (Pertemuan 1 s.d. ${jumlahPertemuan}), wajib memuat:
-  a. Judul pertemuan bertema naratif + Alokasi (${jpPerPertemuan} JP & ${Number(jpPerPertemuan) * 45} menit) + Sintak yang dicakup + Fokus
-  b. Tujuan Pertemuan (3 butir: Keterampilan, Pengetahuan, Sikap)
-  c. ● PEMBUKA (15 menit) — prinsip Deep Learning + integrasi KBC (PC & PPRA), tabel 2 kolom (Aktivitas Guru | Aktivitas Siswa) berpasangan No, 5 baris, SETIAP baris aktivitas guru MAUPUN siswa diakhiri anotasi "(PC: ... | PPRA: ...)"
-  d. SINTAK [n] [Nama Sintak] (durasi menit) — prinsip pembelajaran + integrasi KBC, tabel sama seperti di atas (5 baris)
-  e. Ulangi (d) untuk setiap sintak dalam pertemuan tsb (${sintakModel})
-  f. ● PENUTUP (15 menit) — format sama, 5 baris
-  Total menit per pertemuan harus sama dengan alokasi ${jpPerPertemuan} JP × 45 menit (${Number(jpPerPertemuan) * 45} menit).
-- 10. Asesmen Formatif (tabel: No | Teknik | Instrumen | Waktu Pelaksanaan | Aspek yang Dinilai, satu baris per pertemuan) + 5 contoh soal proses pembelajaran
-- 11. Asesmen Sumatif (tabel: No | Komponen | Deskripsi Tugas | Bobot | Acuan KKTP; bobot harus total 100%)
-- 12. Pengayaan & Remedial (3 kolom: Remedial | Reguler | Pengayaan, masing-masing berisi Sasaran, Kegiatan, Waktu)
-- 13. Refleksi Guru & Peserta Didik (2 kolom, masing-masing 3-4 pertanyaan reflektif, refleksi guru memuat kata "teladan (Qudwah)")
-
-BAGIAN C — LAMPIRAN
-- Deskripsi singkat tiap lampiran (LKPD, lembar penilaian sahabat, dsb.)
-- Glosarium (3 istilah kunci materi)
-- Daftar Pustaka
-PENUTUP / PENGESAHAN (${cityDate}).
-`;
-  } else {
-    docPrompt = `Buatkan dokumen ${docType} untuk ${subject} tingkat ${level}.
-${generalKbcRules}
-Gunakan format HTML murni tanpa markdown, lengkapi kop madrasah dan tanda tangan guru/kepsek.`;
+// Generator Perangkat Ajar KBC (Kurikulum Berbasis Cinta)
+export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any) => {
+  const ai = getAiClient();
+  const schema = KbcSchemas[docType];
+  
+  if (!schema) {
+    return { status: "error", message: `Schema untuk dokumen ${docType} tidak ditemukan.` };
   }
+
+  const generalKbcRules = `Kamu adalah Ahli Kurikulum & Pengembang Perangkat Ajar Kemenag RI, menguasai "Kurikulum Berbasis Cinta (KBC)" (Panca Cinta Kemenag & 10 Nilai PPRA: Ta'addub, Qudwah, Muwaṭanah, Tawassuṭ, Tawāzun, I'tidāl, Musāwah, Syūrā, Tasāmuh, Tathawwur wa Ibtikār).`;
+
+  let userPrompt = `Buatkan konten untuk dokumen ${docType} berdasarkan data berikut:\n${JSON.stringify(formData, null, 2)}\n\nPastikan data terisi lengkap, akurat, dan kaya akan nilai PPRA & Panca Cinta Kemenag.`;
 
   try {
-    const response = await generateContentWithRetry(ai, [
-      { role: "user", parts: [{ text: docPrompt }] }
-    ]);
-    let text = response?.text || "";
-    text = text.replace(/\`\`\`[a-zA-Z]*\n?/g, "").replace(/\`\`\`/g, "").trim();
-    if (text) {
-      return { status: "success", html: text };
-    }
+    const data = await generateJsonWithRepair(ai, generalKbcRules, userPrompt, schema, 2);
+    // Temporary fallback for Phase 2: return JSON string wrapped in <pre> so UI can still render it without crashing
+    const jsonHtml = `<div class="bg-slate-900 text-emerald-400 p-4 rounded-xl text-left font-mono text-xs overflow-x-auto whitespace-pre-wrap">${JSON.stringify(data, null, 2)}</div>`;
+    return { status: "success", html: jsonHtml, data };
   } catch (err) {
-    console.warn("Failed to generate", err);
+    console.error("Failed to generate JSON for KBC API:", err);
+    return { status: "error", message: String(err) };
   }
-
-  return { status: "error", message: "Gagal membuat dokumen." };
 };
