@@ -23,6 +23,8 @@ import { Pengaturan } from "../types";
 import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { useKbcState, defaultKbcState } from "../store/kbcState";
+import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
+import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 
 interface PerangkatAjarKBCViewProps {
   config: Pengaturan;
@@ -38,22 +40,11 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingProgress, setGeneratingProgress] = useState("");
 
-  // Store generated HTML for each document type
-  const [generatedDocs, setGeneratedDocs] = useState<Record<string, string>>({
-    analisis_cp: "",
-    tp: "",
-    atp: "",
-    prota: "",
-    prosem: "",
-    kktp: "",
-    modul_ajar: "",
-    lkpd: "",
-    rubrik: ""
-  });
+  const [generatedDocs, setGeneratedDocs] = useState<Record<string, string>>({});
+  const [generatedJson, setGeneratedJson] = useState<Record<string, any>>({});
 
   const [state, updateState] = useKbcState();
 
-  // Alias for ease of transition
   const formData = {
     ...state.school,
     ...state.curriculum,
@@ -137,6 +128,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           ...prev,
           [targetType]: cleanedHtml
         }));
+        if (res.data) {
+          setGeneratedJson((prev) => ({
+            ...prev,
+            [targetType]: res.data
+          }));
+        }
         notifySimpanSuccess(`${docMeta?.fullTitle || "Dokumen"} KBC berhasil dibuat!`);
       } else {
         throw new Error(res.message || "Gagal menghasilkan dokumen KBC");
@@ -149,7 +146,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     }
   };
 
-  // Generate 3 Paket Pembelajaran (Modul Ajar, LKPD, Rubrik)
   const handleGenerate3ModulDocs = async () => {
     setIsGenerating(true);
     const modulTypes = [
@@ -171,6 +167,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             ...prev,
             [t.id]: cleanedHtml
           }));
+          if (res.data) {
+            setGeneratedJson((prev) => ({
+              ...prev,
+              [t.id]: res.data
+            }));
+          }
         }
       } catch (err) {
         console.error(`Gagal pada ${t.id}:`, err);
@@ -203,6 +205,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             ...prev,
             [t]: cleanedHtml
           }));
+          if (res.data) {
+            setGeneratedJson((prev) => ({
+              ...prev,
+              [t]: res.data
+            }));
+          }
         } else {
           console.warn(`Gagal menyusun ${t}:`, res.message);
         }
@@ -215,15 +223,15 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     notifySimpanSuccess("Seluruh 9 Dokumen Administrasi Perangkat Ajar KBC Berhasil Dibuat!");
   };
 
-  // Print A4 Function
   const handlePrintA4 = () => {
-    const rawHtml = generatedDocs[activeDoc];
-    if (!rawHtml) {
+    const printArea = document.getElementById("kbc-document-render-area");
+    const htmlToPrint = printArea ? printArea.innerHTML : generatedDocs[activeDoc];
+    
+    if (!htmlToPrint) {
       notifySimpanError("Belum ada dokumen KBC yang dihasilkan untuk dicetak.");
       return;
     }
 
-    const activeHtml = sanitizeHtmlForOutput(rawHtml);
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
       notifySimpanError("Gagal membuka jendela cetak. Periksa pembatas pop-up browser Anda.");
@@ -236,181 +244,72 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Cetak Perangkat Ajar KBC - A4 Presisi</title>
+          <title>Cetak Perangkat Ajar KBC</title>
           <meta charset="utf-8" />
           <style>
-            @page {
-              size: A4 ${isLandscape ? "landscape" : "portrait"};
-              margin: 1.2cm;
-            }
-            body {
-              font-family: Arial, Helvetica, sans-serif;
-              color: #000;
-              background: #fff;
-              margin: 0;
-              padding: 0;
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 12px;
-            }
-            th, td {
-              border: 1px solid #333;
-              padding: 6px 8px;
-              font-size: 10pt;
-            }
-            th {
-              background-color: #1a3a5c !important;
-              color: #ffffff !important;
-            }
-            tr:nth-child(even) {
-              background-color: #f8fafc;
-            }
-            table[style*="border:none"], table[style*="border: 0"], table.ttd-table, table.signature-table {
-              border: none !important;
-            }
-            table[style*="border:none"] td, table[style*="border: 0"] td, table.ttd-table td, table.signature-table td {
-              border: none !important;
-            }
-            img, .logo-sekolah, .kop-logo {
-              display: inline-block !important;
-              max-height: 75px;
-              width: auto;
-              object-fit: contain;
-              vertical-align: middle;
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            @media print {
-              body {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-              img, .logo-sekolah, .kop-logo {
-                display: inline-block !important;
-                visibility: visible !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-            }
+            @page { size: A4 ${isLandscape ? "landscape" : "portrait"}; margin: 1.2cm; }
+            body { font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #333; padding: 6px; font-size: 10pt; }
+            th { background: #eee; }
           </style>
         </head>
-        <body>
-          ${activeHtml}
-          <script>
-            window.onload = function() {
-              window.print();
-            };
-          </script>
-        </body>
+        <body>${htmlToPrint}</body>
       </html>
     `);
     printWindow.document.close();
+    printWindow.print();
   };
 
-  // Download Word (.doc)
   const handleDownloadWord = () => {
-    const rawHtml = generatedDocs[activeDoc];
-    if (!rawHtml) {
-      notifySimpanError("Belum ada dokumen KBC yang dihasilkan untuk diunduh.");
+    const printArea = document.getElementById("kbc-document-render-area");
+    const htmlToPrint = printArea ? printArea.innerHTML : generatedDocs[activeDoc];
+
+    if (!htmlToPrint) {
+      notifySimpanError("Belum ada dokumen untuk diunduh.");
       return;
     }
-
-    const activeHtml = sanitizeHtmlForOutput(rawHtml);
-    const orientation = activeDoc === "atp" || activeDoc === "prosem" || activeDoc === "kktp" || activeDoc === "rubrik" ? "landscape" : "portrait";
-    const docTitle = docTypeList.find((d) => d.id === activeDoc)?.fullTitle || "Perangkat_Ajar_KBC";
-    const wordPageSize = orientation === "landscape" ? "841.9pt 595.3pt" : "595.3pt 841.9pt";
-    const currentSubject = activeDoc === "modul_ajar" || activeDoc === "lkpd" || activeDoc === "rubrik" ? formDataModul.subject : formData.subject;
-
-    const wordContent = `
+    const docMeta = docTypeList.find((d) => d.id === activeDoc);
+    const title = docMeta?.fullTitle || "Dokumen_KBC";
+    const content = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head>
-          <meta charset="utf-8">
-          <title>${docTitle}</title>
-          <!--[if gte mso 9]>
-          <xml>
-            <w:WordDocument>
-              <w:View>Print</w:View>
-              <w:Zoom>100</w:Zoom>
-              <w:DoNotOptimizeForCustomXSL/>
-            </w:WordDocument>
-          </xml>
-          <![endif]-->
-          <style>
-            @page WordSection1 {
-              size: ${wordPageSize};
-              mso-page-orientation: ${orientation};
-              margin: 36.0pt 36.0pt 36.0pt 36.0pt;
-            }
-            div.WordSection1 {
-              page: WordSection1;
-            }
-            body {
-              font-family: 'Calibri', 'Arial', sans-serif;
-              font-size: 11pt;
-            }
-            table {
-              border-collapse: collapse;
-              width: 100%;
-              margin-bottom: 15px;
-            }
-            td, th {
-              border: 1px solid #1a3a5c;
-              padding: 6px 8px;
-              vertical-align: top;
-            }
-            th, td.header-cell, th.bg-header {
-              background-color: #1a3a5c !important;
-              background: #1a3a5c !important;
-              color: #ffffff !important;
-              font-weight: bold;
-              text-align: center;
-              mso-shading: windowtext transparent;
-              mso-pattern: fill #1a3a5c;
-            }
-            table[style*="border:none"], table[style*="border: 0"], table[style*="border:none !important"], table.ttd-table, table.signature-table {
-              border: none !important;
-              mso-border-alt: none !important;
-            }
-            table[style*="border:none"] td, table[style*="border: 0"] td, table[style*="border:none !important"] td, table.ttd-table td, table.signature-table td {
-              border: none !important;
-              mso-border-alt: none !important;
-            }
-            img {
-              display: none !important;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="WordSection1">
-            ${activeHtml}
-          </div>
-        </body>
-      </html>
+      <head><meta charset='utf-8'><title>${title}</title></head><body>
+      ${htmlToPrint}
+      </body></html>
     `;
-
-    const blob = new Blob(["\ufeff", wordContent], {
-      type: "application/msword;charset=utf-8"
-    });
-
+    const blob = new Blob([content], { type: "application/msword" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${activeDoc.toUpperCase()}_KBC_${currentSubject.replace(/\s+/g, "_")}.doc`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${title}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    notifyUnduhSuccess(`File Word (.doc) ${title} berhasil diunduh!`);
+  };
 
-    notifyUnduhSuccess(`File Word (.doc) ${docTitle} berhasil diunduh!`);
+  const renderDocument = (docType: string) => {
+    const data = generatedJson[docType];
+    if (!data) {
+      return <div dangerouslySetInnerHTML={{ __html: generatedDocs[docType] || "" }} />;
+    }
+    switch (docType) {
+      case 'analisis_cp': return <AcpRenderer data={data} context={state} />;
+      case 'tp': return <TpRenderer data={data} context={state} />;
+      case 'atp': return <AtpRenderer data={data} context={state} />;
+      case 'prota': return <ProtaRenderer data={data} context={state} />;
+      case 'prosem': return <ProsemRenderer data={data} context={state} />;
+      case 'kktp': return <KktpRenderer data={data} context={state} />;
+      case 'modul_ajar': return <ModulAjarRenderer data={data} context={state} />;
+      case 'lkpd': return <LkpdRenderer data={data} context={state} />;
+      case 'rubrik': return <RubrikRenderer data={data} context={state} />;
+      default: return <div dangerouslySetInnerHTML={{ __html: generatedDocs[docType] || "" }} />;
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header Banner KBC */}
       <div className="bg-gradient-to-r from-emerald-900 via-teal-950 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-emerald-800">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
@@ -450,7 +349,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </div>
       </div>
 
-      {/* Selector Tab Mode Input */}
       <div className="flex items-center space-x-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
         <button
           onClick={() => setInputTab("admin")}
@@ -477,7 +375,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </button>
       </div>
 
-      {/* Form Input Mode 1: Administrasi Pembelajaran */}
       {inputTab === "admin" && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-md space-y-6">
           <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3 flex-wrap gap-2">
@@ -668,7 +565,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </div>
       )}
 
-      {/* Form Input Mode 2: KHUSUS Modul Ajar, LKPD, & Rubrik KBC */}
       {inputTab === "modul" && (
         <div className="bg-emerald-50/50 dark:bg-emerald-950/20 rounded-2xl p-6 border-2 border-emerald-300 dark:border-emerald-800 shadow-lg space-y-6">
           <div className="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-3 flex-wrap gap-2">
@@ -696,7 +592,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           </div>
 
           <div className="space-y-4">
-            {/* Blok Utama 1: Rumusan TP & Elemen CP */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900">
               <div>
                 <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Kode TP</label>
@@ -734,7 +629,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               </div>
             </div>
 
-            {/* Blok Utama 2: Model Pembelajaran, Sintaks & Alokasi */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900">
               <div>
                 <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Model Pembelajaran</label>
@@ -799,7 +693,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               </div>
             </div>
 
-            {/* Blok Utama 3: Identitas Madrasah & Pengesahan */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900">
               <div>
                 <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Kantor Kemenag Kabupaten/Kota</label>
@@ -915,7 +808,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </div>
       )}
 
-      {/* Sub-Menu Tabs Navigation */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-md p-4 space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3 border-b border-slate-200 dark:border-slate-700 pb-3">
           <div className="flex items-center space-x-2">
@@ -937,7 +829,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           </div>
         </div>
 
-        {/* 9 Sub-menu Tab Buttons */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2">
           {docTypeList.map((doc) => {
             const Icon = doc.icon;
@@ -972,7 +863,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </div>
       </div>
 
-      {/* Loading overlay */}
       {isGenerating && (
         <div className="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 p-6 rounded-2xl flex items-center justify-center space-x-4 animate-pulse">
           <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
@@ -984,7 +874,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </div>
       )}
 
-      {/* Output Document Display & Action Bar */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden">
         <div className="p-4 bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
@@ -1016,10 +905,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
         <div className="p-6 overflow-x-auto min-h-[500px] bg-slate-50 dark:bg-slate-900">
           {generatedDocs[activeDoc] ? (
-            <div
-              className="bg-white text-slate-900 p-8 rounded-xl shadow-md border border-slate-300 max-w-5xl mx-auto font-sans leading-relaxed text-sm"
-              dangerouslySetInnerHTML={{ __html: generatedDocs[activeDoc] }}
-            />
+            <div id="kbc-document-render-area" className="a4-preview-container bg-white text-black p-8 rounded-lg shadow-inner min-h-[800px] relative">
+              {renderDocument(activeDoc)}
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
               <div className="w-16 h-16 bg-emerald-100 dark:bg-slate-800 text-emerald-600 rounded-full flex items-center justify-center">

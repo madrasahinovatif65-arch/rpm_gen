@@ -1,7 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { ZodSchema } from "zod";
 import {
-import {
   generateModulAjarFallback,
   generateChatAssistantFallback
 } from "./aiGenerators";
@@ -465,37 +464,7 @@ Gunakan format HTML murni tanpa markdown, lengkapi kop sekolah dan tanda tangan 
   return { status: "error", message: "Gagal membuat dokumen." };
 };
 
-// Generator Perangkat Ajar KBC (Kurikulum Berbasis Cinta)
-export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any) => {
-  const ai = getAiClient();
-  const {
-    schoolName = "MAN 1 Kerinci",
-    kemenagOffice = "KANTOR KEMENTERIAN AGAMA KABUPATEN KERINCI",
-    schoolAddress = "Jl. Raya Semurup No. 45, Semurup, Kabupaten Kerinci",
-    subject = "Akidah Akhlak",
-    singkatanMapel = "AA",
-    level = "Fase E / Kelas X",
-    year = "2026/2027",
-    totalJp = "72 JP / Tahun",
-    jpPerMinggu = "2 JP/Minggu",
-    teacher = "Drs. Yefri Haryanto, M.Pd.",
-    nipTeacher = "19850312 201001 1 008",
-    cityDate = "Kerinci, 14 Juli 2026",
-    principal = "Hamdani, S.Pd., M.Si.",
-    nipPrincipal = "19780514 200212 1 003",
-    cpRasional = "",
-    cpElemen = "",
-    learningModel = "Discovery Learning",
-    sintakModel = "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
-    kodeTp = "TP.AA.ELE.10.01",
-    rumusanTp = "Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
-    elemenCp = "Akidah",
-    jumlahPertemuan = "3",
-    jpPerPertemuan = "2",
-    topikLokal = "Pelestarian Lingkungan Hutan TNKS & Budaya Adat Mudik Kerinci"
-  } = formData || {};
 
-// Generator Perangkat Ajar KBC (Kurikulum Berbasis Cinta)
 export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any) => {
   const ai = getAiClient();
   const schema = KbcSchemas[docType];
