@@ -21,8 +21,8 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
   const templates = config.cpTemplates || [];
   
   const filteredTemplates = templates.filter(t => 
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.rasional.toLowerCase().includes(searchTerm.toLowerCase())
+    (t.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (t.rasional || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddNew = () => {

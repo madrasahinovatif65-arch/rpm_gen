@@ -21,7 +21,8 @@ import {
   BookMarked,
   LayoutList,
   Trash2,
-  Save
+  Save,
+  Settings
 } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
