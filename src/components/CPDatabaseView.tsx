@@ -1,8 +1,9 @@
 import React, { useState, useRef } from "react";
-import { Database, Plus, Trash2, Edit, Save, X, Search, BookOpen, Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Database, Plus, Trash2, Edit, Save, X, Search, BookOpen, Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2, HelpCircle } from "lucide-react";
 import { Pengaturan, CpTemplate } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { notifySimpanSuccess, notifySimpanError } from "../lib/swal";
+import { KamusPedagogiModal } from "./KamusPedagogiModal";
 import * as XLSX from "xlsx";
 
 interface CPDatabaseViewProps {
@@ -23,6 +24,7 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<CpTemplate>({ id: "", name: "", rasional: "", elemen: "" });
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showKamusModal, setShowKamusModal] = useState(false);
   const [importRows, setImportRows] = useState<ImportRow[]>([]);
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -372,7 +374,12 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                   <input type="text" value={editForm.alokasiWaktuTotal || ""} onChange={e => setEditForm({ ...editForm, alokasiWaktuTotal: e.target.value })} placeholder="Contoh: 72" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Model Pembelajaran</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-slate-700 dark:text-slate-300 text-sm">Model Pembelajaran</label>
+                    <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                      <HelpCircle className="w-4 h-4" />
+                    </button>
+                  </div>
                   <input type="text" list="cp-model-pembelajaran-list" value={editForm.modelPembelajaran || ""} onChange={e => setEditForm({ ...editForm, modelPembelajaran: e.target.value })} placeholder="Contoh: Discovery Learning" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
                   <datalist id="cp-model-pembelajaran-list">
                     <option value="Discovery Learning" />
@@ -386,7 +393,12 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                   </datalist>
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Metode Pembelajaran <span className="text-slate-400 font-normal">(Opsional)</span></label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-slate-700 dark:text-slate-300 text-sm">Metode Pembelajaran <span className="text-slate-400 font-normal">(Opsional)</span></label>
+                    <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                      <HelpCircle className="w-4 h-4" />
+                    </button>
+                  </div>
                   <input type="text" list="cp-metode-pembelajaran-list" value={editForm.metodePembelajaran || ""} onChange={e => setEditForm({ ...editForm, metodePembelajaran: e.target.value })} placeholder="Bila kosong, AI akan memilih otomatis" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
                   <datalist id="cp-metode-pembelajaran-list">
                     <option value="Diskusi" />
@@ -463,6 +475,8 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
           </div>
         </div>
       )}
+      
+      <KamusPedagogiModal isOpen={showKamusModal} onClose={() => setShowKamusModal(false)} />
     </div>
   );
 };

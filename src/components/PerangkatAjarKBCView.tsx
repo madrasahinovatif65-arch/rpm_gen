@@ -22,7 +22,8 @@ import {
   LayoutList,
   Trash2,
   Save,
-  Settings
+  Settings,
+  HelpCircle
 } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
@@ -33,6 +34,7 @@ import { subscribeToJobs, enqueueJob, AIJob } from "../lib/aiJobManager";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
 import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
+import { KamusPedagogiModal } from "./KamusPedagogiModal";
 
 interface PerangkatAjarKBCViewProps {
   config?: Pengaturan;
@@ -45,6 +47,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   >("analisis_cp");
 
   const [inputTab, setInputTab] = useState<"admin" | "modul">("admin");
+  const [showKamusModal, setShowKamusModal] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingProgress, setGeneratingProgress] = useState("");
@@ -588,7 +591,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             </div>
 
             <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Model Pembelajaran Sintaks</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="font-bold text-slate-700 dark:text-slate-300">Model Pembelajaran Sintaks</label>
+                <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                  <HelpCircle className="w-4 h-4" />
+                </button>
+              </div>
               <input
                 type="text"
                 list="model-pembelajaran-list"
@@ -831,7 +839,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900">
               <div>
-                <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Model Pembelajaran</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-slate-800 dark:text-slate-200">Model Pembelajaran</label>
+                  <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                    <HelpCircle className="w-4 h-4" />
+                  </button>
+                </div>
                 <input
                   type="text"
                   list="model-pembelajaran-list-2"
@@ -873,9 +886,14 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 />
               </div>
               <div className="md:col-span-3">
-                <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
-                  Metode Pembelajaran <span className="text-slate-500 font-normal">(Opsional)</span>
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-slate-800 dark:text-slate-200">
+                    Metode Pembelajaran <span className="text-slate-500 font-normal">(Opsional)</span>
+                  </label>
+                  <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                    <HelpCircle className="w-4 h-4" />
+                  </button>
+                </div>
                 <input
                   type="text"
                   list="metode-pembelajaran-list-main"
@@ -1158,6 +1176,8 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           )}
         </div>
       </div>
+      
+      <KamusPedagogiModal isOpen={showKamusModal} onClose={() => setShowKamusModal(false)} />
     </div>
   );
 };
