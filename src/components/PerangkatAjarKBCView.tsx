@@ -859,19 +859,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
               <div className="md:col-span-3">
                 <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
-                  Urutan Sintaks Model Pembelajaran
-                </label>
-                <input
-                  type="text"
-                  value={formDataModul.sintakModel as string}
-                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, sintakModel: e.target.value } }))}
-                  placeholder="Urutan sintaks lengkap..."
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold text-slate-800 dark:text-slate-200"
-                />
-              </div>
-
-              <div className="md:col-span-3">
-                <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
                   Topik / Konteks Lokal Relevan (Kearifan Lokal Kerinci / Isu Lingkungan / Budaya)
                 </label>
                 <textarea
