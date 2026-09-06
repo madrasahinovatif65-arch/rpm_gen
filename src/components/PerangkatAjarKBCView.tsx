@@ -156,11 +156,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     updateState(s => ({
       ...s,
       cp: {
-        rasional: "Mata pelajaran ini diarahkan untuk membentuk karakter unggul dengan mengintegrasikan nilai-nilai Panca Cinta (Cinta Allah, Cinta Rasulullah, Cinta Al-Qur'an, Cinta Sesama, Cinta Tanah Air) serta menginternalisasi 10 Nilai Profil Pelajar Rahmatan Lil 'Alamin (PPRA). Pembelajaran disusun sedemikian rupa agar siswa mampu bernalar kritis, kreatif, serta mengaplikasikan ilmu pengetahuan dalam kehidupan nyata yang moderat dan toleran.",
+        rasional: "Mata pelajaran ini diarahkan untuk membentuk peserta didik yang berpengetahuan luas, berakhlak mulia, dan mampu berpikir kritis serta kreatif. Pembelajaran dirancang agar siswa dapat memahami, menganalisis, dan mengaplikasikan ilmu pengetahuan secara bermakna dalam kehidupan nyata yang moderat dan toleran.",
         elemen: "Elemen Pemahaman Konsep: Peserta didik mampu menganalisis dan menjelaskan ruang lingkup materi secara mendalam dan komprehensif.\n\nElemen Keterampilan Proses: Peserta didik mampu mengamati, menanya, mengeksplorasi, merumuskan kesimpulan, serta mengkomunikasikan hasil karya secara lisan maupun tulisan."
       }
     }));
   };
+
 
   const handleSelectCpTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const templateId = e.target.value;
@@ -674,15 +675,23 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div className="flex flex-col h-full">
                 <label className="font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  CP Umum / Rasional KBC (Panca Cinta & PPRA)
+                  Rasional Mata Pelajaran
+                  <span className="ml-2 text-[10px] font-normal bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full">
+                    ✨ 8 DPL · 5 Panca Cinta · 10 PPRA otomatis
+                  </span>
                 </label>
                 <textarea
                   rows={4}
                   value={formData.cpRasional}
                   onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, rasional: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
+                  placeholder="Tulis rasional mata pelajaran secara ringkas. Contoh: Mata pelajaran Akidah Akhlak bertujuan membentuk peserta didik yang beriman, berakhlak mulia, dan mampu mengamalkan nilai-nilai Islam dalam kehidupan sehari-hari..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed placeholder:text-slate-400 placeholder:font-normal"
                 />
+                <p className="mt-1 text-[10px] text-slate-400 dark:text-slate-500 italic">
+                  Cukup tulis inti rasional mapel. Integrasi nilai KBC dilakukan otomatis oleh AI.
+                </p>
               </div>
+
 
               <div className="flex flex-col h-full">
                 <label className="font-bold text-slate-700 dark:text-slate-300 mb-1">
