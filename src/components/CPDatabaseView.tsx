@@ -373,11 +373,33 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Model Pembelajaran</label>
-                  <input type="text" value={editForm.modelPembelajaran || ""} onChange={e => setEditForm({ ...editForm, modelPembelajaran: e.target.value })} placeholder="Contoh: Discovery Learning" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                  <input type="text" list="cp-model-pembelajaran-list" value={editForm.modelPembelajaran || ""} onChange={e => setEditForm({ ...editForm, modelPembelajaran: e.target.value })} placeholder="Contoh: Discovery Learning" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                  <datalist id="cp-model-pembelajaran-list">
+                    <option value="Discovery Learning" />
+                    <option value="Problem Based Learning (PBL)" />
+                    <option value="Project Based Learning (PjBL)" />
+                    <option value="Inquiry Learning" />
+                    <option value="Pembelajaran Berdiferensiasi" />
+                    <option value="Cooperative Learning" />
+                    <option value="Flipped Classroom" />
+                    <option value="Teaching at the Right Level (TaRL)" />
+                  </datalist>
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Metode Pembelajaran <span className="text-slate-400 font-normal">(Opsional)</span></label>
-                  <input type="text" value={editForm.metodePembelajaran || ""} onChange={e => setEditForm({ ...editForm, metodePembelajaran: e.target.value })} placeholder="Bila kosong, AI akan memilih otomatis" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                  <input type="text" list="cp-metode-pembelajaran-list" value={editForm.metodePembelajaran || ""} onChange={e => setEditForm({ ...editForm, metodePembelajaran: e.target.value })} placeholder="Bila kosong, AI akan memilih otomatis" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                  <datalist id="cp-metode-pembelajaran-list">
+                    <option value="Diskusi" />
+                    <option value="Ceramah Interaktif" />
+                    <option value="Tanya Jawab" />
+                    <option value="Role Playing" />
+                    <option value="Demonstrasi" />
+                    <option value="Eksperimen Terbimbing" />
+                    <option value="Kerja Kelompok (Kolaborasi)" />
+                    <option value="Presentasi" />
+                    <option value="Observasi" />
+                    <option value="Penugasan Proyek" />
+                  </datalist>
                 </div>
               </div>
             </div>

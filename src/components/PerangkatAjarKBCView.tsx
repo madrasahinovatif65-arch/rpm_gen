@@ -878,11 +878,24 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 </label>
                 <input
                   type="text"
+                  list="metode-pembelajaran-list-main"
                   value={formDataModul.learningMethod || ""}
                   onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, learningMethod: e.target.value } }))}
                   placeholder="misal: Diskusi, Role Playing, Penugasan (Bila kosong, AI akan memilih otomatis sesuai model)"
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
+                <datalist id="metode-pembelajaran-list-main">
+                  <option value="Diskusi" />
+                  <option value="Ceramah Interaktif" />
+                  <option value="Tanya Jawab" />
+                  <option value="Role Playing" />
+                  <option value="Demonstrasi" />
+                  <option value="Eksperimen Terbimbing" />
+                  <option value="Kerja Kelompok (Kolaborasi)" />
+                  <option value="Presentasi" />
+                  <option value="Observasi" />
+                  <option value="Penugasan Proyek" />
+                </datalist>
               </div>
 
               <div className="md:col-span-3">
