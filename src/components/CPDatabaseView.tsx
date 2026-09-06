@@ -24,7 +24,7 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<CpTemplate>({ id: "", name: "", rasional: "", elemen: "" });
   const [showImportModal, setShowImportModal] = useState(false);
-  const [showKamusModal, setShowKamusModal] = useState(false);
+  const [showKamusModal, setShowKamusModal] = useState<"model" | "metode" | null>(null);
   const [importRows, setImportRows] = useState<ImportRow[]>([]);
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -376,7 +376,7 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="font-bold text-slate-700 dark:text-slate-300 text-sm">Model Pembelajaran</label>
-                    <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                    <button onClick={() => setShowKamusModal("model")} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
                       <HelpCircle className="w-4 h-4" />
                     </button>
                   </div>
@@ -395,7 +395,7 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="font-bold text-slate-700 dark:text-slate-300 text-sm">Metode Pembelajaran <span className="text-slate-400 font-normal">(Opsional)</span></label>
-                    <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                    <button onClick={() => setShowKamusModal("metode")} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
                       <HelpCircle className="w-4 h-4" />
                     </button>
                   </div>
@@ -476,7 +476,7 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
         </div>
       )}
       
-      <KamusPedagogiModal isOpen={showKamusModal} onClose={() => setShowKamusModal(false)} />
+      <KamusPedagogiModal isOpen={!!showKamusModal} initialTab={showKamusModal || "model"} onClose={() => setShowKamusModal(null)} />
     </div>
   );
 };

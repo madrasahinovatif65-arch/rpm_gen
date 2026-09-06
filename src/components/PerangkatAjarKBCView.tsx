@@ -47,7 +47,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   >("analisis_cp");
 
   const [inputTab, setInputTab] = useState<"admin" | "modul">("admin");
-  const [showKamusModal, setShowKamusModal] = useState(false);
+  const [showKamusModal, setShowKamusModal] = useState<"model" | "metode" | null>(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingProgress, setGeneratingProgress] = useState("");
@@ -581,7 +581,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="font-bold text-slate-700 dark:text-slate-300">Model Pembelajaran Sintaks</label>
-                <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                <button onClick={() => setShowKamusModal("model")} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
                   <HelpCircle className="w-4 h-4" />
                 </button>
               </div>
@@ -610,7 +610,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 <label className="font-bold text-slate-700 dark:text-slate-300">
                   Metode Pembelajaran <span className="text-slate-500 font-normal">(Opsional)</span>
                 </label>
-                <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                <button onClick={() => setShowKamusModal("metode")} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
                   <HelpCircle className="w-4 h-4" />
                 </button>
               </div>
@@ -860,7 +860,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="font-bold text-slate-800 dark:text-slate-200">Model Pembelajaran</label>
-                  <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                  <button onClick={() => setShowKamusModal("model")} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
                     <HelpCircle className="w-4 h-4" />
                   </button>
                 </div>
@@ -909,7 +909,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   <label className="font-bold text-slate-800 dark:text-slate-200">
                     Metode Pembelajaran <span className="text-slate-500 font-normal">(Opsional)</span>
                   </label>
-                  <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                  <button onClick={() => setShowKamusModal("metode")} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
                     <HelpCircle className="w-4 h-4" />
                   </button>
                 </div>
@@ -1196,7 +1196,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </div>
       </div>
       
-      <KamusPedagogiModal isOpen={showKamusModal} onClose={() => setShowKamusModal(false)} />
+      <KamusPedagogiModal isOpen={!!showKamusModal} initialTab={showKamusModal || "model"} onClose={() => setShowKamusModal(null)} />
     </div>
   );
 };
