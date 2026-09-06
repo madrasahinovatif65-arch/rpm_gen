@@ -7,10 +7,13 @@ import {
   ArrowRight,
   Sparkles,
   LayoutGrid,
-  FileCheck,
+  Download,
   Globe,
-  Download
+  History
 } from "lucide-react";
+import { Button } from "./ui/Button";
+import { Badge } from "./ui/Badge";
+import { Card } from "./ui/Card";
 
 interface DashboardViewProps {
   onNavigate: (tab: string) => void;
@@ -19,7 +22,7 @@ interface DashboardViewProps {
 export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigate
 }) => {
-  // Full Menu Cards List matching all sidebar destinations
+  // Simplified color mapping: primary (emerald), accent (amber), secondary (slate)
   const menuCards = [
     {
       id: "downloadperangkat",
@@ -27,7 +30,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       desc: "Download RPP/Modul Ajar terlengkap.",
       icon: Download,
       badge: "Download",
-      color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200"
+      variant: "primary" as const,
     },
     {
       id: "perangkat_kbc",
@@ -35,23 +38,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       desc: "ACP, TP, ATP, Prota, Prosem, KKTP, Modul, LKPD & Rubrik KBC.",
       icon: HeartHandshake,
       badge: "KBC",
-      color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200"
+      variant: "primary" as const,
+    },
+    {
+      id: "riwayat_dokumen",
+      title: "Riwayat Dokumen",
+      desc: "Lihat, unduh, dan kelola dokumen yang pernah dibuat.",
+      icon: History,
+      badge: "Arsip",
+      variant: "secondary" as const,
     },
     {
       id: "modulai",
       title: "Modul Ajar Deep Learning AI",
-      desc: "Generator RPP Deep Learning Kurikulum Merdeka (hingga 5 pertemuan).",
+      desc: "Generator RPP Deep Learning Kurikulum Merdeka hingga 5 pertemuan.",
       icon: Wand2,
-      badge: "Fitur Unggulan AI",
-      color: "bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300"
+      badge: "Unggulan",
+      variant: "accent" as const,
     },
     {
       id: "asistenai",
       title: "Asisten Chatbot Guru AI",
       desc: "Konsultan pedagogi AI, pembuat soal HOTS, & draf narasi rapor.",
       icon: Bot,
-      badge: "Asisten AI",
-      color: "bg-violet-50 text-violet-600 dark:bg-violet-950/60 dark:text-violet-400 border-violet-200"
+      badge: "AI Chatbot",
+      variant: "primary" as const,
     },
     {
       id: "lkpdai",
@@ -59,7 +70,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       desc: "Buat Lembar Kerja Peserta Didik interaktif.",
       icon: Sparkles,
       badge: "LKPD",
-      color: "bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 border-rose-200"
+      variant: "primary" as const,
     },
     {
       id: "ailainnya",
@@ -67,89 +78,108 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       desc: "Generator Soal, Silabus, Rubrik Asesmen & Media.",
       icon: Globe,
       badge: "Multi-Tool",
-      color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-950/60 dark:text-cyan-400 border-cyan-200"
+      variant: "primary" as const,
     },
     {
       id: "pengaturan",
       title: "Pengaturan & Profil",
       desc: "Kelola profil guru, instansi sekolah, & kop dokumen.",
       icon: Settings,
-      badge: "Profil & Sekolah",
-      color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300"
+      badge: "Profil",
+      variant: "secondary" as const,
     }
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto w-full select-none">
-      {/* Quick Action Banner */}
-      <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 rounded-3xl p-5 sm:p-6 text-white shadow-lg flex flex-col items-start justify-between gap-4 sm:gap-5 border border-emerald-700/50">
-        <div className="space-y-2.5">
-          <div className="flex items-center space-x-2">
-            <span className="bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
-              Deep Learning AI Pro
-            </span>
-            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+    <div className="space-y-6 max-w-2xl mx-auto w-full">
+      {/* Hero CTA Card */}
+      <Card variant="elevated" padding="lg" className="bg-gradient-to-r from-emerald-700 to-emerald-800 text-white border-0">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Badge variant="accent" size="md" className="uppercase tracking-wider">
+              Fitur Unggulan
+            </Badge>
+            <Sparkles className="w-4 h-4 text-amber-300" />
           </div>
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-black leading-snug">Buat Modul Ajar Deep Learning Otomatis</h2>
-          <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
-            Susun modul pembelajaran Kurikulum Merdeka lengkap dengan skenario kegiatan per pertemuan (hingga 5 pertemuan), tabel diagnostik, rubrik asesmen, dan LKPD interaktif siap cetak.
-          </p>
+          
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold leading-tight">
+              Modul Ajar Deep Learning Otomatis
+            </h2>
+            <p className="text-sm text-emerald-100 leading-relaxed">
+              Susun modul pembelajaran Kurikulum Merdeka lengkap dengan skenario kegiatan per pertemuan, tabel diagnostik, rubrik asesmen, dan LKPD interaktif.
+            </p>
+          </div>
+          
+          <Button
+            variant="accent"
+            size="md"
+            icon={Wand2}
+            onClick={() => onNavigate("modulai")}
+            className="w-full sm:w-auto"
+          >
+            Buka Modul Ajar AI
+          </Button>
         </div>
-        <button
-          onClick={() => onNavigate("modulai")}
-          className="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-slate-950 px-6 py-3 rounded-2xl text-xs sm:text-sm font-extrabold shadow-md transition-transform active:scale-95 flex items-center justify-center space-x-2 shrink-0 cursor-pointer"
-        >
-          <Wand2 className="w-4 h-4" />
-          <span>Buka Modul Ajar AI</span>
-        </button>
-      </div>
+      </Card>
 
-      {/* ALL SIDEBAR MENUS IN DASHBOARD GRID - Single Column for Mobile */}
-      <div className="space-y-3.5">
+      {/* Menu Grid */}
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <LayoutGrid className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <h3 className="font-extrabold text-sm sm:text-base text-slate-800 dark:text-white tracking-tight">
-              Akses Cepat Modul & Menu Administrasi Guru
+            <h3 className="text-base font-bold text-slate-800 dark:text-white">
+              Akses Cepat Menu
             </h3>
           </div>
-          <span className="text-xs font-semibold text-slate-500">{menuCards.length} Menu Lengkap</span>
+          <span className="text-xs font-semibold text-slate-500">
+            {menuCards.length} Menu
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {menuCards.map((item) => {
             const Icon = item.icon;
             return (
-              <div
+              <Card
                 key={item.id}
+                variant="interactive"
+                padding="md"
                 onClick={() => onNavigate(item.id)}
-                className="group bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md border border-slate-200 dark:border-slate-800 transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-3.5 active:scale-[0.99]"
+                className="cursor-pointer active:scale-[0.99] group"
               >
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      item.variant === 'accent' 
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300'
+                        : item.variant === 'primary'
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300'
+                        : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                    }`}>
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                    
+                    <Badge variant={item.variant} size="sm" className="uppercase tracking-wide">
                       {item.badge}
-                    </span>
+                    </Badge>
                   </div>
 
-                  <div>
-                    <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-bold text-slate-800 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                       {item.title}
                     </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
-                </div>
 
-                <div className="flex items-center text-xs font-extrabold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform pt-1">
-                  <span>Buka Fitur</span>
-                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  <div className="flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform pt-2 border-t border-slate-100 dark:border-slate-700">
+                    <span>Buka</span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

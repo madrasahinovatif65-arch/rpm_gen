@@ -1,6 +1,7 @@
 import React from "react";
-import { Menu, CloudCheck, CloudOff, Moon, Sun, GraduationCap, ShieldCheck, LogOut } from "lucide-react";
+import { Menu, CloudCheck, CloudOff, Moon, Sun, ShieldCheck, LogOut } from "lucide-react";
 import { Pengaturan } from "../types";
+import { Badge } from "./ui/Badge";
 
 interface HeaderProps {
   activeTab: string;
@@ -16,22 +17,16 @@ interface HeaderProps {
 
 const TAB_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
-  siswa: "Kelola Master Data Siswa",
-  kartu: "Cetak Kartu Pelajar QR Code",
-  mapel: "Kelola Mata Pelajaran",
-  jadwal: "Jadwal Mengajar Guru",
-  absensi: "Input Absensi Harian & QR Scanner",
-  penilaian: "Input Nilai Akademik Siswa",
-  agenda: "Jurnal Agenda Mengajar",
-  bimbingan: "Catatan Bimbingan Guru Wali",
-  downloadperangkat: "Download Perangkat Ajar (Deep Learning)",
-  modulai: "Generator Modul Ajar AI (Deep Learning)",
-  asistenai: "Asisten AI Pendamping Guru",
-  lkpdai: "Generator LKPD AI (Lembar Kerja Peserta Didik)",
+  downloadperangkat: "Download Perangkat Ajar",
+  perangkat_kbc: "Perangkat Ajar KBC",
+  riwayat_dokumen: "Riwayat Dokumen",
+  cp_database: "Database CP Elemen",
+  modulai: "Modul Ajar AI",
+  asistenai: "Asisten Guru AI",
+  lkpdai: "Generator LKPD AI",
   ailainnya: "Generator AI Lainnya",
-  laporan: "Pusat Cetak Laporan PDF",
-  pengaturan: "Pengaturan & Profil Sekolah",
-  resetdb: "Kosongkan & Hapus Seluruh Isi Database"
+  pengaturan: "Pengaturan & Profil",
+  resetdb: "Hapus Database"
 };
 
 export const Header: React.FC<HeaderProps> = ({
@@ -54,31 +49,36 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-3 sm:px-4 lg:px-6 shrink-0 z-30 transition-colors shadow-xs">
-      <div className="flex items-center space-x-1.5 sm:space-x-2.5 min-w-0 shrink-0">
+    <header className="sticky top-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-6 shrink-0 z-30 shadow-sm">
+      <div className="flex items-center gap-2 min-w-0">
         <button
           onClick={onToggleSidebar}
-          className="p-1.5 sm:p-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 transition-all min-w-[36px] min-h-[36px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center shrink-0 cursor-pointer"
-          aria-label="Buka Laci Samping"
-          title="Buka Laci Samping (Drawer Menu)"
+          className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500"
+          aria-label="Buka menu navigasi"
+          title="Buka Menu"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         <button 
           onClick={() => onNavigateToDashboard && onNavigateToDashboard()}
-          className="flex items-center space-x-2 sm:space-x-2.5 min-w-0 shrink-0 text-left transition-transform active:scale-95 cursor-pointer"
-          title="Ke Dashboard"
+          className="flex items-center gap-2 text-left active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg"
+          title="Kembali ke Dashboard"
+          aria-label="Dashboard"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
-            <img src="https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds" alt="Logo Madrasah" className="w-full h-full object-contain p-1" />
+          <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-200 dark:border-slate-700">
+            <img 
+              src="https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds" 
+              alt="Logo" 
+              className="w-full h-full object-contain p-1" 
+            />
           </div>
-          <div className="flex flex-col min-w-0 leading-tight justify-center shrink-0">
-            <span className="font-black text-slate-900 dark:text-white text-sm sm:text-base lg:text-lg tracking-tight block whitespace-nowrap">
+          <div className="hidden sm:flex flex-col leading-tight">
+            <span className="font-bold text-slate-900 dark:text-white text-base">
               Aplikasi Guru AI
             </span>
             {activeTab !== "dashboard" && TAB_TITLES[activeTab] && (
-              <span className="text-[10px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-semibold truncate max-w-[120px] sm:max-w-xs block">
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold truncate max-w-xs">
                 {TAB_TITLES[activeTab]}
               </span>
             )}
@@ -86,76 +86,74 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </div>
 
-      <div className="flex items-center space-x-1 sm:space-x-2 shrink-0 ml-1">
-        {/* Firebase Live Status Badge */}
-        <div
-          className={`hidden min-[480px]:flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold shadow-xs transition-colors shrink-0 ${
-            isConnected
-              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-              : "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
-          }`}
+      <div className="flex items-center gap-2">
+        {/* Firebase Status */}
+        <Badge 
+          variant={isConnected ? "success" : "warning"}
+          size="sm"
+          className="hidden sm:flex items-center gap-1.5"
         >
           {isConnected ? (
             <>
-              <CloudCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>Firebase Live</span>
+              <CloudCheck className="w-3.5 h-3.5" />
+              <span>Live</span>
             </>
           ) : (
             <>
-              <CloudOff className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span>Connecting...</span>
+              <CloudOff className="w-3.5 h-3.5" />
+              <span>Connecting</span>
             </>
           )}
-        </div>
+        </Badge>
 
-        {/* Teacher profile badge (Andi Yoka / Nama Guru) */}
-        <div className="hidden min-[380px]:flex items-center space-x-1 sm:space-x-1.5 bg-slate-100 dark:bg-slate-800 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-          <span className="text-[11px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 max-w-[70px] sm:max-w-[140px] truncate">
-            {config.Nama_Guru || "Andi Yoka"}
+        {/* Teacher Profile */}
+        <div className="hidden md:flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 max-w-[120px] truncate">
+            {config.Nama_Guru || "Guru"}
           </span>
         </div>
 
-        {/* Theme Toggle Switch (Sun = Light Mode, Moon = Dark Mode) */}
-        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 sm:p-1 rounded-xl border border-slate-200 dark:border-slate-700 space-x-0.5 shrink-0">
+        {/* Theme Toggle */}
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 gap-0.5">
           <button
             type="button"
             onClick={() => handleSelectDark(false)}
-            className={`p-1.5 sm:p-2 rounded-lg transition-all flex items-center justify-center min-w-[30px] min-h-[30px] sm:min-w-[36px] sm:min-h-[36px] cursor-pointer ${
+            className={`p-2 rounded-md transition-all flex items-center justify-center min-w-[36px] min-h-[36px] focus-visible:ring-2 focus-visible:ring-emerald-500 ${
               !isDarkMode
-                ? "bg-amber-400 text-slate-950 shadow-xs font-bold scale-105"
-                : "text-slate-400 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 active:scale-95"
+                ? "bg-amber-400 text-slate-950 shadow-sm"
+                : "text-slate-500 hover:text-amber-500 active:scale-95"
             }`}
-            title="Sinar Matahari: Aktifkan Tema Terang (Light Mode)"
-            aria-label="Tema Terang"
+            title="Tema Terang"
+            aria-label="Aktifkan tema terang"
           >
-            <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <Sun className="w-4 h-4" />
           </button>
           <button
             type="button"
             onClick={() => handleSelectDark(true)}
-            className={`p-1.5 sm:p-2 rounded-lg transition-all flex items-center justify-center min-w-[30px] min-h-[30px] sm:min-w-[36px] sm:min-h-[36px] cursor-pointer ${
+            className={`p-2 rounded-md transition-all flex items-center justify-center min-w-[36px] min-h-[36px] focus-visible:ring-2 focus-visible:ring-emerald-500 ${
               isDarkMode
-                ? "bg-teal-600 text-white shadow-xs font-bold scale-105"
-                : "text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 active:scale-95"
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "text-slate-500 hover:text-emerald-600 active:scale-95"
             }`}
-            title="Bulan Sabit: Aktifkan Tema Gelap (Dark Mode)"
-            aria-label="Tema Gelap"
+            title="Tema Gelap"
+            aria-label="Aktifkan tema gelap"
           >
-            <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <Moon className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Logout Button */}
+        {/* Logout */}
         {onLogout && (
           <button
             type="button"
             onClick={onLogout}
-            className="p-1.5 sm:p-2 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/60 active:scale-95 transition-all min-w-[32px] min-h-[32px] sm:min-w-[38px] sm:min-h-[38px] flex items-center justify-center shrink-0 text-xs font-semibold cursor-pointer"
-            title="Keluar dari Akses System (Logout)"
+            className="p-2 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/60 active:scale-95 transition-all min-w-[40px] min-h-[40px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-red-500"
+            title="Keluar"
             aria-label="Logout"
           >
-            <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <LogOut className="w-4 h-4" />
           </button>
         )}
       </div>
