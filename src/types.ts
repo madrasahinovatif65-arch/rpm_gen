@@ -32,6 +32,10 @@ export interface Pengaturan {
   password?: string;
   isDatabaseCleared?: boolean;
   cpTemplates?: CpTemplate[];
+  // SIAKAD SSO fields
+  siakadUserId?: string;        // Guru ID from SIAKAD (primary key for SSO users)
+  siakadSyncedAt?: number;      // Last sync timestamp
+  authProvider?: 'local' | 'siakad';  // Track auth method
 }
 
 
@@ -71,4 +75,17 @@ export interface PerangkatDoc {
   schoolName: string;
   subject: string;
   shareToken?: string;
+}
+
+export interface AuthSession {
+  token: string;
+  tokenType: 'local' | 'siakad';
+  expiresAt?: number;
+  user: {
+    id: string;
+    username: string;
+    nama: string;
+    role: string;
+    provider: 'local' | 'siakad';
+  };
 }

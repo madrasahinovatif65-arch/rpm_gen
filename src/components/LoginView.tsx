@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { GraduationCap, Lock, User, Eye, EyeOff, ShieldCheck, LogIn, AlertCircle, Sun, Moon } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { GraduationCap, Lock, User, Eye, EyeOff, ShieldCheck, LogIn, AlertCircle, Sun, Moon, Building2, ChevronDown, ChevronUp, WifiOff } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 import { firestore, COLLECTIONS } from "../lib/firebase";
+import { redirectToSiakadLogin, checkSiakadHealth } from "../lib/siakad-auth";
 import { Button, Input } from "./ui";
 
 interface LoginViewProps {
@@ -22,6 +23,25 @@ export const LoginView: React.FC<LoginViewProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [siakadOffline, setSiakadOffline] = useState(false);
+  const [showLocalLogin, setShowLocalLogin] = useState(false);
+  const [checkingHealth, setCheckingHealth] = useState(true);
+
+  // Check SIAKAD health on mount
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const healthy = await checkSiakadHealth();
+        setSiakadOffline(!healthy);
+      } catch (error) {
+        console.warn('Health check failed:', error);
+        setSiakadOffline(true);
+      } finally {
+        setCheckingHealth(false);
+      }
+    };
+    checkHealth();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,6 +142,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
             </h2>
           </div>
 
+          {/* SIAKAD Offline Banner */}
+          {siakadOffline && !checkingHealth && (
+            <div className="p-3.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/70 rounded-xl flex items-start space-x-3 text-amber-800 dark:text-amber-300 text-xs">
+              <WifiOff className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+              <div>
+                <p className="font-bold">SIAKAD Tidak Tersedia</p>
+                <p className="mt-0.5">Server SIAKAD sedang offline atau tidak dapat dijangkau. Gunakan login lokal untuk akses emergency.</p>
+              </div>
+            </div>
+          )}
+
           {/* Error Alert */}
           {errorMsg && (
             <div className="p-3.5 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/70 rounded-xl flex items-start space-x-3 text-red-700 dark:text-red-300 text-xs animate-shake">
@@ -130,63 +161,104 @@ export const LoginView: React.FC<LoginViewProps> = ({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username Input */}
-            <div className="space-y-1.5">
-              <label htmlFor="login-username" className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                Username / Alamat Web
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <User className="w-4 h-4" />
-                </div>
-                <Input
-                  id="login-username"
-                  type="text"
-                  required
-                  readOnly
-                  autoComplete="username"
-                  value={username}
-                  className="pl-10 cursor-not-allowed select-none text-sm font-bold"
-                />
-              </div>
-            </div>
-
-            {/* Password Input */}
-            <div className="space-y-1.5">
-              <label htmlFor="login-password" className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                Kata Sandi (Password)
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Lock className="w-4 h-4" />
-                </div>
-                <Input
-                  id="login-password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="pl-10 pr-12 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 w-11 inline-flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
-                  aria-pressed={showPassword}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <Button type="submit" className="w-full mt-2" loading={loading} icon={LogIn}>
-              {loading ? "Memverifikasi Akses Server..." : "Masuk ke Sistem Guru"}
+          {/* Primary SSO Login */}
+          <div className="space-y-4">
+            <Button 
+              type="button"
+              onClick={() => redirectToSiakadLogin()}
+              className="w-full" 
+              size="lg"
+              variant="primary"
+              icon={Building2}
+              disabled={checkingHealth}
+            >
+              {checkingHealth ? "Memeriksa SIAKAD..." : "Login dengan SIAKAD"}
             </Button>
-          </form>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+              <span className="font-medium">atau</span>
+              <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+            </div>
+
+            {/* Collapsible Local Login */}
+            <button
+              type="button"
+              onClick={() => setShowLocalLogin(!showLocalLogin)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            >
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Login Lokal (Emergency Access)
+              </span>
+              {showLocalLogin ? (
+                <ChevronUp className="w-4 h-4 text-slate-500" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-slate-500" />
+              )}
+            </button>
+
+            {/* Local Login Form (Collapsible) */}
+            {showLocalLogin && (
+              <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+                {/* Username Input */}
+                <div className="space-y-1.5">
+                  <label htmlFor="login-username" className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    Username / Alamat Web
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <Input
+                      id="login-username"
+                      type="text"
+                      required
+                      readOnly
+                      autoComplete="username"
+                      value={username}
+                      className="pl-10 cursor-not-allowed select-none text-sm font-bold"
+                    />
+                  </div>
+                </div>
+
+                {/* Password Input */}
+                <div className="space-y-1.5">
+                  <label htmlFor="login-password" className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    Kata Sandi (Password)
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <Input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="pl-10 pr-12 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 w-11 inline-flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                      aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                      aria-pressed={showPassword}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full mt-2" loading={loading} icon={LogIn}>
+                  {loading ? "Memverifikasi Akses Server..." : "Masuk ke Sistem Guru"}
+                </Button>
+              </form>
+            )}
+          </div>
 
           {/* Security & Anti-Inspect Notice */}
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center space-x-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium">

@@ -28,6 +28,8 @@ import { CPDatabaseView } from "./components/CPDatabaseView";
 import { PengaturanView } from "./components/PengaturanView";
 import { ResetDatabaseView } from "./components/ResetDatabaseView";
 import { LoginView } from "./components/LoginView";
+import { SiakadCallbackView } from "./components/SiakadCallbackView";
+import { refreshAccessToken } from "./lib/siakad-auth";
 
 import { 
   subscribePengaturan, 
@@ -118,6 +120,54 @@ export default function App() {
     runMigration();
   }, []);
 
+  // Token auto-refresh: check expiry every minute and refresh 5 min before expiration
+  useEffect(() => {
+    const checkAndRefreshToken = async () => {
+      // Only check if authenticated and using SSO
+      if (!isAuthenticated) return;
+
+      const refreshToken = localStorage.getItem("edadmin_siakad_refresh");
+      const expiresAtStr = localStorage.getItem("edadmin_token_expires_at");
+      
+      // Skip if not SSO login (no refresh token)
+      if (!refreshToken || !expiresAtStr) return;
+
+      const expiresAt = parseInt(expiresAtStr, 10);
+      const now = Date.now();
+      const timeUntilExpiry = expiresAt - now;
+      const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+      // If token expires in less than 5 minutes, refresh it
+      if (timeUntilExpiry < fiveMinutes && timeUntilExpiry > 0) {
+        try {
+          console.log('🔄 Auto-refreshing SSO token (expires soon)...');
+          const tokenResponse = await refreshAccessToken(refreshToken);
+          
+          // Update localStorage with new token
+          localStorage.setItem("edadmin_auth_token", tokenResponse.access_token);
+          if (tokenResponse.refresh_token) {
+            localStorage.setItem("edadmin_siakad_refresh", tokenResponse.refresh_token);
+          }
+          const newExpiresAt = Date.now() + (tokenResponse.expires_in * 1000);
+          localStorage.setItem("edadmin_token_expires_at", newExpiresAt.toString());
+          
+          console.log('✅ SSO token refreshed successfully');
+        } catch (error) {
+          console.error('❌ Token refresh failed:', error);
+          // If refresh fails, let token expire naturally (user will need to re-login)
+        }
+      }
+    };
+
+    // Check immediately on mount
+    checkAndRefreshToken();
+
+    // Then check every minute
+    const intervalId = setInterval(checkAndRefreshToken, 60000); // 60 seconds
+
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated]);
+
   // Save initial config if empty
   useEffect(() => {
     const seedInitialData = async () => {
@@ -142,10 +192,37 @@ export default function App() {
   const handleLogout = () => {
     localStorage.removeItem("edadmin_auth_token");
     localStorage.removeItem("edadmin_user");
+    localStorage.removeItem("edadmin_siakad_refresh");
+    localStorage.removeItem("edadmin_token_expires_at");
     setIsAuthenticated(false);
   };
 
+  // Check if we're on OAuth callback route
+  const isAuthCallback = typeof window !== 'undefined' && window.location.pathname === '/auth/callback';
+
+  if (isAuthCallback && isAuthenticated) {
+    return (
+      <SiakadCallbackView
+        onSuccess={() => {
+          // Callback already sets auth state, just ensure authenticated state is set
+          setIsAuthenticated(true);
+        }}
+        config={config}
+      />
+    );
+  }
+
   if (!isAuthenticated) {
+    // Also check if we're in OAuth callback before login is confirmed
+    if (isAuthCallback) {
+      return (
+        <SiakadCallbackView
+          onSuccess={() => setIsAuthenticated(true)}
+          config={config}
+        />
+      );
+    }
+    
     return (
       <LoginView
         onLoginSuccess={() => setIsAuthenticated(true)}
