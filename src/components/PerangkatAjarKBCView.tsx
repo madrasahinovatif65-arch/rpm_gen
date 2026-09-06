@@ -35,6 +35,8 @@ import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, Kk
 import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
+import { Button } from "./ui/Button";
+import { Badge } from "./ui/Badge";
 
 interface PerangkatAjarKBCViewProps {
   config?: Pengaturan;
@@ -381,68 +383,76 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-emerald-900 via-teal-950 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-emerald-800">
+      <div className="bg-gradient-to-r from-emerald-700 to-emerald-800 text-white rounded-xl p-6 md:p-8 shadow-md">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 bg-emerald-400 text-slate-950 font-black px-3 py-1 rounded-full text-xs uppercase tracking-wider shadow-xs">
-              <HeartHandshake className="w-4 h-4 text-slate-950" />
-              <span>Kurikulum Berbasis Cinta (KBC) Kemenag RI</span>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-emerald-300">
+            <Badge variant="accent" size="md" className="uppercase tracking-wider">
+              <HeartHandshake className="w-4 h-4" />
+              <span>Kurikulum Berbasis Cinta</span>
+            </Badge>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
               Perangkat Ajar KBC AI
             </h2>
-            <p className="text-slate-200 text-xs md:text-sm leading-relaxed">
-              Generator 9 Paket Perangkat Administrasi Pembelajaran KBC (Analisis CP, TP, ATP, Prota, Prosem, KKTP, Modul Ajar Deep Learning, LKPD, & Rubrik Formatif/Sumatif) terintegrasi Panca Cinta Kemenag & 10 Nilai PPRA!
+            <p className="text-emerald-100 text-sm leading-relaxed">
+              Generator 9 paket perangkat administrasi pembelajaran KBC, terintegrasi Panca Cinta Kemenag dan 10 Nilai PPRA.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full md:w-auto">
+          <div className="shrink-0 w-full md:w-auto">
             {inputTab === "modul" ? (
-              <button
+              <Button
+                variant="accent"
+                size="md"
+                icon={Sparkles}
                 onClick={handleGenerate3ModulDocs}
                 disabled={isGenerating}
-                className="bg-gradient-to-r from-amber-400 to-emerald-400 hover:from-amber-300 hover:to-emerald-300 text-slate-950 font-black px-5 py-3 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-xs md:text-sm cursor-pointer disabled:opacity-50"
+                className="w-full"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Generate Modul + LKPD + Rubrik</span>
-              </button>
+                Generate Modul + LKPD + Rubrik
+              </Button>
             ) : (
-              <button
+              <Button
+                variant="accent"
+                size="md"
+                icon={Sparkles}
                 onClick={handleGenerateAllDocs}
                 disabled={isGenerating}
-                className="bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black px-5 py-3 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-xs md:text-sm cursor-pointer disabled:opacity-50"
+                className="w-full"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Generate 9 Dokumen KBC</span>
-              </button>
+                Generate 9 Dokumen KBC
+              </Button>
             )}
           </div>
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800">
         <button
+          type="button"
           onClick={() => setInputTab("admin")}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs md:text-sm font-black transition flex items-center justify-center space-x-2 cursor-pointer ${
+          className={`min-h-[44px] px-4 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 ${
             inputTab === "admin"
-              ? "bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 shadow-md border border-emerald-200 dark:border-emerald-800"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              ? "bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 shadow-sm"
+              : "text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-800/60"
           }`}
+          aria-pressed={inputTab === "admin"}
         >
-          <LayoutList className="w-4 h-4 text-emerald-600" />
-          <span>1. Input Administrasi KBC (ACP, TP, ATP, Prota, Prosem, KKTP)</span>
+          <LayoutList className="w-4 h-4" />
+          <span>Administrasi KBC</span>
         </button>
 
         <button
+          type="button"
           onClick={() => setInputTab("modul")}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs md:text-sm font-black transition flex items-center justify-center space-x-2 cursor-pointer ${
+          className={`min-h-[44px] px-4 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 ${
             inputTab === "modul"
-              ? "bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 shadow-md border border-emerald-200 dark:border-emerald-800"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              ? "bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 shadow-sm"
+              : "text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-800/60"
           }`}
+          aria-pressed={inputTab === "modul"}
         >
-          <BookMarked className="w-4 h-4 text-amber-500" />
-          <span>2. Input Khusus Modul Ajar, LKPD & Rubrik KBC</span>
+          <BookMarked className="w-4 h-4" />
+          <span>Modul, LKPD & Rubrik</span>
         </button>
       </div>
 
@@ -454,21 +464,25 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               <span>Data Identitas Madrasah & Capaian Pembelajaran (Dokumen Administrasi 1-6)</span>
             </h3>
             <div className="flex gap-2">
-              <button
+              <Button
+                type="button"
+                variant="accent"
+                size="sm"
+                icon={Sparkles}
                 onClick={handleAutofillFromProfile}
-                className="bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1.5 cursor-pointer border border-amber-300 dark:border-amber-800"
                 title="Isi Otomatis dari Tab Pengaturan"
               >
-                <Sparkles className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Isi dari Profil</span>
-              </button>
-              <button
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                icon={RefreshCw}
                 onClick={handleFillSample}
-                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1.5 cursor-pointer"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Isi Contoh Manual</span>
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -1074,14 +1088,17 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           </div>
 
           <div className="flex items-center space-x-2">
-            <button
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              icon={Sparkles}
+              loading={isGenerating}
               onClick={() => handleGenerateDoc(activeDoc)}
               disabled={isGenerating}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2 cursor-pointer disabled:opacity-50"
             >
-              {isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-              <span>Generate {docTypeList.find((d) => d.id === activeDoc)?.label}</span>
-            </button>
+              Generate {docTypeList.find((d) => d.id === activeDoc)?.label}
+            </Button>
           </div>
         </div>
 
@@ -1148,22 +1165,26 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           </div>
 
           <div className="flex items-center space-x-2">
-            <button
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              icon={Printer}
               onClick={handlePrintF4}
               disabled={!generatedDocs[activeDoc]}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2 disabled:opacity-40 cursor-pointer"
             >
-              <Printer className="w-4 h-4" />
-              <span>Cetak F4</span>
-            </button>
-            <button
+              Cetak F4
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              icon={Download}
               onClick={handleDownloadWord}
               disabled={!generatedDocs[activeDoc]}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2 disabled:opacity-40 cursor-pointer"
             >
-              <Download className="w-4 h-4" />
-              <span>Unduh Word (.doc)</span>
-            </button>
+              Unduh Word (.doc)
+            </Button>
           </div>
         </div>
 
@@ -1183,14 +1204,17 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
                 Klik tombol "Generate {docTypeList.find((d) => d.id === activeDoc)?.label}" di atas untuk menyusun dokumen KBC secara otomatis menggunakan AI.
               </p>
-              <button
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
+                icon={Sparkles}
+                loading={isGenerating}
                 onClick={() => handleGenerateDoc(activeDoc)}
                 disabled={isGenerating}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl text-xs shadow-md transition flex items-center space-x-2 cursor-pointer"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Mulai Generate {docTypeList.find((d) => d.id === activeDoc)?.label}</span>
-              </button>
+                Mulai Generate {docTypeList.find((d) => d.id === activeDoc)?.label}
+              </Button>
             </div>
           )}
         </div>

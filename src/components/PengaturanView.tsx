@@ -3,6 +3,8 @@ import { Settings, Save, ShieldCheck, School, UserCheck, Trash2, ShieldAlert, Ke
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { notifySimpanSuccess, notifySimpanError } from "../lib/swal";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
 
 interface PengaturanViewProps {
   config: Pengaturan;
@@ -64,6 +66,8 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
     }
   };
 
+  const inputClassName = "text-xs";
+
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xs border border-slate-200 dark:border-slate-800 space-y-6">
@@ -88,25 +92,25 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nama Guru Lengkap & Gelar</label>
-                <input
+                <Input
                   type="text"
                   id="Nama_Guru"
                   value={form.Nama_Guru}
                   onChange={handleChange}
                   placeholder="Contoh: Budi Santoso, S.Pd., M.Pd."
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">NIP Guru</label>
-                <input
+                <Input
                   type="text"
                   id="NIP_Guru"
                   value={form.NIP_Guru}
                   onChange={handleChange}
                   placeholder="19900101 201501 1 002"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
             </div>
@@ -120,25 +124,25 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nama Kepala Sekolah</label>
-                <input
+                <Input
                   type="text"
                   id="Nama_Kepsek"
                   value={form.Nama_Kepsek}
                   onChange={handleChange}
                   placeholder="Nama & Gelar Kepala Sekolah"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">NIP Kepala Sekolah</label>
-                <input
+                <Input
                   type="text"
                   id="NIP_Kepsek"
                   value={form.NIP_Kepsek}
                   onChange={handleChange}
                   placeholder="NIP Kepala Sekolah"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
             </div>
@@ -154,61 +158,61 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Pemerintah Prov / Kab / Kota</label>
-                <input
+                <Input
                   type="text"
                   id="Pemerintah"
                   value={form.Pemerintah}
                   onChange={handleChange}
                   placeholder="PEMERINTAH PROVINSI / KABUPATEN"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nama Resmi Sekolah</label>
-                <input
+                <Input
                   type="text"
                   id="Nama_Sekolah"
                   value={form.Nama_Sekolah}
                   onChange={handleChange}
                   placeholder="SMA NEGERI 1 KOTA"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
 
               <div className="md:col-span-2">
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Alamat Lengkap & Telepon Sekolah</label>
-                <input
+                <Input
                   type="text"
                   id="Alamat_Sekolah"
                   value={form.Alamat_Sekolah}
                   onChange={handleChange}
                   placeholder="Jalan Pendidikan No. 1, Telp: 021-xxxxxx"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Kota / Tempat Tanda Tangan Laporan</label>
-                <input
+                <Input
                   type="text"
                   id="Tempat_Tanda_Tangan"
                   value={form.Tempat_Tanda_Tangan}
                   onChange={handleChange}
                   placeholder="Contoh: Bandung / Jakarta"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">URL Logo Sekolah (Opsional)</label>
-                <input
+                <Input
                   type="text"
                   id="Logo_Kanan"
                   value={form.Logo_Kanan}
                   onChange={handleChange}
                   placeholder="Link gambar HTTPS logo"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none"
+                  className={inputClassName}
                 />
               </div>
             </div>
@@ -228,24 +232,24 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="md:col-span-2">
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Kantor / Yayasan Kemenag</label>
-                <input
+                <Input
                   type="text"
                   id="Kantor_Kemenag"
                   value={form.Kantor_Kemenag || ""}
                   onChange={handleChange}
                   placeholder="Contoh: Kementerian Agama Kabupaten Pasuruan"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={inputClassName}
                 />
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Tahun Pelajaran</label>
-                <input
+                <Input
                   type="text"
                   id="Tahun_Pelajaran"
                   value={form.Tahun_Pelajaran || ""}
                   onChange={handleChange}
                   placeholder="Contoh: 2026/2027"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={inputClassName}
                 />
               </div>
             </div>
@@ -264,31 +268,35 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Username Login</label>
-                <input
+                <Input
                   type="text"
                   id="username"
                   value={form.username || ""}
                   onChange={handleChange}
                   placeholder="www.yefriharyanto.id"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500"
+                  autoComplete="username"
+                  className={inputClassName}
                 />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Password Baru (Standar: 123456)</label>
                 <div className="relative">
-                  <input
+                  <Input
                     type={showPassword ? "text" : "password"}
                     id="password"
                     value={form.password || ""}
                     onChange={handleChange}
                     placeholder="123456"
-                    className="w-full pl-3 pr-10 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    autoComplete="current-password"
+                    className="text-xs font-mono pr-12"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus-visible:ring-2 focus-visible:ring-emerald-500"
+                    aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+                    aria-pressed={showPassword}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -298,13 +306,9 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
           </div>
 
           <div className="flex justify-end">
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl text-xs flex items-center space-x-2 shadow-md cursor-pointer transition-colors"
-            >
-              <Save className="w-4 h-4" />
-              <span>Simpan Pengaturan ke Firebase</span>
-            </button>
+            <Button type="submit" variant="primary" size="md" icon={Save}>
+              Simpan Pengaturan ke Firebase
+            </Button>
           </div>
         </form>
 
@@ -322,14 +326,15 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                 </p>
               </div>
 
-              <button
+              <Button
                 type="button"
+                variant="danger"
+                size="sm"
+                icon={Trash2}
                 onClick={onNavigateToReset}
-                className="bg-red-600 hover:bg-red-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-1.5 shadow-md shrink-0 cursor-pointer transition-colors"
               >
-                <Trash2 className="w-4 h-4" />
-                <span>Buka Menu Hapus Database</span>
-              </button>
+                Buka Menu Hapus Database
+              </Button>
             </div>
           </div>
         )}

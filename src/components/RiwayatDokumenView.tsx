@@ -8,7 +8,6 @@ import {
   Calendar,
   School,
   BookOpen,
-  Copy,
   Check,
   Filter,
   Package
@@ -17,6 +16,9 @@ import { PerangkatDoc } from "../types";
 import { subscribePerangkatDocs, deletePerangkatDoc } from "../lib/perangkatKbcStorage";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { exportAll9Documents } from "../lib/exportBatchZip";
+import { Button } from "./ui/Button";
+import { Badge } from "./ui/Badge";
+import { Card } from "./ui/Card";
 
 interface RiwayatDokumenViewProps {
   onViewDocument?: (doc: PerangkatDoc) => void;
@@ -107,45 +109,47 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-900 via-purple-950 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-indigo-800">
+      <Card variant="elevated" padding="lg" className="bg-gradient-to-r from-emerald-700 to-emerald-800 text-white border-0">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 bg-indigo-400 text-slate-950 font-black px-3 py-1 rounded-full text-xs uppercase tracking-wider shadow-xs">
+          <div className="space-y-3">
+            <Badge variant="accent" size="md" className="uppercase tracking-wider">
               <History className="w-4 h-4" />
-              <span>Riwayat Dokumen</span>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-indigo-300">
+              <span>Riwayat</span>
+            </Badge>
+            <h2 className="text-2xl md:text-3xl font-bold">
               Arsip Perangkat KBC
             </h2>
-            <p className="text-slate-200 text-xs md:text-sm leading-relaxed">
+            <p className="text-emerald-100 text-sm leading-relaxed">
               Lihat, unduh, bagikan, atau hapus dokumen KBC yang pernah dihasilkan.
             </p>
           </div>
 
-          <button
+          <Button
+            variant="accent"
+            size="md"
+            icon={Package}
             onClick={handleExportAll}
             disabled={docs.length === 0}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition flex items-center space-x-2 disabled:opacity-40"
+            className="shrink-0"
           >
-            <Package className="w-5 h-5" />
-            <span>Unduh Semua (ZIP)</span>
-          </button>
+            Unduh Semua (ZIP)
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-md p-4">
-        <div className="flex items-center space-x-2 mb-3">
+      <Card variant="bordered" padding="md">
+        <div className="flex items-center gap-2 mb-3">
           <Filter className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-          <span className="font-bold text-slate-700 dark:text-slate-300 text-sm">Filter Dokumen</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300 text-sm">Filter Dokumen</span>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold text-sm"
+            className="px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             <option value="all">Semua Jenis Dokumen</option>
             {Object.entries(docTypeMap).map(([key, label]) => (
@@ -156,7 +160,7 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
           <select
             value={filterSubject}
             onChange={(e) => setFilterSubject(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold text-sm"
+            className="px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             <option value="all">Semua Mata Pelajaran</option>
             {uniqueSubjects.map(subject => (
@@ -164,12 +168,12 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
             ))}
           </select>
         </div>
-      </div>
+      </Card>
 
       {/* Document List */}
       <div className="space-y-3">
         {filteredDocs.length === 0 ? (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-12 text-center">
+          <Card variant="bordered" padding="lg" className="text-center">
             <History className="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
             <h3 className="font-bold text-slate-700 dark:text-slate-300 text-lg mb-2">
               Belum Ada Dokumen
@@ -177,17 +181,14 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
             <p className="text-slate-500 dark:text-slate-400 text-sm">
               Dokumen yang Anda generate akan muncul di sini
             </p>
-          </div>
+          </Card>
         ) : (
           filteredDocs.map((doc, index) => (
-            <div
-              key={doc.id}
-              className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition p-4"
-            >
+            <Card key={doc.id} variant="bordered" padding="md" className="hover:shadow-md transition">
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex-1 space-y-2">
                   <div className="flex items-start gap-3">
-                    <div className="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-lg p-2 shrink-0">
+                    <div className="bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 rounded-lg p-2 shrink-0">
                       <BookOpen className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
@@ -204,9 +205,9 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
                           {doc.schoolName}
                         </div>
                         {doc.subject && (
-                          <div className="inline-flex bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-md font-semibold">
+                          <Badge variant="primary" size="sm">
                             {doc.subject}
-                          </div>
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -215,54 +216,55 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
 
                 <div className="flex items-center gap-2 shrink-0">
                   {onViewDocument && (
-                    <button
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      icon={Eye}
                       onClick={() => onViewDocument(doc)}
-                      className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-2 rounded-lg text-xs transition flex items-center gap-1.5"
                       title="Lihat Dokumen"
                     >
-                      <Eye className="w-4 h-4" />
                       <span className="hidden sm:inline">Lihat</span>
-                    </button>
+                    </Button>
                   )}
                   
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    icon={Download}
                     onClick={() => handleDownloadWord(doc)}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-2 rounded-lg text-xs transition flex items-center gap-1.5"
                     title="Unduh Word"
                   >
-                    <Download className="w-4 h-4" />
                     <span className="hidden sm:inline">Word</span>
-                  </button>
+                  </Button>
 
                   {doc.shareToken && (
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      icon={copiedToken === doc.shareToken ? Check : Share2}
                       onClick={() => handleCopyShareLink(doc)}
-                      className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-2 rounded-lg text-xs transition flex items-center gap-1.5"
                       title="Salin Link Berbagi"
                     >
-                      {copiedToken === doc.shareToken ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        <Share2 className="w-4 h-4" />
-                      )}
                       <span className="hidden sm:inline">Share</span>
-                    </button>
+                    </Button>
                   )}
 
-                  <button
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    icon={Trash2}
                     onClick={() => handleDelete(doc.id)}
-                    className="bg-red-600 hover:bg-red-500 text-white font-bold px-3 py-2 rounded-lg text-xs transition flex items-center gap-1.5"
                     title="Hapus Dokumen"
                   >
-                    <Trash2 className="w-4 h-4" />
                     <span className="hidden sm:inline">Hapus</span>
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))
         )}
       </div>
     </div>
   );
 };
+
