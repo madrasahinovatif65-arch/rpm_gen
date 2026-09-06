@@ -383,22 +383,24 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-emerald-700 to-emerald-800 text-white rounded-xl p-6 md:p-8 shadow-md">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <Badge variant="accent" size="md" className="uppercase tracking-wider">
-              <HeartHandshake className="w-4 h-4" />
+      <section aria-labelledby="kbc-page-title" className="relative overflow-hidden rounded-2xl border border-emerald-600 bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-900 p-5 text-white shadow-lg sm:p-6 md:p-8">
+        <div className="relative flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+          <div className="min-w-0 max-w-2xl space-y-4">
+            <Badge variant="accent" size="md" className="w-fit max-w-full gap-2 whitespace-normal break-words uppercase tracking-wider">
+              <HeartHandshake className="h-4 w-4 shrink-0" />
               <span>Kurikulum Berbasis Cinta</span>
             </Badge>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Perangkat Ajar KBC AI
-            </h2>
-            <p className="text-emerald-100 text-sm leading-relaxed">
-              Generator 9 paket perangkat administrasi pembelajaran KBC, terintegrasi Panca Cinta Kemenag dan 10 Nilai PPRA.
-            </p>
+            <div className="space-y-2">
+              <h1 id="kbc-page-title" className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Perangkat Ajar KBC AI
+              </h1>
+              <p className="max-w-xl text-sm leading-relaxed text-emerald-50 sm:text-base">
+                Generator 9 paket perangkat administrasi pembelajaran KBC, terintegrasi Panca Cinta Kemenag dan 10 Nilai PPRA.
+              </p>
+            </div>
           </div>
 
-          <div className="shrink-0 w-full md:w-auto">
+          <div className="w-full shrink-0 lg:w-auto lg:min-w-64">
             {inputTab === "modul" ? (
               <Button
                 variant="accent"
@@ -406,7 +408,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 icon={Sparkles}
                 onClick={handleGenerate3ModulDocs}
                 disabled={isGenerating}
-                className="w-full"
+                className="w-full lg:w-auto"
               >
                 Generate Modul + LKPD + Rubrik
               </Button>
@@ -417,14 +419,14 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 icon={Sparkles}
                 onClick={handleGenerateAllDocs}
                 disabled={isGenerating}
-                className="w-full"
+                className="w-full lg:w-auto"
               >
                 Generate 9 Dokumen KBC
               </Button>
             )}
           </div>
         </div>
-      </div>
+      </section>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800">
         <button
