@@ -11,6 +11,7 @@ export interface CpTemplate {
   jpPerMinggu?: string;
   alokasiWaktuTotal?: string;
   modelPembelajaran?: string;
+  metodePembelajaran?: string;
 }
 
 export interface Pengaturan {

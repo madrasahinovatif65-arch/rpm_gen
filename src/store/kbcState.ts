@@ -19,6 +19,7 @@ export interface KbcState {
     totalJp: number;
     jpPerMinggu: number;
     learningModel: string;
+    learningMethod: string;
   };
   cp: {
     rasional: string;
@@ -56,6 +57,7 @@ export const defaultKbcState: KbcState = {
     totalJp: 72,
     jpPerMinggu: 2,
     learningModel: "Discovery Learning",
+    learningMethod: "",
   },
   cp: {
     rasional: "",

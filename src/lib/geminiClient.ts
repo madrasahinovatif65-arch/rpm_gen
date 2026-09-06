@@ -543,6 +543,7 @@ Gunakan pedoman baku berikut jika guru memilih model di bawah ini:
 8. Teaching at the Right Level (TaRL):
    - Sintak: (1) Asesmen diagnostik penempatan, (2) Pengelompokan siswa berdasarkan tingkat kemampuan, (3) Pembelajaran terarah & bimbingan sesuai level, (4) Evaluasi formatif, (5) Perpindahan level (re-grouping) & Pengayaan.
    - Metode cocok: Pendampingan intensif, scaffolding, tutor sebaya, latihan berjenjang.
+*PENTING: Jika data input memiliki "learningMethod" yang diisi secara spesifik oleh guru, maka kamu WAJIB menggunakan metode tersebut alih-alih metode otomatismu.
 *Jika model yang dipilih di luar daftar di atas, gunakan pengetahuan AI terbaikmu untuk menentukan sintak baku dan metode yang paling relevan.
 
 INSTRUKSI PENTING: Setiap kali menyusun Analisis CP, TP, ATP, atau Modul Ajar, WAJIB mengaitkan materi dengan minimal 3 dari 5 Panca Cinta, minimal 3 dari 10 Nilai PPRA, dan minimal 3 dari 8 DPL secara eksplisit dan relevan. Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model Pembelajarannya.`;

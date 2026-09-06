@@ -190,7 +190,8 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           level: template.faseKelas || s.curriculum.level,
           jpPerMinggu: template.jpPerMinggu ? parseInt(template.jpPerMinggu) : s.curriculum.jpPerMinggu,
           totalJp: template.alokasiWaktuTotal ? parseInt(template.alokasiWaktuTotal) : s.curriculum.totalJp,
-          learningModel: template.modelPembelajaran || s.curriculum.learningModel
+          learningModel: template.modelPembelajaran || s.curriculum.learningModel,
+          learningMethod: template.metodePembelajaran || s.curriculum.learningMethod
         }
       }));
       notifySimpanSuccess(`Template "${template.name}" & Profil Mapel berhasil dimuat!`);
@@ -854,6 +855,18 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, jpPerPertemuan: Number(e.target.value) || 0 } }))}
                   placeholder="misal: 2 JP (2 x 45 menit)"
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold"
+                />
+              </div>
+              <div className="md:col-span-3">
+                <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
+                  Metode Pembelajaran <span className="text-slate-500 font-normal">(Opsional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={formDataModul.learningMethod || ""}
+                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, learningMethod: e.target.value } }))}
+                  placeholder="misal: Diskusi, Role Playing, Penugasan (Bila kosong, AI akan memilih otomatis sesuai model)"
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
 

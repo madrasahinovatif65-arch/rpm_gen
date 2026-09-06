@@ -35,7 +35,7 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
   );
 
   const handleAddNew = () => {
-    setEditForm({ id: Date.now().toString(), name: "", rasional: "", elemen: "", mataPelajaran: "", singkatanMapel: "", faseKelas: "", jpPerMinggu: "", alokasiWaktuTotal: "", modelPembelajaran: "" });
+    setEditForm({ id: Date.now().toString(), name: "", rasional: "", elemen: "", mataPelajaran: "", singkatanMapel: "", faseKelas: "", jpPerMinggu: "", alokasiWaktuTotal: "", modelPembelajaran: "", metodePembelajaran: "" });
     setIsEditing(true);
   };
 
@@ -374,6 +374,10 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                 <div>
                   <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Model Pembelajaran</label>
                   <input type="text" value={editForm.modelPembelajaran || ""} onChange={e => setEditForm({ ...editForm, modelPembelajaran: e.target.value })} placeholder="Contoh: Discovery Learning" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Metode Pembelajaran <span className="text-slate-400 font-normal">(Opsional)</span></label>
+                  <input type="text" value={editForm.metodePembelajaran || ""} onChange={e => setEditForm({ ...editForm, metodePembelajaran: e.target.value })} placeholder="Bila kosong, AI akan memilih otomatis" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
                 </div>
               </div>
             </div>
