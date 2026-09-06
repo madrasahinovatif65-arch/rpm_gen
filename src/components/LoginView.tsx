@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { GraduationCap, Lock, User, Eye, EyeOff, ShieldCheck, LogIn, AlertCircle, Sun, Moon } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 import { firestore, COLLECTIONS } from "../lib/firebase";
+import { Button, Input } from "./ui";
 
 interface LoginViewProps {
   onLoginSuccess: () => void;
@@ -81,24 +82,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
       {/* Top Bar Theme Toggle */}
       <div className="absolute top-4 right-4 z-20">
-        <button
+        <Button
           type="button"
           onClick={onToggleDarkMode}
-          className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all shadow-xs flex items-center space-x-2 text-xs font-semibold"
-          aria-label="Toggle Theme"
+          variant="outline"
+          size="sm"
+          aria-label={isDarkMode ? "Aktifkan tema terang" : "Aktifkan tema gelap"}
+          aria-pressed={isDarkMode}
+          icon={isDarkMode ? Sun : Moon}
         >
-          {isDarkMode ? (
-            <>
-              <Sun className="w-4 h-4 text-amber-400" />
-              <span>Tema Terang</span>
-            </>
-          ) : (
-            <>
-              <Moon className="w-4 h-4 text-indigo-600" />
-              <span>Tema Gelap</span>
-            </>
-          )}
-        </button>
+          {isDarkMode ? "Tema Terang" : "Tema Gelap"}
+        </Button>
       </div>
 
       {/* Main Login Card */}
@@ -120,7 +114,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
         </div>
 
         {/* Login Form Container */}
-        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-2xl space-y-6">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-2xl space-y-6">
           <div className="space-y-1">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <LogIn className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
@@ -139,69 +133,59 @@ export const LoginView: React.FC<LoginViewProps> = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username Input */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+              <label htmlFor="login-username" className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Username / Alamat Web
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <User className="w-4 h-4" />
                 </div>
-                <input
+                <Input
+                  id="login-username"
                   type="text"
                   required
                   readOnly
+                  autoComplete="username"
                   value={username}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none cursor-not-allowed select-none text-sm transition-all font-bold"
+                  className="pl-10 cursor-not-allowed select-none text-sm font-bold"
                 />
               </div>
             </div>
 
             {/* Password Input */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+              <label htmlFor="login-password" className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Kata Sandi (Password)
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-4 h-4" />
                 </div>
-                <input
+                <Input
+                  id="login-password"
                   type={showPassword ? "text" : "password"}
                   required
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-11 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-sm transition-all font-medium"
+                  className="pl-10 pr-12 text-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  className="absolute inset-y-0 right-0 w-11 inline-flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                   aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 active:scale-95 transition-all flex items-center justify-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Memverifikasi Akses Server...</span>
-                </>
-              ) : (
-                <>
-                  <LogIn className="w-4 h-4" />
-                  <span>Masuk ke Sistem Guru</span>
-                </>
-              )}
-            </button>
+            <Button type="submit" className="w-full mt-2" loading={loading} icon={LogIn}>
+              {loading ? "Memverifikasi Akses Server..." : "Masuk ke Sistem Guru"}
+            </Button>
           </form>
 
           {/* Security & Anti-Inspect Notice */}

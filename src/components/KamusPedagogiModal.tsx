@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { X, BookOpen, Lightbulb, Users, ArrowRightCircle } from "lucide-react";
 
 interface KamusPedagogiModalProps {
@@ -9,43 +9,69 @@ interface KamusPedagogiModalProps {
 
 export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, onClose, initialTab = "model" }) => {
   const [activeTab, setActiveTab] = useState<"model" | "metode">(initialTab);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      setActiveTab(initialTab);
-    }
-  }, [isOpen, initialTab]);
+    if (!isOpen) return;
+
+    previousFocusRef.current = document.activeElement as HTMLElement;
+    setActiveTab(initialTab);
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      previousFocusRef.current?.focus();
+    };
+  }, [isOpen, initialTab, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="kamus-pedagogi-title"
+        className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700"
+      >
         
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl">
+            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-xl">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Kamus Pedagogi KBC</h2>
+              <h2 id="kamus-pedagogi-title" className="text-lg font-bold text-slate-800 dark:text-slate-100">Kamus Pedagogi KBC</h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">Referensi Model & Metode Pembelajaran Kurikulum Merdeka</p>
             </div>
           </div>
           <button
+            ref={closeButtonRef}
+            type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+            className="w-11 h-11 inline-flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            aria-label="Tutup Kamus Pedagogi"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-6 pt-4 gap-6">
+        <div role="tablist" aria-label="Kategori Kamus Pedagogi" className="flex border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-6 pt-4 gap-6">
           <button
+            id="kamus-tab-model"
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "model"}
+            aria-controls="kamus-panel-model"
             onClick={() => setActiveTab("model")}
-            className={`pb-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-colors ${
+            className={`pb-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
               activeTab === "model" 
                 ? "border-amber-500 text-amber-600 dark:text-amber-400" 
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
@@ -55,8 +81,13 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
             Model Pembelajaran
           </button>
           <button
+            id="kamus-tab-metode"
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "metode"}
+            aria-controls="kamus-panel-metode"
             onClick={() => setActiveTab("metode")}
-            className={`pb-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-colors ${
+            className={`pb-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
               activeTab === "metode" 
                 ? "border-emerald-500 text-emerald-600 dark:text-emerald-400" 
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
@@ -72,7 +103,7 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
           
           {/* Section: Model Pembelajaran */}
           {activeTab === "model" && (
-            <section className="animate-in fade-in duration-300">
+            <section id="kamus-panel-model" role="tabpanel" aria-labelledby="kamus-tab-model" className="animate-in fade-in duration-300">
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/50 font-medium">
                 <strong className="text-amber-700 dark:text-amber-400">Model</strong> adalah kerangka utuh (sintaks/langkah-langkah baku) dari awal sampai akhir kelas.
               </p>
@@ -116,7 +147,7 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
 
           {/* Section: Metode Pembelajaran */}
           {activeTab === "metode" && (
-            <section className="animate-in fade-in duration-300">
+            <section id="kamus-panel-metode" role="tabpanel" aria-labelledby="kamus-tab-metode" className="animate-in fade-in duration-300">
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-lg border border-emerald-100 dark:border-emerald-900/50 font-medium">
                 <strong className="text-emerald-700 dark:text-emerald-400">Metode</strong> adalah teknik spesifik yang bebas dipilih/diganti dan disisipkan di dalam sintaks sebuah model pembelajaran.
               </p>
@@ -149,8 +180,9 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
         {/* Footer */}
         <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
           <button
+            type="button"
             onClick={onClose}
-            className="px-6 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white rounded-xl font-bold transition-colors shadow-md"
+            className="px-6 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white rounded-xl font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             Tutup Kamus
           </button>

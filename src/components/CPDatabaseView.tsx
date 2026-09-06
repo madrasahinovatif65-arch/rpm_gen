@@ -4,6 +4,7 @@ import { Pengaturan, CpTemplate } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { notifySimpanSuccess, notifySimpanError } from "../lib/swal";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
+import { Button, Input } from "./ui";
 import * as XLSX from "xlsx";
 
 interface CPDatabaseViewProps {
@@ -200,29 +201,16 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
 
         {!isEditing && (
           <div className="relative z-10 flex items-center gap-2 flex-wrap">
-            {/* Download Template */}
-            <button
-              onClick={handleDownloadTemplate}
-              className="flex items-center space-x-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl font-bold transition-all shadow-sm border border-slate-200 dark:border-slate-700 active:scale-95 whitespace-nowrap text-sm"
-              title="Unduh template Excel untuk import bulk"
-            >
-              <Download className="w-4 h-4 text-emerald-500" />
-              <span>Unduh Template Excel</span>
-            </button>
+            <Button onClick={handleDownloadTemplate} variant="outline" size="sm" icon={Download} title="Unduh template Excel untuk import bulk">
+              Unduh Template Excel
+            </Button>
 
-            {/* Export Data */}
-            <button
-              onClick={handleExportData}
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-blue-500/20 active:scale-95 whitespace-nowrap text-sm"
-              title="Ekspor semua template ke file Excel"
-            >
-              <Download className="w-4 h-4" />
-              <span>Ekspor Data</span>
-            </button>
+            <Button onClick={handleExportData} variant="secondary" size="sm" icon={Download} title="Ekspor semua template ke file Excel">
+              Ekspor Data
+            </Button>
 
-            {/* Import Excel */}
             <label
-              className="flex items-center space-x-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-teal-500/20 active:scale-95 whitespace-nowrap text-sm cursor-pointer"
+              className="inline-flex h-8 items-center gap-2 rounded-lg bg-emerald-600 px-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 cursor-pointer"
               title="Import banyak CP sekaligus dari file Excel"
             >
               <FileSpreadsheet className="w-4 h-4" />
@@ -231,34 +219,29 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                 ref={fileInputRef}
                 type="file"
                 accept=".xlsx,.xls"
-                className="hidden"
+                className="sr-only"
                 onChange={handleFileUpload}
               />
             </label>
 
-            {/* Tambah Manual */}
-            <button
-              onClick={handleAddNew}
-              className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-emerald-500/20 active:scale-95 whitespace-nowrap"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Tambah CP Baru</span>
-            </button>
+            <Button onClick={handleAddNew} variant="primary" size="sm" icon={Plus}>
+              Tambah CP Baru
+            </Button>
           </div>
         )}
       </div>
 
       {/* Import Preview Modal */}
       {showImportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-3xl max-h-[85vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4">
+          <div role="dialog" aria-modal="true" aria-labelledby="cp-import-title" className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-3xl max-h-[85vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
               <div className="flex items-center gap-3">
-                <FileSpreadsheet className="w-6 h-6 text-teal-500" />
-                <h2 className="text-lg font-black text-slate-800 dark:text-white">Pratinjau Import Excel</h2>
+                <FileSpreadsheet className="w-6 h-6 text-emerald-500" />
+                <h2 id="cp-import-title" className="text-lg font-black text-slate-800 dark:text-white">Pratinjau Import Excel</h2>
               </div>
-              <button onClick={() => { setShowImportModal(false); setImportRows([]); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+              <button type="button" aria-label="Tutup pratinjau import" onClick={() => { setShowImportModal(false); setImportRows([]); }} className="w-11 h-11 inline-flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
                 <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
@@ -284,10 +267,10 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <span className="font-black text-slate-800 dark:text-slate-100 leading-snug">{row.name || <span className="text-slate-400 italic">Nama kosong</span>}</span>
                     <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${row.valid ? "bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-400" : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-400"}`}>
-                      Baris {row.rowIndex} {row.valid ? "âœ“" : "âœ—"}
+                      Baris {row.rowIndex} {row.valid ? "✓" : "✕"}
                     </span>
                   </div>
-                  {row.error && <p className="text-red-600 dark:text-red-400 text-xs font-medium mb-1">âš  {row.error}</p>}
+                  {row.error && <p className="text-red-600 dark:text-red-400 text-xs font-medium mb-1">⚠ {row.error}</p>}
                   {row.rasional && <p className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 leading-relaxed mb-1"><span className="font-semibold text-slate-600 dark:text-slate-300">Rasional:</span> {row.rasional}</p>}
                   {row.elemen && <p className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 leading-relaxed"><span className="font-semibold text-slate-600 dark:text-slate-300">Elemen:</span> {row.elemen}</p>}
                 </div>
@@ -296,20 +279,10 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
 
             {/* Modal Footer */}
             <div className="flex justify-end gap-3 p-6 border-t border-slate-100 dark:border-slate-800 shrink-0">
-              <button onClick={() => { setShowImportModal(false); setImportRows([]); }} className="px-6 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                Batal
-              </button>
-              <button
-                onClick={handleConfirmImport}
-                disabled={validCount === 0 || isImporting}
-                className="px-6 py-2.5 rounded-xl font-bold bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-md shadow-teal-500/20 transition-colors flex items-center gap-2"
-              >
-                {isImporting ? (
-                  <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Menyimpan...</>
-                ) : (
-                  <><Upload className="w-4 h-4" /><span>Impor {validCount} Template</span></>
-                )}
-              </button>
+              <Button type="button" variant="ghost" onClick={() => { setShowImportModal(false); setImportRows([]); }}>Batal</Button>
+              <Button type="button" variant="primary" onClick={handleConfirmImport} disabled={validCount === 0} loading={isImporting} icon={Upload}>
+                {isImporting ? "Menyimpan..." : `Impor ${validCount} Template`}
+              </Button>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Download, ExternalLink, ArrowRight, BookOpenCheck } from "lucide-react";
+import { Button } from "./ui";
 
 export const DownloadPerangkatAjarView: React.FC = () => {
   const targetUrl = "https://www.yefriharyanto.id/2025/10/perangkat-ajar-deep-learning-.html";
@@ -10,14 +11,14 @@ export const DownloadPerangkatAjarView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-purple-800">
+      <div className="bg-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-slate-700">
         <div className="max-w-3xl space-y-4">
-          <div className="inline-flex items-center space-x-2 bg-amber-400 text-slate-950 font-black px-3 py-1 rounded-full text-xs uppercase tracking-wider shadow-xs">
+          <div className="inline-flex items-center space-x-2 bg-amber-400 text-slate-950 font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider shadow-xs">
             <BookOpenCheck className="w-4 h-4" />
             <span>Perangkat Ajar Deep Learning Kurikulum Merdeka</span>
           </div>
 
-          <h2 className="text-2xl md:text-3xl font-black tracking-tight text-amber-300">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-amber-300">
             Download Perangkat Ajar
           </h2>
 
@@ -26,14 +27,10 @@ export const DownloadPerangkatAjarView: React.FC = () => {
           </p>
 
           <div className="pt-2 flex flex-wrap gap-4">
-            <button
-              onClick={handleOpenLink}
-              className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-amber-400/20 transition-all flex items-center space-x-3 text-sm md:text-base cursor-pointer transform active:scale-95"
-            >
-              <Download className="w-5 h-5" />
+            <Button onClick={handleOpenLink} variant="accent" size="lg" icon={Download}>
               <span>Unduh Perangkat Ajar Deep Learning</span>
-              <ExternalLink className="w-4 h-4 ml-1" />
-            </button>
+              <ExternalLink className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </div>

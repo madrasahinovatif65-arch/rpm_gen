@@ -1,5 +1,6 @@
 import React from "react";
 import { Bot, ExternalLink, Globe, Sparkles, Compass, ShieldCheck } from "lucide-react";
+import { Badge, Button, Card } from "./ui";
 
 export const GeneratorAILainnyaView: React.FC = () => {
   const targetUrl = "https://website-kerinciberbagi.blogspot.com/";
@@ -15,7 +16,7 @@ export const GeneratorAILainnyaView: React.FC = () => {
       url: "https://website-kerinciberbagi.blogspot.com/",
       badge: "Rekomendasi Utama",
       icon: Globe,
-      color: "from-emerald-500 to-teal-700"
+      color: "bg-emerald-600"
     },
     {
       title: "Bank Prompt & Modul AI Edukasi",
@@ -23,7 +24,7 @@ export const GeneratorAILainnyaView: React.FC = () => {
       url: "https://website-kerinciberbagi.blogspot.com/",
       badge: "Resource Guru",
       icon: Sparkles,
-      color: "from-blue-500 to-indigo-700"
+      color: "bg-slate-700"
     },
     {
       title: "Media Pembelajaran Interaktif",
@@ -31,21 +32,21 @@ export const GeneratorAILainnyaView: React.FC = () => {
       url: "https://website-kerinciberbagi.blogspot.com/",
       badge: "Aplikasi Eksternal",
       icon: Compass,
-      color: "from-purple-500 to-violet-700"
+      color: "bg-amber-600"
     }
   ];
 
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-teal-950 to-emerald-950 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-teal-800/60">
+      <div className="bg-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-slate-700">
         <div className="max-w-3xl space-y-4">
-          <div className="inline-flex items-center space-x-2 bg-emerald-400 text-slate-950 font-black px-3 py-1 rounded-full text-xs uppercase tracking-wider shadow-xs">
+          <Badge variant="primary" size="sm" className="w-fit items-center gap-2 uppercase tracking-wider">
             <Bot className="w-4 h-4" />
-            <span>Kumpulan AI Edukasi Eksternal</span>
-          </div>
+            Kumpulan AI Edukasi Eksternal
+          </Badge>
 
-          <h2 className="text-2xl md:text-3xl font-black tracking-tight text-emerald-300">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-emerald-300">
             Generator AI Lainnya
           </h2>
 
@@ -54,14 +55,10 @@ export const GeneratorAILainnyaView: React.FC = () => {
           </p>
 
           <div className="pt-2">
-            <button
-              onClick={() => handleOpenLink(targetUrl)}
-              className="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-emerald-400/20 transition-all flex items-center space-x-3 text-sm md:text-base cursor-pointer transform active:scale-95"
-            >
-              <Globe className="w-5 h-5" />
+            <Button onClick={() => handleOpenLink(targetUrl)} variant="primary" size="lg" icon={Globe}>
               <span>Buka Portal Generator AI (Tab Baru)</span>
-              <ExternalLink className="w-4 h-4 ml-1" />
-            </button>
+              <ExternalLink className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </div>
@@ -79,18 +76,13 @@ export const GeneratorAILainnyaView: React.FC = () => {
         {externalLinks.map((item, index) => {
           const Icon = item.icon;
           return (
-            <div
-              key={index}
-              className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-md hover:shadow-xl transition-all flex flex-col justify-between group"
-            >
+            <Card key={index} variant="bordered" padding="lg" className="flex flex-col justify-between group">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform`}>
+                  <div className={`w-12 h-12 rounded-xl ${item.color} flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform`}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 uppercase tracking-wider">
-                    {item.badge}
-                  </span>
+                  <Badge variant="info" size="sm">{item.badge}</Badge>
                 </div>
 
                 <div className="space-y-2">
@@ -114,7 +106,7 @@ export const GeneratorAILainnyaView: React.FC = () => {
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>

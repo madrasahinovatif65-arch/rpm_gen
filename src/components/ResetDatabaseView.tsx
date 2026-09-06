@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Trash2, AlertTriangle, ShieldAlert, RefreshCw, Layers } from "lucide-react";
 import { clearAllDatabaseCollections } from "../lib/firebase";
 import { notifyHapusSuccess, notifyHapusError, confirmDeleteAlert } from "../lib/swal";
@@ -31,6 +31,15 @@ export const ResetDatabaseView: React.FC<ResetDatabaseViewProps> = ({ onSuccessR
       notifyHapusError(err.message || "Gagal menghapus database. Silakan periksa koneksi Anda.");
     }
   };
+
+  useEffect(() => {
+    if (!showModal || isLoading) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowModal(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showModal, isLoading]);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -113,16 +122,19 @@ export const ResetDatabaseView: React.FC<ResetDatabaseViewProps> = ({ onSuccessR
 
           {isConfirmed && (
             <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300">
+              <label htmlFor="reset-confirm-text" className="block text-xs font-extrabold text-slate-700 dark:text-slate-300">
                 Ketik kata <span className="text-red-600 font-black">HAPUS</span> di bawah ini untuk mengonfirmasi tindakan Anda:
               </label>
               <input
+                id="reset-confirm-text"
                 type="text"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder='Ketik "HAPUS"'
+                aria-describedby="reset-confirm-help"
                 className="w-full sm:w-64 px-4 py-2 text-xs font-black uppercase tracking-widest border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-red-500"
               />
+              <p id="reset-confirm-help" className="sr-only">Tindakan penghapusan hanya dapat dilanjutkan setelah mengetik HAPUS.</p>
             </div>
           )}
 
@@ -145,17 +157,23 @@ export const ResetDatabaseView: React.FC<ResetDatabaseViewProps> = ({ onSuccessR
 
       {/* Confirmation Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full border border-red-200 dark:border-red-900/50 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-confirmation-title"
+            aria-describedby="reset-confirmation-description"
+            className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full border border-red-200 dark:border-red-900/50 shadow-2xl space-y-5 animate-in fade-in zoom-in-95"
+          >
             <div className="w-14 h-14 bg-red-100 dark:bg-red-950 text-red-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
               <AlertTriangle className="w-8 h-8" />
             </div>
 
             <div className="text-center space-y-2">
-              <h3 className="text-lg font-black text-slate-900 dark:text-white">
+              <h3 id="reset-confirmation-title" className="text-lg font-black text-slate-900 dark:text-white">
                 Konfirmasi Terakhir Penghapusan!
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+              <p id="reset-confirmation-description" className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
                 Apakah Anda benar-benar YAKIN 100% untuk menghapus seluruh data siswa, absensi, nilai, jadwal, agenda, dan bimbingan secara permanen?
               </p>
             </div>
@@ -166,16 +184,18 @@ export const ResetDatabaseView: React.FC<ResetDatabaseViewProps> = ({ onSuccessR
 
             <div className="flex items-center space-x-3 pt-2">
               <button
+                type="button"
                 disabled={isLoading}
                 onClick={() => setShowModal(false)}
-                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer"
+                className="flex-1 min-h-11 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               >
                 Batal / Batalkan
               </button>
               <button
+                type="button"
                 disabled={isLoading}
                 onClick={handleExecuteReset}
-                className="flex-1 py-2.5 rounded-xl text-xs font-extrabold bg-red-600 hover:bg-red-700 text-white flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-red-600/30"
+                className="flex-1 min-h-11 py-2.5 rounded-xl text-xs font-extrabold bg-red-600 hover:bg-red-700 text-white flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-red-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
               >
                 {isLoading ? (
                   <>
