@@ -140,13 +140,17 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       ...prev,
       school: {
         ...prev.school,
-        kemenagOffice: config.Pemerintah || prev.school.kemenagOffice,
+        kemenagOffice: config.Kantor_Kemenag || config.Pemerintah || prev.school.kemenagOffice,
         schoolName: config.Nama_Sekolah || prev.school.schoolName,
         teacher: config.Nama_Guru || prev.school.teacher,
         nipTeacher: config.NIP_Guru || prev.school.nipTeacher,
         principal: config.Nama_Kepsek || prev.school.principal,
         nipPrincipal: config.NIP_Kepsek || prev.school.nipPrincipal,
         cityDate: `${config.Tempat_Tanda_Tangan || "Kota"}, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`
+      },
+      curriculum: {
+        ...prev.curriculum,
+        year: config.Tahun_Pelajaran || prev.curriculum.year
       }
     }));
     notifySimpanSuccess("Berhasil menyalin data dari Profil Madrasah!");
@@ -161,7 +165,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       }
     }));
   };
-
 
   const handleSelectCpTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const templateId = e.target.value;
@@ -179,9 +182,18 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         cp: {
           rasional: template.rasional,
           elemen: template.elemen
+        },
+        curriculum: {
+          ...s.curriculum,
+          subject: template.mataPelajaran || s.curriculum.subject,
+          singkatanMapel: template.singkatanMapel || s.curriculum.singkatanMapel,
+          level: template.faseKelas || s.curriculum.level,
+          jpPerMinggu: template.jpPerMinggu ? parseInt(template.jpPerMinggu) : s.curriculum.jpPerMinggu,
+          totalJp: template.alokasiWaktuTotal ? parseInt(template.alokasiWaktuTotal) : s.curriculum.totalJp,
+          learningModel: template.modelPembelajaran || s.curriculum.learningModel
         }
       }));
-      notifySimpanSuccess(`Template "${template.name}" berhasil dimuat!`);
+      notifySimpanSuccess(`Template "${template.name}" & Profil Mapel berhasil dimuat!`);
     }
     e.target.value = "";
   };
