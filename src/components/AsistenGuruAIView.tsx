@@ -66,7 +66,7 @@ export const AsistenGuruAIView: React.FC<AsistenGuruAIViewProps> = ({ config }) 
         };
         setMessages((prev) => [...prev, assistantMsg]);
       } else {
-        throw new Error(res.message || "Gagal mendapatkan respon");
+        throw new Error((res as any).message || "Gagal mendapatkan respon");
       }
     } catch (err: any) {
       setMessages((prev) => [

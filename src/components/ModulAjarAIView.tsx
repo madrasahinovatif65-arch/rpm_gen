@@ -76,7 +76,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
         setGeneratedHtml(cleaned);
         notifySimpanSuccess("Modul Ajar AI berhasil dibuat dan siap dicetak!");
       } else {
-        throw new Error(res.message || "Gagal membuat modul AI.");
+        throw new Error((res as any).message || "Gagal membuat modul AI.");
       }
     } catch (err: any) {
       notifySimpanError(err.message || "Terjadi kesalahan saat memproses generator AI.");

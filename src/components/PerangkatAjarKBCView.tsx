@@ -1046,7 +1046,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           <div className="text-left">
             <h4 className="font-bold text-yellow-800 dark:text-yellow-400 text-sm">AI Sedang Memproses Antrean...</h4>
             <p className="text-xs text-yellow-700 dark:text-yellow-500">
-              {Object.values(jobs).filter(j => j.status === 'running').map(j => j.progressMessage).join(', ') || "Silakan tunggu..."}
+              {Object.values(jobs).filter(j => (j as any).status === 'running').map(j => (j as any).progressMessage).join(', ') || "Silakan tunggu..."}
             </p>
           </div>
         </div>

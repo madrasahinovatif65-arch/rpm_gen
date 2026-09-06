@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 
 // 1. Analisis CP (ACP)
 export const AcpSchema = z.object({
@@ -13,7 +13,7 @@ export const AcpSchema = z.object({
     nilaiPpra: z.string(),
     deskripsi: z.string(),
     integrasi: z.string()
-  })).describe("Keterkaitan dengan 10 Nilai PPRA (Ta'addub, Qudwah, dsb)")
+  })).describe("Keterkaitan dengan 10 Nilai PPRA")
 });
 export type AcpType = z.infer<typeof AcpSchema>;
 
@@ -25,8 +25,14 @@ export const TpSchema = z.object({
     rumusanTp: z.string(),
     kompetensi: z.string(),
     integrasiNilai: z.string().describe("Integrasi Panca Cinta dan PPRA"),
-    alokasiJp: z.number().describe("Estimasi JP untuk TP ini (jangan pusingkan total akhir)")
-  }))
+    alokasiJp: z.number().describe("Estimasi JP untuk TP ini")
+  })),
+  rekapAlokasi: z.array(z.object({
+    elemen: z.string(),
+    jumlahTp: z.number(),
+    totalJp: z.number(),
+    persentase: z.number()
+  })).optional().describe("Rekap alokasi JP per elemen")
 });
 export type TpType = z.infer<typeof TpSchema>;
 
@@ -47,6 +53,15 @@ export type AtpType = z.infer<typeof AtpSchema>;
 
 // 4. Program Tahunan (Prota)
 export const ProtaSchema = z.object({
+  distribusiMinggu: z.array(z.object({
+    semester: z.number(),
+    bulan: z.string(),
+    mingguKalender: z.number(),
+    tidakEfektif: z.number(),
+    efektif: z.number(),
+    jp: z.number(),
+    keterangan: z.string()
+  })).optional().describe("Distribusi minggu efektif per bulan"),
   programTahunan: z.array(z.object({
     kodeTp: z.string(),
     rumusanTp: z.string(),
@@ -64,13 +79,13 @@ export const ProsemSchema = z.object({
     kodeTp: z.string(),
     rumusanTp: z.string(),
     alokasiJp: z.number(),
-    bulanMinggu: z.record(z.string(), z.array(z.number())).describe("Key: nama bulan (Juli), Value: array of JP per minggu (M1-M5)")
+    bulanMinggu: z.record(z.string(), z.array(z.number())).describe("Key: nama bulan, Value: array JP per minggu")
   })),
   keterangan: z.array(z.string())
 });
 export type ProsemType = z.infer<typeof ProsemSchema>;
 
-// 6. KKTP (Kriteria Ketercapaian Tujuan Pembelajaran)
+// 6. KKTP
 export const KktpSchema = z.object({
   kktp: z.array(z.object({
     kodeTp: z.string(),
@@ -85,7 +100,7 @@ export const KktpSchema = z.object({
 });
 export type KktpType = z.infer<typeof KktpSchema>;
 
-// 7A. Modul Ajar UMUM (Identitas, Asesmen, Lampiran)
+// 7A. Modul Ajar UMUM
 export const ModulAjarUmumSchema = z.object({
   informasiUmum: z.object({
     kesiapanPesertaDidik: z.string(),
@@ -109,14 +124,8 @@ export const ModulAjarUmumSchema = z.object({
     }),
     asesmenFormatif: z.array(z.object({ teknik: z.string(), instrumen: z.string(), aspek: z.string() })),
     asesmenSumatif: z.array(z.object({ deskripsi: z.string(), bobot: z.number() })),
-    pengayaanRemedial: z.object({
-      remedial: z.string(),
-      pengayaan: z.string()
-    }),
-    refleksi: z.object({
-      guru: z.array(z.string()),
-      siswa: z.array(z.string())
-    })
+    pengayaanRemedial: z.object({ remedial: z.string(), pengayaan: z.string() }),
+    refleksi: z.object({ guru: z.array(z.string()), siswa: z.array(z.string()) })
   }),
   lampiran: z.object({
     glosarium: z.array(z.object({ istilah: z.string(), arti: z.string() })),
@@ -125,7 +134,7 @@ export const ModulAjarUmumSchema = z.object({
 });
 export type ModulAjarUmumType = z.infer<typeof ModulAjarUmumSchema>;
 
-// 7B. Modul Ajar MEETING DETAIL (Skenario per pertemuan)
+// 7B. Modul Ajar MEETING DETAIL
 export const ModulAjarMeetingSchema = z.object({
   pertemuanKe: z.number(),
   judul: z.string(),
@@ -136,42 +145,52 @@ export const ModulAjarMeetingSchema = z.object({
 });
 export type ModulAjarMeetingType = z.infer<typeof ModulAjarMeetingSchema>;
 
-// 8. LKPD (Lembar Kerja Peserta Didik)
+// 8. LKPD
 export const LkpdSchema = z.object({
   judul: z.string(),
+  tujuanLkpd: z.array(z.string()).optional().describe("Tujuan kegiatan LKPD"),
   tujuanKegiatan: z.string(),
   alatDanBahan: z.array(z.string()),
   langkahKerja: z.array(z.string()),
   pertanyaanDiskusi: z.array(z.string()),
-  tabelPengamatan: z.array(z.object({
-    kolom1: z.string(),
-    kolom2: z.string(),
-    kolom3: z.string()
-  })).optional()
+  tugas: z.array(z.object({ pertanyaan: z.string() })).optional().describe("Daftar tugas terstruktur"),
+  tabelPengamatan: z.array(z.object({ kolom1: z.string(), kolom2: z.string(), kolom3: z.string() })).optional()
 });
 export type LkpdType = z.infer<typeof LkpdSchema>;
+
+// Shared kriteria object
+const KriteriaSchema = z.object({
+  sangatBaik: z.string(),
+  baik: z.string(),
+  cukup: z.string(),
+  kurang: z.string()
+});
 
 // 9. Rubrik Penilaian
 export const RubrikSchema = z.object({
   rubrikSikap: z.array(z.object({
     aspek: z.string(),
-    skor1: z.string(),
-    skor2: z.string(),
-    skor3: z.string(),
-    skor4: z.string()
+    kriteria: KriteriaSchema,
+    skor1: z.string().optional(),
+    skor2: z.string().optional(),
+    skor3: z.string().optional(),
+    skor4: z.string().optional()
   })),
   rubrikPengetahuan: z.array(z.object({
+    aspek: z.string().optional(),
     indikator: z.string(),
     soal: z.string(),
     kunciJawaban: z.string(),
-    skor: z.number()
+    skor: z.number(),
+    kriteria: KriteriaSchema.optional()
   })),
   rubrikKeterampilan: z.array(z.object({
     aspek: z.string(),
-    skor1: z.string(),
-    skor2: z.string(),
-    skor3: z.string(),
-    skor4: z.string()
+    kriteria: KriteriaSchema,
+    skor1: z.string().optional(),
+    skor2: z.string().optional(),
+    skor3: z.string().optional(),
+    skor4: z.string().optional()
   }))
 });
 export type RubrikType = z.infer<typeof RubrikSchema>;

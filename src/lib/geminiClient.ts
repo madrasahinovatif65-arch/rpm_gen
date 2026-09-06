@@ -98,7 +98,7 @@ export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPromp
         return validationResult.data;
       } else {
         // Validation failed, create repair prompt
-        const errorMsg = validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+        const errorMsg = ((validationResult.error as any).issues || []).map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ');
         console.warn(`JSON validation failed on attempt ${attempt + 1}:`, errorMsg);
         currentPrompt = `You previously returned invalid JSON. Please fix the following validation errors:\n${errorMsg}\n\nPrevious JSON:\n${text}\n\nReturn ONLY the corrected JSON object.`;
       }
@@ -482,7 +482,41 @@ export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any
     return { status: "error", message: `Schema untuk dokumen ${docType} tidak ditemukan.` };
   }
 
-  const generalKbcRules = `Kamu adalah Ahli Kurikulum & Pengembang Perangkat Ajar Kemenag RI, menguasai "Kurikulum Berbasis Cinta (KBC)" (Panca Cinta Kemenag & 10 Nilai PPRA).`;
+  const generalKbcRules = `Kamu adalah Ahli Kurikulum & Pengembang Perangkat Ajar Kemenag RI, menguasai "Kurikulum Berbasis Cinta (KBC)".
+Dalam setiap analisis, penyusunan tujuan, dan modul ajar, kamu WAJIB berpedoman mutlak pada definisi berikut sebagai GROUND TRUTH (kebenaran dasar) tanpa merujuk sumber eksternal mana pun:
+
+=== PEDOMAN KURIKULUM BERBASIS CINTA (KBC) ===
+
+[A] LIMA (5) PANCA CINTA KEMENAG:
+1. Cinta Allah
+2. Cinta Rasulullah SAW
+3. Cinta Al-Qur'an
+4. Cinta Sesama Manusia
+5. Cinta Tanah Air dan Alam Semesta
+
+[B] SEPULUH (10) NILAI PROFIL PELAJAR RAHMATAN LIL 'ALAMIN (PPRA):
+1. Berkeadaban (Ta'addub) — menjunjung tinggi akhlak mulia, budi pekerti, dan adab.
+2. Keteladanan (Qudwah) — memiliki suri teladan yang baik dalam sikap dan perilaku.
+3. Kewarganegaraan dan Kebangsaan (Muwaṭanah) — mencintai tanah air dan berkomitmen pada NKRI.
+4. Mengambil Jalan Tengah (Tawassuṭ) — bersikap moderat, tidak ekstrem kanan maupun kiri.
+5. Berimbang (Tawāzun) — menjaga keseimbangan antara aspek jasmani, rohani, dunia, dan akhirat.
+6. Lurus dan Tegas (I'tidāl) — bersikap proporsional, adil, dan tidak berpihak secara tidak benar.
+7. Kesetaraan (Musāwah) — mengakui persamaan derajat antar sesama manusia tanpa diskriminasi.
+8. Musyawarah (Syūra) — mengutamakan mufakat dan dialog dalam mengambil keputusan.
+9. Toleransi (Tasāmuh) — menghormati perbedaan keyakinan, pendapat, dan keberagaman budaya.
+10. Dinamis dan Inovatif (Taṭawwur wa Ibtikār) — terbuka terhadap perubahan positif dan terus berkreasi.
+
+[C] DELAPAN (8) DIMENSI PROFIL LULUSAN (DPL) — Permendikdasmen No. 10 Tahun 2025:
+1. Keimanan dan Ketakwaan terhadap Tuhan YME — memiliki keyakinan teguh & menghayati nilai spiritual.
+2. Kewargaan — cinta tanah air, taat norma, peduli sosial, berkomitmen pada keberlanjutan lingkungan.
+3. Penalaran Kritis — berpikir logis, analitis, dan reflektif dalam memproses informasi & menyelesaikan masalah.
+4. Kreativitas — berpikir inovatif, fleksibel, dan orisinal dalam menciptakan solusi yang unik & bermanfaat.
+5. Kolaborasi — peduli, berbagi, dan bekerja sama (gotong royong) secara efektif untuk tujuan bersama.
+6. Kemandirian — bertanggung jawab atas proses belajar sendiri, berinisiatif, dan adaptif dalam pengembangan diri.
+7. Kesehatan — menjalankan pola hidup bersih & sehat, menjaga kebugaran fisik & mental.
+8. Komunikasi — mampu menyimak, membaca, berbicara, dan menulis dengan baik, benar, dan etis.
+
+INSTRUKSI PENTING: Setiap kali menyusun Analisis CP, TP, ATP, atau Modul Ajar, WAJIB mengaitkan materi dengan minimal 3 dari 5 Panca Cinta, minimal 3 dari 10 Nilai PPRA, dan minimal 3 dari 8 DPL secara eksplisit dan relevan.`;
 
   let userPrompt = `Buatkan konten JSON untuk dokumen ${docType} berdasarkan data berikut:\n${JSON.stringify(formData, null, 2)}\n\nPastikan data terisi lengkap, akurat, dan kaya akan nilai PPRA & Panca Cinta Kemenag.`;
 
