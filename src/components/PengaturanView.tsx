@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Settings, Save, ShieldCheck, School, UserCheck, Trash2, ShieldAlert, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Settings, Save, ShieldCheck, School, UserCheck, Trash2, ShieldAlert, KeyRound, Eye, EyeOff, BookOpen } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { notifySimpanSuccess, notifySimpanError } from "../lib/swal";
@@ -22,6 +22,8 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
     Tempat_Tanda_Tangan: "",
     Logo_Kiri: "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
     Logo_Kanan: "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
+    Kantor_Kemenag: "",
+    Tahun_Pelajaran: "",
     username: "www.yefriharyanto.id",
     password: "123456"
   });
@@ -39,6 +41,8 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
         Tempat_Tanda_Tangan: config.Tempat_Tanda_Tangan || "",
         Logo_Kiri: config.Logo_Kiri || "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
         Logo_Kanan: config.Logo_Kanan || "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
+        Kantor_Kemenag: config.Kantor_Kemenag || "",
+        Tahun_Pelajaran: config.Tahun_Pelajaran || "",
         username: config.username || "www.yefriharyanto.id",
         password: config.password || "123456"
       });
@@ -210,7 +214,43 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
             </div>
           </div>
 
-          {/* Box 4: Akses Keamanan & Akun Login */}
+          {/* Box 4: Profil Default KBC (madrasah-level) */}
+          <div className="p-5 bg-emerald-50/60 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 space-y-4">
+            <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-2 border-b border-emerald-200 dark:border-emerald-800 pb-2">
+              <BookOpen className="w-4 h-4" />
+              Info Madrasah untuk Dokumen KBC
+              <span className="ml-1 text-[10px] font-normal normal-case text-emerald-600 dark:text-emerald-500">(Berlaku untuk semua mapel — diisi otomatis saat klik "Isi dari Profil")</span>
+            </h3>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 -mt-1">
+              📌 Data per mata pelajaran (Mapel, Fase, JP, Model Pembelajaran, dll) dikelola di menu <strong>Kelola Database CP Elemen</strong>.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="md:col-span-2">
+                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Kantor / Yayasan Kemenag</label>
+                <input
+                  type="text"
+                  id="Kantor_Kemenag"
+                  value={form.Kantor_Kemenag || ""}
+                  onChange={handleChange}
+                  placeholder="Contoh: Kementerian Agama Kabupaten Pasuruan"
+                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Tahun Pelajaran</label>
+                <input
+                  type="text"
+                  id="Tahun_Pelajaran"
+                  value={form.Tahun_Pelajaran || ""}
+                  onChange={handleChange}
+                  placeholder="Contoh: 2026/2027"
+                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="p-5 bg-blue-50/60 dark:bg-blue-950/30 rounded-2xl border border-blue-200 dark:border-blue-800/60 space-y-4">
             <h3 className="font-bold text-xs uppercase tracking-wider text-blue-700 dark:text-blue-300 flex items-center gap-2 border-b border-blue-200 dark:border-blue-800 pb-2">
               <KeyRound className="w-4 h-4 text-blue-600 dark:text-blue-400" />

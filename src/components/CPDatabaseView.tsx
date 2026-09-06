@@ -35,7 +35,7 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
   );
 
   const handleAddNew = () => {
-    setEditForm({ id: Date.now().toString(), name: "", rasional: "", elemen: "" });
+    setEditForm({ id: Date.now().toString(), name: "", rasional: "", elemen: "", mataPelajaran: "", singkatanMapel: "", faseKelas: "", jpPerMinggu: "", alokasiWaktuTotal: "", modelPembelajaran: "" });
     setIsEditing(true);
   };
 
@@ -342,7 +342,43 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Capaian Pembelajaran (CP) Per Elemen <span className="text-red-500">*</span></label>
               <textarea rows={6} value={editForm.elemen} onChange={e => setEditForm({ ...editForm, elemen: e.target.value })} placeholder={"Elemen Pemahaman: ...\nElemen Keterampilan: ..."} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
             </div>
+
+            {/* Data Per Mapel */}
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+              <p className="text-[11px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span className="w-4 h-4 bg-teal-100 dark:bg-teal-900/40 rounded flex items-center justify-center text-[9px]">⚙</span>
+                Data Spesifik Mata Pelajaran
+                <span className="font-normal normal-case text-slate-400 dark:text-slate-500">(otomatis mengisi form saat template ini dipilih)</span>
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Mata Pelajaran <span className="text-red-500">*</span></label>
+                  <input type="text" value={editForm.mataPelajaran || ""} onChange={e => setEditForm({ ...editForm, mataPelajaran: e.target.value })} placeholder="Contoh: Al Qur'an Hadis" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Singkatan / Kode TP</label>
+                  <input type="text" value={editForm.singkatanMapel || ""} onChange={e => setEditForm({ ...editForm, singkatanMapel: e.target.value })} placeholder="Contoh: QH" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Fase / Kelas</label>
+                  <input type="text" value={editForm.faseKelas || ""} onChange={e => setEditForm({ ...editForm, faseKelas: e.target.value })} placeholder="Contoh: Fase D / Kelas VII" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">JP per Minggu</label>
+                  <input type="text" value={editForm.jpPerMinggu || ""} onChange={e => setEditForm({ ...editForm, jpPerMinggu: e.target.value })} placeholder="Contoh: 2" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Alokasi Waktu Total (JP)</label>
+                  <input type="text" value={editForm.alokasiWaktuTotal || ""} onChange={e => setEditForm({ ...editForm, alokasiWaktuTotal: e.target.value })} placeholder="Contoh: 72" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Model Pembelajaran</label>
+                  <input type="text" value={editForm.modelPembelajaran || ""} onChange={e => setEditForm({ ...editForm, modelPembelajaran: e.target.value })} placeholder="Contoh: Discovery Learning" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                </div>
+              </div>
+            </div>
           </div>
+
 
           <div className="mt-8 flex justify-end gap-3">
             <button onClick={() => setIsEditing(false)} className="px-6 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Batal</button>

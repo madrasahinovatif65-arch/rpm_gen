@@ -1,10 +1,16 @@
 
-
 export interface CpTemplate {
   id: string;
   name: string;
   rasional: string;
   elemen: string;
+  // Per-mapel fields (dikelola di Kelola CP Elemen)
+  mataPelajaran?: string;
+  singkatanMapel?: string;
+  faseKelas?: string;
+  jpPerMinggu?: string;
+  alokasiWaktuTotal?: string;
+  modelPembelajaran?: string;
 }
 
 export interface Pengaturan {
@@ -18,11 +24,15 @@ export interface Pengaturan {
   Tempat_Tanda_Tangan: string;
   Logo_Kiri: string;
   Logo_Kanan: string;
+  // Madrasah-level KBC fields (tetap, dikelola di Pengaturan Profil)
+  Kantor_Kemenag?: string;
+  Tahun_Pelajaran?: string;
   username?: string;
   password?: string;
   isDatabaseCleared?: boolean;
   cpTemplates?: CpTemplate[];
 }
+
 
 export interface ModulFormState {
   namaGuru: string;
