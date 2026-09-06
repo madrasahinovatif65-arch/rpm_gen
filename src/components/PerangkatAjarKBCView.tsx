@@ -618,6 +618,37 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             </div>
 
             <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="font-bold text-slate-700 dark:text-slate-300">
+                  Metode Pembelajaran <span className="text-slate-500 font-normal">(Opsional)</span>
+                </label>
+                <button onClick={() => setShowKamusModal(true)} title="Lihat Kamus Pedagogi" className="text-emerald-600 hover:text-emerald-500 transition-colors">
+                  <HelpCircle className="w-4 h-4" />
+                </button>
+              </div>
+              <input
+                type="text"
+                list="metode-pembelajaran-list-admin"
+                value={formData.learningMethod || ""}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, learningMethod: e.target.value } }))}
+                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+                placeholder="Bila kosong, AI memilih otomatis..."
+              />
+              <datalist id="metode-pembelajaran-list-admin">
+                <option value="Diskusi" />
+                <option value="Ceramah Interaktif" />
+                <option value="Tanya Jawab" />
+                <option value="Role Playing" />
+                <option value="Demonstrasi" />
+                <option value="Eksperimen Terbimbing" />
+                <option value="Kerja Kelompok (Kolaborasi)" />
+                <option value="Presentasi" />
+                <option value="Observasi" />
+                <option value="Penugasan Proyek" />
+              </datalist>
+            </div>
+
+            <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Nama Guru Penyusun</label>
               <input
                 type="text"
