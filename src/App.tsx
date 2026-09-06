@@ -181,7 +181,7 @@ export default function App() {
         />
 
         {AI_TOOLS_ITEMS.some(item => item.id === activeTab) && (
-          <div className="bg-emerald-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-emerald-200/50 dark:border-slate-800 px-3 py-2 flex items-center space-x-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
+          <div className="bg-emerald-50 dark:bg-slate-900 border-b border-emerald-200/50 dark:border-slate-800 px-3 py-2 flex items-center space-x-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
             <button 
               onClick={() => setActiveCategorySheet("ai")}
               className="flex items-center space-x-1 pr-2 border-r border-emerald-200 dark:border-slate-800 shrink-0 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs active:scale-95 transition-transform cursor-pointer"
@@ -242,7 +242,7 @@ export default function App() {
 
         {/* Native Android Bottom Navigation Bar */}
         <nav 
-          className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 z-30 px-2 py-1.5 pb-safe shadow-lg flex items-center justify-around transition-colors select-none"
+          className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-30 px-2 py-1.5 pb-safe shadow-lg flex items-center justify-around transition-colors select-none"
           aria-label="Navigasi Bawah Android"
         >
           <button
@@ -298,7 +298,7 @@ export default function App() {
           <div className="fixed inset-0 z-50 flex flex-col justify-end select-none">
             {/* Dark Backdrop */}
             <div 
-              className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity"
+              className="fixed inset-0 bg-slate-950/70 transition-opacity"
               onClick={() => setActiveCategorySheet(null)}
             />
 

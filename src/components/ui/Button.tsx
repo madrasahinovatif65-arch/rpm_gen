@@ -1,10 +1,10 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
-import { cn, getButtonClasses } from '../../design/components';
+import { buttonSizes, buttonVariants, cn, getButtonClasses } from '../../design/components';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'variant'> {
+  variant?: keyof typeof buttonVariants;
+  size?: keyof typeof buttonSizes;
   loading?: boolean;
   icon?: React.ComponentType<{ className?: string }>;
   children?: React.ReactNode;
@@ -26,7 +26,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        className={cn(getButtonClasses(variant, size), className)}
+        className={cn(getButtonClasses(variant as keyof typeof buttonVariants, size as keyof typeof buttonSizes), className)}
         disabled={isDisabled}
         {...props}
       >

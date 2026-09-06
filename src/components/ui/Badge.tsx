@@ -1,9 +1,9 @@
 import React from 'react';
-import { cn, getBadgeClasses } from '../../design/components';
+import { badgeSizes, badgeVariants, cn, getBadgeClasses } from '../../design/components';
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error' | 'info';
-  size?: 'sm' | 'md';
+export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'variant'> {
+  variant?: keyof typeof badgeVariants;
+  size?: keyof typeof badgeSizes;
   children: React.ReactNode;
 }
 
@@ -12,7 +12,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
     return (
       <span
         ref={ref}
-        className={cn(getBadgeClasses(variant, size), className)}
+        className={cn(getBadgeClasses(variant as keyof typeof badgeVariants, size as keyof typeof badgeSizes), className)}
         {...props}
       >
         {children}

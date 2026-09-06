@@ -3,6 +3,7 @@ import { Wand2, Printer, Download, Sparkles, FileText, Loader2, AlertTriangle, B
 import { ModulFormState, Pengaturan } from "../types";
 import { generateModulAjarAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyCetakSuccess, notifyUnduhSuccess, notifyUnduhError } from "../lib/swal";
+import { Button } from "./ui";
 
 interface ModulAjarAIViewProps {
   config: Pengaturan;
@@ -421,23 +422,16 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
 
         {/* Generate Button */}
         <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
-          <button
+          <Button
             onClick={handleGenerate}
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-extrabold py-3 px-4 rounded-xl shadow-lg transition-transform hover:scale-101 flex items-center justify-center space-x-2 disabled:opacity-60 cursor-pointer"
+            loading={loading}
+            variant="primary"
+            size="lg"
+            icon={Wand2}
+            className="w-full shadow-lg"
           >
-            {loading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Meracik Modul AI...</span>
-              </>
-            ) : (
-              <>
-                <Wand2 className="w-5 h-5 text-amber-300" />
-                <span>GENERATE MODUL PREMIUM</span>
-              </>
-            )}
-          </button>
+            {loading ? "Meracik Modul AI..." : "GENERATE MODUL PREMIUM"}
+          </Button>
         </div>
       </div>
 
@@ -454,23 +448,27 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
           </div>
 
           <div className="flex items-center space-x-2 w-full sm:w-auto">
-            <button
+            <Button
               onClick={handlePrint}
               disabled={!generatedHtml}
-              className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 shadow-xs transition-colors cursor-pointer"
+              variant="primary"
+              size="sm"
+              icon={Printer}
+              className="flex-1 sm:flex-none"
             >
-              <Printer className="w-4 h-4" />
-              <span>Cetak PDF</span>
-            </button>
+              Cetak PDF
+            </Button>
 
-            <button
+            <Button
               onClick={handleExportWord}
               disabled={!generatedHtml}
-              className="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 shadow-xs transition-colors cursor-pointer"
+              variant="secondary"
+              size="sm"
+              icon={Download}
+              className="flex-1 sm:flex-none"
             >
-              <Download className="w-4 h-4" />
-              <span>Word (.DOC)</span>
-            </button>
+              Word (.DOC)
+            </Button>
           </div>
         </div>
 

@@ -1,9 +1,9 @@
 import React from 'react';
-import { cn, getCardClasses } from '../../design/components';
+import { cardPadding, cardVariants, cn, getCardClasses } from '../../design/components';
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'bordered' | 'elevated' | 'interactive';
-  padding?: 'sm' | 'md' | 'lg';
+export interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'variant'> {
+  variant?: keyof typeof cardVariants;
+  padding?: keyof typeof cardPadding;
   children: React.ReactNode;
 }
 
@@ -12,7 +12,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={cn(getCardClasses(variant, padding), className)}
+        className={cn(getCardClasses(variant as keyof typeof cardVariants, padding as keyof typeof cardPadding), className)}
         {...props}
       >
         {children}

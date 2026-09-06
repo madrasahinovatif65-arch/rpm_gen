@@ -4,7 +4,7 @@ import { Pengaturan, CpTemplate } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { notifySimpanSuccess, notifySimpanError } from "../lib/swal";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
-import { Button, Input } from "./ui";
+import { Button } from "./ui";
 import * as XLSX from "xlsx";
 
 interface CPDatabaseViewProps {
@@ -426,9 +426,9 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                   <div key={template.id} className="group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-md transition-all flex flex-col">
                     <div className="flex justify-between items-start mb-3">
                       <h3 className="font-bold text-slate-800 dark:text-slate-100 pr-8 line-clamp-2">{template.name}</h3>
-                      <div className="flex items-center space-x-1 absolute top-4 right-4 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
-                        <button onClick={() => handleEdit(template)} className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Edit"><Edit className="w-4 h-4" /></button>
-                        <button onClick={() => handleDelete(template.id, template.name)} className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors" title="Hapus"><Trash2 className="w-4 h-4" /></button>
+                      <div className="flex items-center space-x-1 absolute top-4 right-4 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-white dark:bg-slate-800 p-1 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                        <button type="button" onClick={() => handleEdit(template)} className="w-9 h-9 inline-flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" title="Edit" aria-label={`Edit template ${template.name}`}><Edit className="w-4 h-4" /></button>
+                        <button type="button" onClick={() => handleDelete(template.id, template.name)} className="w-9 h-9 inline-flex items-center justify-center text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500" title="Hapus" aria-label={`Hapus template ${template.name}`}><Trash2 className="w-4 h-4" /></button>
                       </div>
                     </div>
                     <div className="flex-1 space-y-3">
