@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Database, Plus, Trash2, Edit, Save, X, Search, BookOpen, Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Pengaturan, CpTemplate } from "../types";
 import { savePengaturan } from "../lib/firebase";
@@ -83,6 +83,27 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
     XLSX.utils.book_append_sheet(wb, ws, "Template CP");
     XLSX.writeFile(wb, "Template_Import_CP_KBC.xlsx");
     notifySimpanSuccess("Template Excel berhasil diunduh!");
+  };
+
+  const handleExportData = () => {
+    if (templates.length === 0) {
+      notifySimpanError("Belum ada data template untuk diekspor.");
+      return;
+    }
+
+    const exportData = templates.map(t => [t.name, t.rasional || "", t.elemen || ""]);
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["Nama Template", "Rasional Mapel", "CP Per Elemen"],
+      ...exportData
+    ]);
+    
+    ws["!cols"] = [{ wch: 35 }, { wch: 60 }, { wch: 80 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Database CP");
+    
+    const timestamp = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `Backup_Database_CP_${timestamp}.xlsx`);
+    notifySimpanSuccess("Data berhasil diekspor ke Excel!");
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,6 +206,16 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
             >
               <Download className="w-4 h-4 text-emerald-500" />
               <span>Unduh Template Excel</span>
+            </button>
+
+            {/* Export Data */}
+            <button
+              onClick={handleExportData}
+              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-blue-500/20 active:scale-95 whitespace-nowrap text-sm"
+              title="Ekspor semua template ke file Excel"
+            >
+              <Download className="w-4 h-4" />
+              <span>Ekspor Data</span>
             </button>
 
             {/* Import Excel */}
