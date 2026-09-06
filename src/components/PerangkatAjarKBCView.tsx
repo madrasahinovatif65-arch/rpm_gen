@@ -530,34 +530,28 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Fase / Kelas</label>
-              {!["Fase A (Kelas 1-2)", "Fase B (Kelas 3-4)", "Fase C (Kelas 5-6)"].includes(formData.level) && formData.level !== "" && !["Lainnya"].includes(formData.level) ? (
-                <input
-                  type="text"
-                  value={formData.level}
-                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
-                  placeholder="Ketik fase/kelas manual..."
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              ) : (
-                <select
-                  value={["Fase A (Kelas 1-2)", "Fase B (Kelas 3-4)", "Fase C (Kelas 5-6)"].includes(formData.level) ? formData.level : (formData.level === "" ? "" : "Lainnya")}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === "Lainnya") {
-                      updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: "" } }));
-                    } else {
-                      updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: val } }));
-                    }
-                  }}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold cursor-pointer"
-                >
-                  <option value="" disabled>Pilih Fase...</option>
-                  <option value="Fase A (Kelas 1-2)">Fase A (Kelas 1-2)</option>
-                  <option value="Fase B (Kelas 3-4)">Fase B (Kelas 3-4)</option>
-                  <option value="Fase C (Kelas 5-6)">Fase C (Kelas 5-6)</option>
-                  <option value="Lainnya">Lainnya (Ketik Manual)...</option>
-                </select>
-              )}
+              <input
+                type="text"
+                list="fase-kelas-list"
+                value={formData.level}
+                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
+                placeholder="Pilih atau ketik fase/kelas..."
+                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+              />
+              <datalist id="fase-kelas-list">
+                <option value="Fase A / Kelas 1" />
+                <option value="Fase A / Kelas 2" />
+                <option value="Fase B / Kelas 3" />
+                <option value="Fase B / Kelas 4" />
+                <option value="Fase C / Kelas 5" />
+                <option value="Fase C / Kelas 6" />
+                <option value="Fase D / Kelas 7" />
+                <option value="Fase D / Kelas 8" />
+                <option value="Fase D / Kelas 9" />
+                <option value="Fase E / Kelas 10" />
+                <option value="Fase F / Kelas 11" />
+                <option value="Fase F / Kelas 12" />
+              </datalist>
             </div>
 
             <div>

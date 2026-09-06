@@ -52,7 +52,7 @@ export const defaultKbcState: KbcState = {
   curriculum: {
     subject: "Akidah Akhlak",
     singkatanMapel: "AA",
-    level: "Fase E / Kelas X",
+    level: "Fase A / Kelas 1",
     year: "2026/2027",
     totalJp: 72,
     jpPerMinggu: 2,
