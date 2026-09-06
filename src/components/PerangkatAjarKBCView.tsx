@@ -589,16 +589,24 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Model Pembelajaran Sintaks</label>
-              <select
+              <input
+                type="text"
+                list="model-pembelajaran-list"
                 value={formData.learningModel}
                 onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, learningModel: e.target.value } }))}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold cursor-pointer"
-              >
-                <option value="Discovery Learning">Discovery Learning</option>
-                <option value="Problem Based Learning">Problem Based Learning</option>
-                <option value="Project Based Learning">Project Based Learning</option>
-                <option value="Inquiry Learning">Inquiry Learning</option>
-              </select>
+                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+                placeholder="Pilih atau ketik model..."
+              />
+              <datalist id="model-pembelajaran-list">
+                <option value="Discovery Learning" />
+                <option value="Problem Based Learning (PBL)" />
+                <option value="Project Based Learning (PjBL)" />
+                <option value="Inquiry Learning" />
+                <option value="Pembelajaran Berdiferensiasi" />
+                <option value="Cooperative Learning" />
+                <option value="Flipped Classroom" />
+                <option value="Teaching at the Right Level (TaRL)" />
+              </datalist>
             </div>
 
             <div>
@@ -824,17 +832,24 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900">
               <div>
                 <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Model Pembelajaran</label>
-                <select
+                <input
+                  type="text"
+                  list="model-pembelajaran-list-2"
                   value={formDataModul.learningModel}
                   onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, learningModel: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold text-emerald-700 dark:text-emerald-400 cursor-pointer"
-                >
-                  <option value="Discovery Learning">Discovery Learning</option>
-                  <option value="Problem Based Learning (PBL)">Problem Based Learning (PBL)</option>
-                  <option value="Project Based Learning (PjBL)">Project Based Learning (PjBL)</option>
-                  <option value="Inquiry Learning">Inquiry Learning</option>
-                  <option value="Cooperative Learning">Cooperative Learning</option>
-                </select>
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold text-emerald-700 dark:text-emerald-400"
+                  placeholder="Pilih atau ketik model..."
+                />
+                <datalist id="model-pembelajaran-list-2">
+                  <option value="Discovery Learning" />
+                  <option value="Problem Based Learning (PBL)" />
+                  <option value="Project Based Learning (PjBL)" />
+                  <option value="Inquiry Learning" />
+                  <option value="Pembelajaran Berdiferensiasi" />
+                  <option value="Cooperative Learning" />
+                  <option value="Flipped Classroom" />
+                  <option value="Teaching at the Right Level (TaRL)" />
+                </datalist>
               </div>
 
               <div>
