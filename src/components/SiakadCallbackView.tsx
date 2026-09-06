@@ -78,8 +78,23 @@ export const SiakadCallbackView: React.FC<SiakadCallbackViewProps> = ({ onSucces
 
         localStorage.setItem('edadmin_user', JSON.stringify(userProfile));
 
-        // Sync user profile to Firestore
+        // Sync user profile to Firestore + Phase 4: NIP-based account linking
         try {
+          // Phase 4: Detect if existing local account matches SIAKAD profile by NIP
+          let migrationMessage = '';
+          
+          if (config?.NIP_Guru && tokenResponse.user.nip) {
+            // Compare NIP: remove spaces/dashes for flexible matching
+            const existingNIP = config.NIP_Guru.replace(/[\s\-]/g, '');
+            const siakadNIP = tokenResponse.user.nip.replace(/[\s\-]/g, '');
+            
+            if (existingNIP === siakadNIP && !config.siakadUserId) {
+              // NIP match found! Account can be linked
+              migrationMessage = `✅ Akun lokal "​${config.Nama_Guru}" berhasil terhubung dengan SIAKAD!`;
+              console.log('🔗 Account linking detected - NIP match found');
+            }
+          }
+
           const updatedConfig: Pengaturan = {
             ...(config || {}),
             Nama_Guru: tokenResponse.user.nama,
@@ -91,6 +106,11 @@ export const SiakadCallbackView: React.FC<SiakadCallbackViewProps> = ({ onSucces
 
           await savePengaturan(updatedConfig);
           console.log('✅ User profile synced to Firestore');
+          
+          // Store migration message for display
+          if (migrationMessage) {
+            sessionStorage.setItem('siakad_migration_message', migrationMessage);
+          }
         } catch (syncError) {
           console.warn('⚠️ Failed to sync profile to Firestore:', syncError);
           // Non-blocking: continue even if Firestore sync fails
@@ -155,6 +175,12 @@ export const SiakadCallbackView: React.FC<SiakadCallbackViewProps> = ({ onSucces
                 <h2 className="text-xl font-bold text-emerald-700 dark:text-emerald-400">
                   Login Berhasil!
                 </h2>
+                {/* Phase 4: Display migration message if account was linked */}
+                {typeof window !== 'undefined' && sessionStorage.getItem('siakad_migration_message') && (
+                  <p className="text-sm text-blue-600 dark:text-blue-400 mt-3 font-semibold bg-blue-50 dark:bg-blue-900/30 px-3 py-2 rounded-lg">
+                    {sessionStorage.getItem('siakad_migration_message')}
+                  </p>
+                )}
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
                   Mengalihkan ke dashboard...
                 </p>
