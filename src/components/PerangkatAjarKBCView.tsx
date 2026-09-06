@@ -284,7 +284,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     notifySimpanSuccess("Ke-9 Dokumen telah ditambahkan ke antrean AI secara berurutan!");
   };
 
-  const handlePrintA4 = () => {
+  const handlePrintF4 = () => {
     const printArea = document.getElementById("kbc-document-render-area");
     const htmlToPrint = printArea ? printArea.innerHTML : generatedDocs[activeDoc];
     
@@ -308,7 +308,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           <title>Cetak Perangkat Ajar KBC</title>
           <meta charset="utf-8" />
           <style>
-            @page { size: A4 ${isLandscape ? "landscape" : "portrait"}; margin: 1.2cm; }
+            @page { size: 21.59cm 33.02cm ${isLandscape ? "landscape" : "portrait"}; margin: 1.5cm; }
             body { font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; }
             table { width: 100%; border-collapse: collapse; }
             th, td { border: 1px solid #333; padding: 6px; font-size: 10pt; }
@@ -1149,12 +1149,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={handlePrintA4}
+              onClick={handlePrintF4}
               disabled={!generatedDocs[activeDoc]}
               className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2 disabled:opacity-40 cursor-pointer"
             >
               <Printer className="w-4 h-4" />
-              <span>Cetak PDF (A4)</span>
+              <span>Cetak F4</span>
             </button>
             <button
               onClick={handleDownloadWord}

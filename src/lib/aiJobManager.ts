@@ -11,6 +11,8 @@ export interface AIJob {
   data?: any;
   error?: string;
   lastUpdated: number;
+  firestoreDocId?: string;
+  savedToFirestore?: boolean;
 }
 
 // In-memory queue state (can be hooked up to React state later)
@@ -139,11 +141,34 @@ const processQueue = async (formData: any) => {
       jobsRecord[jobId] = {
         ...jobsRecord[jobId],
         status: "success",
-        progressMessage: "Selesai",
+        progressMessage: "Menyimpan ke database...",
         data: finalData,
         lastUpdated: Date.now()
       };
       saveToLocalStorage(jobId, finalData);
+      notifyListeners();
+      
+      // Auto-save to Firestore
+      try {
+        const { saveGeneratedDoc } = await import("./perangkatKbcStorage");
+        const userStr = localStorage.getItem('edadmin_user');
+        const user = userStr ? JSON.parse(userStr) : {};
+        const username = user.username || user.nama || 'anonim';
+        
+        const firestoreDocId = await saveGeneratedDoc(
+          jobId,
+          finalData,
+          dynamicFormData,
+          username
+        );
+        
+        jobsRecord[jobId].firestoreDocId = firestoreDocId;
+        jobsRecord[jobId].savedToFirestore = true;
+        jobsRecord[jobId].progressMessage = "✓ Tersimpan";
+      } catch (saveErr: any) {
+        console.warn("Failed to save to Firestore:", saveErr);
+        jobsRecord[jobId].progressMessage = "⚠ Selesai (lokal)";
+      }
     } else {
       throw new Error(res.message || "Gagal mendapatkan data valid.");
     }

@@ -19,6 +19,7 @@ import { Header } from "./components/Header";
 import { DashboardView } from "./components/DashboardView";
 import { DownloadPerangkatAjarView } from "./components/DownloadPerangkatAjarView";
 import { PerangkatAjarKBCView } from "./components/PerangkatAjarKBCView";
+import { RiwayatDokumenView } from "./components/RiwayatDokumenView";
 import { ModulAjarAIView } from "./components/ModulAjarAIView";
 import { AsistenGuruAIView } from "./components/AsistenGuruAIView";
 import { GeneratorLkpdAIView } from "./components/GeneratorLkpdAIView";
@@ -99,6 +100,22 @@ export default function App() {
     return () => {
       unsubs.forEach((unsub) => unsub());
     };
+  }, []);
+
+  // Run migration once on mount
+  useEffect(() => {
+    const runMigration = async () => {
+      try {
+        const { migrateKbcCacheToFirestore } = await import("./lib/migrations/migrateKbcCache");
+        const result = await migrateKbcCacheToFirestore();
+        if (result.success > 0) {
+          console.log(`Migrated ${result.success} documents from cache`);
+        }
+      } catch (err) {
+        console.warn("Migration failed:", err);
+      }
+    };
+    runMigration();
   }, []);
 
   // Save initial config if empty
@@ -204,6 +221,7 @@ export default function App() {
 
           {activeTab === "downloadperangkat" && <DownloadPerangkatAjarView />}
           {activeTab === "perangkat_kbc" && <PerangkatAjarKBCView config={config} onNavigateToCP={() => setActiveTab("cp_database")} />}
+          {activeTab === "riwayat_dokumen" && <RiwayatDokumenView />}
           {activeTab === "cp_database" && <CPDatabaseView config={config} />}
           {activeTab === "modulai" && <ModulAjarAIView config={config} />}
           {activeTab === "asistenai" && <AsistenGuruAIView config={config} />}

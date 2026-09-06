@@ -80,7 +80,8 @@ export const firestore = firestoreInstance;
 // Collections references
 export const COLLECTIONS = {
   PENGATURAN: "pengaturan",
-  KBC_STATE: "kbc_state"
+  KBC_STATE: "kbc_state",
+  PERANGKAT_KBC: "perangkat_kbc"
 };
 
 // Helpers for isolated local storage fallback when running in a remixed environment

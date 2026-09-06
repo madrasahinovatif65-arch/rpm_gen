@@ -59,3 +59,16 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
 }
+
+export interface PerangkatDoc {
+  id: string;
+  docType: string;
+  docTitle: string;
+  data: any;
+  formData: any;
+  createdAt: number;
+  createdBy: string;
+  schoolName: string;
+  subject: string;
+  shareToken?: string;
+}

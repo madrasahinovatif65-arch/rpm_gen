@@ -11,7 +11,8 @@ import {
   X,
   FileCheck,
   Download,
-  Globe
+  Globe,
+  History
 } from "lucide-react";
 
 interface SidebarProps {
@@ -39,6 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       items: [
         { id: "downloadperangkat", label: "Download Perangkat Ajar", icon: Download },
         { id: "perangkat_kbc", label: "Perangkat Ajar KBC", icon: HeartHandshake, highlight: true },
+        { id: "riwayat_dokumen", label: "Riwayat Dokumen", icon: History },
         { id: "modulai", label: "Modul Ajar AI", icon: Wand2, highlight: true },
         { id: "asistenai", label: "Asisten Guru AI", icon: Bot, highlight: true },
         { id: "lkpdai", label: "Generator LKPD AI", icon: Sparkles, highlight: true },
