@@ -1,37 +1,41 @@
-import React, { useState } from "react";
-import { Database, Plus, Trash2, Edit, Save, X, Search, BookOpen } from "lucide-react";
+﻿import React, { useState, useRef } from "react";
+import { Database, Plus, Trash2, Edit, Save, X, Search, BookOpen, Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Pengaturan, CpTemplate } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { notifySimpanSuccess, notifySimpanError } from "../lib/swal";
+import * as XLSX from "xlsx";
 
 interface CPDatabaseViewProps {
   config: Pengaturan;
 }
 
+interface ImportRow {
+  rowIndex: number;
+  name: string;
+  rasional: string;
+  elemen: string;
+  valid: boolean;
+  error?: string;
+}
+
 export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState<CpTemplate>({
-    id: "",
-    name: "",
-    rasional: "",
-    elemen: ""
-  });
+  const [editForm, setEditForm] = useState<CpTemplate>({ id: "", name: "", rasional: "", elemen: "" });
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importRows, setImportRows] = useState<ImportRow[]>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const templates = config.cpTemplates || [];
-  
-  const filteredTemplates = templates.filter(t => 
+
+  const filteredTemplates = templates.filter(t =>
     (t.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     (t.rasional || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddNew = () => {
-    setEditForm({
-      id: Date.now().toString(),
-      name: "",
-      rasional: "",
-      elemen: ""
-    });
+    setEditForm({ id: Date.now().toString(), name: "", rasional: "", elemen: "" });
     setIsEditing(true);
   };
 
@@ -43,12 +47,7 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
   const handleDelete = async (id: string, name: string) => {
     const confirm = window.confirm(`Apakah Anda yakin ingin menghapus template "${name}"?`);
     if (!confirm) return;
-
-    const updatedConfig = {
-      ...config,
-      cpTemplates: templates.filter(t => t.id !== id)
-    };
-
+    const updatedConfig = { ...config, cpTemplates: templates.filter(t => t.id !== id) };
     try {
       await savePengaturan(updatedConfig);
       notifySimpanSuccess(`Template "${name}" berhasil dihapus.`);
@@ -58,27 +57,12 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
   };
 
   const handleSave = async () => {
-    if (!editForm.name.trim()) {
-      notifySimpanError("Nama template tidak boleh kosong.");
-      return;
-    }
-
+    if (!editForm.name.trim()) { notifySimpanError("Nama template tidak boleh kosong."); return; }
     let updatedTemplates = [...templates];
     const existingIndex = updatedTemplates.findIndex(t => t.id === editForm.id);
-
-    if (existingIndex >= 0) {
-      updatedTemplates[existingIndex] = editForm;
-    } else {
-      updatedTemplates.push(editForm);
-    }
-
-    const updatedConfig = {
-      ...config,
-      cpTemplates: updatedTemplates
-    };
-
+    if (existingIndex >= 0) { updatedTemplates[existingIndex] = editForm; } else { updatedTemplates.push(editForm); }
     try {
-      await savePengaturan(updatedConfig);
+      await savePengaturan({ ...config, cpTemplates: updatedTemplates });
       notifySimpanSuccess(`Template "${editForm.name}" berhasil disimpan.`);
       setIsEditing(false);
     } catch (err) {
@@ -86,19 +70,105 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
     }
   };
 
+  // â”€â”€ EXCEL IMPORT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  const handleDownloadTemplate = () => {
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["Nama Template", "Rasional Mapel", "CP Per Elemen"],
+      ["CP Akidah Akhlak Fase B (MI Kelas 3-4)", "Mata pelajaran Akidah Akhlak bertujuan membentuk peserta didik yang beriman, berakhlak mulia...", "Elemen Akidah: Peserta didik mampu memahami dan meyakini rukun iman...\n\nElemen Akhlak: Peserta didik mampu mengamalkan perilaku terpuji..."],
+      ["CP Fikih Fase C (MI Kelas 5-6)", "Mata pelajaran Fikih menekankan kemampuan peserta didik dalam memahami dan mempraktikkan hukum Islam...", "Elemen Fikih Ibadah: Peserta didik mampu melaksanakan ibadah mahdhah dengan benar...\n\nElemen Fikih Muamalah: Peserta didik mampu menjelaskan hukum muamalah dasar..."],
+    ]);
+    ws["!cols"] = [{ wch: 35 }, { wch: 60 }, { wch: 80 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Template CP");
+    XLSX.writeFile(wb, "Template_Import_CP_KBC.xlsx");
+    notifySimpanSuccess("Template Excel berhasil diunduh!");
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = new Uint8Array(evt.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        // Skip header row (row 0)
+        const parsed: ImportRow[] = rows.slice(1).filter(r => r.some(cell => cell !== undefined && cell !== "")).map((row, idx) => {
+          const name = String(row[0] || "").trim();
+          const rasional = String(row[1] || "").trim();
+          const elemen = String(row[2] || "").trim();
+          const valid = name.length > 0 && elemen.length > 0;
+          return {
+            rowIndex: idx + 2,
+            name,
+            rasional,
+            elemen,
+            valid,
+            error: !name ? "Kolom 'Nama Template' wajib diisi" : !elemen ? "Kolom 'CP Per Elemen' wajib diisi" : undefined
+          };
+        });
+
+        setImportRows(parsed);
+        setShowImportModal(true);
+      } catch (err) {
+        notifySimpanError("Gagal membaca file Excel. Pastikan format file benar (.xlsx atau .xls).");
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    // Reset input agar file yang sama bisa di-upload ulang
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleConfirmImport = async () => {
+    const validRows = importRows.filter(r => r.valid);
+    if (validRows.length === 0) { notifySimpanError("Tidak ada baris data yang valid untuk diimpor."); return; }
+
+    setIsImporting(true);
+    const newTemplates: CpTemplate[] = validRows.map(r => ({
+      id: `import_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      name: r.name,
+      rasional: r.rasional,
+      elemen: r.elemen
+    }));
+
+    const updatedConfig = {
+      ...config,
+      cpTemplates: [...templates, ...newTemplates]
+    };
+
+    try {
+      await savePengaturan(updatedConfig);
+      notifySimpanSuccess(`âœ… ${validRows.length} template CP berhasil diimpor ke database!`);
+      setShowImportModal(false);
+      setImportRows([]);
+    } catch (err) {
+      notifySimpanError("Gagal menyimpan data ke Firebase. Coba lagi.");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const validCount = importRows.filter(r => r.valid).length;
+  const invalidCount = importRows.filter(r => !r.valid).length;
+
+  // â”€â”€ RENDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden gap-4">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
-        
         <div className="relative z-10 flex items-center space-x-4">
           <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 shrink-0">
             <Database className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
-              Database CP Elemen
-            </h1>
+            <h1 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Database CP Elemen</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">
               Kelola template Capaian Pembelajaran untuk digunakan pada RPP & Modul KBC.
             </p>
@@ -106,16 +176,113 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
         </div>
 
         {!isEditing && (
-          <button
-            onClick={handleAddNew}
-            className="relative z-10 flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-emerald-500/20 active:scale-95 whitespace-nowrap"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Tambah CP Baru</span>
-          </button>
+          <div className="relative z-10 flex items-center gap-2 flex-wrap">
+            {/* Download Template */}
+            <button
+              onClick={handleDownloadTemplate}
+              className="flex items-center space-x-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl font-bold transition-all shadow-sm border border-slate-200 dark:border-slate-700 active:scale-95 whitespace-nowrap text-sm"
+              title="Unduh template Excel untuk import bulk"
+            >
+              <Download className="w-4 h-4 text-emerald-500" />
+              <span>Unduh Template Excel</span>
+            </button>
+
+            {/* Import Excel */}
+            <label
+              className="flex items-center space-x-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-teal-500/20 active:scale-95 whitespace-nowrap text-sm cursor-pointer"
+              title="Import banyak CP sekaligus dari file Excel"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Import Excel</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+            </label>
+
+            {/* Tambah Manual */}
+            <button
+              onClick={handleAddNew}
+              className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-emerald-500/20 active:scale-95 whitespace-nowrap"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Tambah CP Baru</span>
+            </button>
+          </div>
         )}
       </div>
 
+      {/* Import Preview Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-3xl max-h-[85vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
+              <div className="flex items-center gap-3">
+                <FileSpreadsheet className="w-6 h-6 text-teal-500" />
+                <h2 className="text-lg font-black text-slate-800 dark:text-white">Pratinjau Import Excel</h2>
+              </div>
+              <button onClick={() => { setShowImportModal(false); setImportRows([]); }} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="px-6 py-4 flex gap-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+              <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-sm font-bold">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{validCount} baris valid</span>
+              </div>
+              {invalidCount > 0 && (
+                <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{invalidCount} baris error (tidak akan diimpor)</span>
+                </div>
+              )}
+            </div>
+
+            {/* Rows Preview */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-3">
+              {importRows.map((row) => (
+                <div key={row.rowIndex} className={`rounded-2xl border p-4 text-sm ${row.valid ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10" : "border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10"}`}>
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <span className="font-black text-slate-800 dark:text-slate-100 leading-snug">{row.name || <span className="text-slate-400 italic">Nama kosong</span>}</span>
+                    <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${row.valid ? "bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-400" : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-400"}`}>
+                      Baris {row.rowIndex} {row.valid ? "âœ“" : "âœ—"}
+                    </span>
+                  </div>
+                  {row.error && <p className="text-red-600 dark:text-red-400 text-xs font-medium mb-1">âš  {row.error}</p>}
+                  {row.rasional && <p className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 leading-relaxed mb-1"><span className="font-semibold text-slate-600 dark:text-slate-300">Rasional:</span> {row.rasional}</p>}
+                  {row.elemen && <p className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 leading-relaxed"><span className="font-semibold text-slate-600 dark:text-slate-300">Elemen:</span> {row.elemen}</p>}
+                </div>
+              ))}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-3 p-6 border-t border-slate-100 dark:border-slate-800 shrink-0">
+              <button onClick={() => { setShowImportModal(false); setImportRows([]); }} className="px-6 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                Batal
+              </button>
+              <button
+                onClick={handleConfirmImport}
+                disabled={validCount === 0 || isImporting}
+                className="px-6 py-2.5 rounded-xl font-bold bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-md shadow-teal-500/20 transition-colors flex items-center gap-2"
+              >
+                {isImporting ? (
+                  <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Menyimpan...</>
+                ) : (
+                  <><Upload className="w-4 h-4" /><span>Impor {validCount} Template</span></>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Form */}
       {isEditing ? (
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 dark:border-slate-800 animate-in slide-in-from-bottom-4 duration-300">
           <div className="flex items-center justify-between mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
@@ -123,83 +290,44 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
               <BookOpen className="w-5 h-5 text-emerald-500" />
               {templates.some(t => t.id === editForm.id) ? "Edit Template CP" : "Buat Template CP Baru"}
             </h2>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors"
-            >
+            <button onClick={() => setIsEditing(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="space-y-5">
             <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                Nama Template <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={editForm.name}
-                onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                placeholder="Contoh: CP Fikih Fase D (MTs)"
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Nama Template <span className="text-red-500">*</span></label>
+              <input type="text" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} placeholder="Contoh: CP Fikih Fase B (MI Kelas 3-4)" className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
             </div>
-
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                CP Umum / Rasional KBC (Panca Cinta & PPRA)
+                Rasional Mata Pelajaran
+                <span className="ml-2 text-[10px] font-normal bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full">âœ¨ KBC otomatis</span>
               </label>
-              <textarea
-                rows={4}
-                value={editForm.rasional}
-                onChange={e => setEditForm({ ...editForm, rasional: e.target.value })}
-                placeholder="Masukkan redaksi rasional CP Umum di sini..."
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
+              <textarea rows={4} value={editForm.rasional} onChange={e => setEditForm({ ...editForm, rasional: e.target.value })} placeholder="Tulis rasional mapel secara ringkas. Integrasi 8 DPL, Panca Cinta & PPRA dilakukan otomatis oleh AI." className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400 placeholder:font-normal" />
             </div>
-
             <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                Capaian Pembelajaran (CP) Per Elemen
-              </label>
-              <textarea
-                rows={6}
-                value={editForm.elemen}
-                onChange={e => setEditForm({ ...editForm, elemen: e.target.value })}
-                placeholder="Elemen Pemahaman: ...&#10;Elemen Keterampilan: ..."
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-              />
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Capaian Pembelajaran (CP) Per Elemen <span className="text-red-500">*</span></label>
+              <textarea rows={6} value={editForm.elemen} onChange={e => setEditForm({ ...editForm, elemen: e.target.value })} placeholder={"Elemen Pemahaman: ...\nElemen Keterampilan: ..."} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
             </div>
           </div>
 
           <div className="mt-8 flex justify-end gap-3">
-            <button
-              onClick={() => setIsEditing(false)}
-              className="px-6 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            >
-              Batal
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-6 py-2.5 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-colors flex items-center gap-2"
-            >
+            <button onClick={() => setIsEditing(false)} className="px-6 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Batal</button>
+            <button onClick={handleSave} className="px-6 py-2.5 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-colors flex items-center gap-2">
               <Save className="w-4 h-4" />
               <span>Simpan Template</span>
             </button>
           </div>
         </div>
       ) : (
+        /* Template List */
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col min-h-[400px]">
           <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
             <div className="relative max-w-md">
               <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Cari nama atau isi CP..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow"
-              />
+              <input type="text" placeholder="Cari nama atau isi CP..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow" />
             </div>
           </div>
 
@@ -211,51 +339,30 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                 </div>
                 <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">Belum Ada Template</h3>
                 <p className="text-slate-500 dark:text-slate-400 max-w-sm">
-                  {searchTerm ? "Tidak ada template yang cocok dengan pencarian Anda." : "Anda belum menyimpan template Capaian Pembelajaran apapun. Klik 'Tambah CP Baru' untuk mulai membuat."}
+                  {searchTerm ? "Tidak ada template yang cocok dengan pencarian Anda." : "Tambah template satu per satu atau klik 'Import Excel' untuk memasukkan banyak CP sekaligus."}
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredTemplates.map(template => (
                   <div key={template.id} className="group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-md transition-all flex flex-col">
-                    
                     <div className="flex justify-between items-start mb-3">
-                      <h3 className="font-bold text-slate-800 dark:text-slate-100 pr-8 line-clamp-2">
-                        {template.name}
-                      </h3>
+                      <h3 className="font-bold text-slate-800 dark:text-slate-100 pr-8 line-clamp-2">{template.name}</h3>
                       <div className="flex items-center space-x-1 absolute top-4 right-4 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
-                        <button
-                          onClick={() => handleEdit(template)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(template.id, template.name)}
-                          className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
-                          title="Hapus"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <button onClick={() => handleEdit(template)} className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Edit"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete(template.id, template.name)} className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors" title="Hapus"><Trash2 className="w-4 h-4" /></button>
                       </div>
                     </div>
-
                     <div className="flex-1 space-y-3">
                       <div>
                         <span className="text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase block mb-1">Rasional</span>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
-                          {template.rasional || <span className="text-slate-400 italic">Kosong</span>}
-                        </p>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">{template.rasional || <span className="text-slate-400 italic">Kosong</span>}</p>
                       </div>
                       <div>
                         <span className="text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase block mb-1">Per Elemen</span>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-4 leading-relaxed whitespace-pre-wrap">
-                          {template.elemen || <span className="text-slate-400 italic">Kosong</span>}
-                        </p>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-4 leading-relaxed whitespace-pre-wrap">{template.elemen || <span className="text-slate-400 italic">Kosong</span>}</p>
                       </div>
                     </div>
-
                   </div>
                 ))}
               </div>
@@ -266,3 +373,4 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
     </div>
   );
 };
+
