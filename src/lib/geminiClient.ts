@@ -531,6 +531,18 @@ Gunakan pedoman baku berikut jika guru memilih model di bawah ini:
 4. Inquiry Learning:
    - Sintak: (1) Orientasi, (2) Merumuskan masalah, (3) Merumuskan hipotesis, (4) Mengumpulkan data, (5) Menguji hipotesis, (6) Menarik kesimpulan.
    - Metode cocok: Penyelidikan kritis, observasi, tanya jawab analitik.
+5. Pembelajaran Berdiferensiasi (Differentiated Learning):
+   - Sintak: (1) Pemetaan kebutuhan belajar (Asesmen awal), (2) Diferensiasi Konten, (3) Diferensiasi Proses, (4) Diferensiasi Produk, (5) Refleksi & Umpan balik.
+   - Metode cocok: Tutor sebaya, penugasan mandiri terstruktur, diskusi kelompok heterogen.
+6. Cooperative Learning (Jigsaw / STAD):
+   - Sintak: (1) Menyampaikan tujuan & motivasi, (2) Menyajikan informasi/materi dasar, (3) Mengorganisasikan siswa ke dalam kelompok (asal & ahli), (4) Membimbing kelompok bekerja & belajar, (5) Evaluasi, (6) Memberikan penghargaan.
+   - Metode cocok: Diskusi kelompok ahli, saling mengajar antar teman, role playing.
+7. Flipped Classroom (Kelas Terbalik):
+   - Sintak: (1) Pra-pembelajaran mandiri (di rumah), (2) Asesmen awal diagnostik (di kelas), (3) Pemecahan masalah tingkat lanjut/diskusi kelas, (4) Praktik/Penerapan konsep, (5) Konfirmasi & Penguatan.
+   - Metode cocok: Penugasan pra-kelas, diskusi kasus, praktik terbimbing, presentasi interaktif.
+8. Teaching at the Right Level (TaRL):
+   - Sintak: (1) Asesmen diagnostik penempatan, (2) Pengelompokan siswa berdasarkan tingkat kemampuan, (3) Pembelajaran terarah & bimbingan sesuai level, (4) Evaluasi formatif, (5) Perpindahan level (re-grouping) & Pengayaan.
+   - Metode cocok: Pendampingan intensif, scaffolding, tutor sebaya, latihan berjenjang.
 *Jika model yang dipilih di luar daftar di atas, gunakan pengetahuan AI terbaikmu untuk menentukan sintak baku dan metode yang paling relevan.
 
 INSTRUKSI PENTING: Setiap kali menyusun Analisis CP, TP, ATP, atau Modul Ajar, WAJIB mengaitkan materi dengan minimal 3 dari 5 Panca Cinta, minimal 3 dari 10 Nilai PPRA, dan minimal 3 dari 8 DPL secara eksplisit dan relevan. Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model Pembelajarannya.`;
