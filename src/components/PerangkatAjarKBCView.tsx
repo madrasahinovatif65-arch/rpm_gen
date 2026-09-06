@@ -545,12 +545,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 <option value="Fase B / Kelas 4" />
                 <option value="Fase C / Kelas 5" />
                 <option value="Fase C / Kelas 6" />
-                <option value="Fase D / Kelas 7" />
-                <option value="Fase D / Kelas 8" />
-                <option value="Fase D / Kelas 9" />
-                <option value="Fase E / Kelas 10" />
-                <option value="Fase F / Kelas 11" />
-                <option value="Fase F / Kelas 12" />
               </datalist>
             </div>
 
