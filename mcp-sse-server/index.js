@@ -254,6 +254,8 @@ app.get('/sse', authenticate, rateLimit, async (req, res) => {
   console.log(`📱 Client connected via SSE from ${clientIp}`);
   
   const transport = new SSEServerTransport('/message', res);
+  
+  // server.connect() automatically calls transport.start() internally
   await server.connect(transport);
   
   // Handle client disconnect
