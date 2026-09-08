@@ -151,7 +151,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         nipTeacher: config.NIP_Guru || prev.school.nipTeacher,
         principal: config.Nama_Kepsek || prev.school.principal,
         nipPrincipal: config.NIP_Kepsek || prev.school.nipPrincipal,
-        cityDate: `${config.Tempat_Tanda_Tangan || "Kota"}, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`
+        cityDate: `${config.Tempat_Tanda_Tangan || "Karangrejo"}, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`
       },
       curriculum: {
         ...prev.curriculum,

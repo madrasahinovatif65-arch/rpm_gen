@@ -218,11 +218,13 @@ export function mapSiakadToPengaturan(
 
     // Data sekolah dari SIAKAD
     Nama_Sekolah: sekolah.nama_sekolah || 'MI Miftahul Khoir 1 Karangrejo',
-    Alamat_Sekolah: sekolah.alamat || '-',
+    // JSON SIAKAD menggunakan field 'Jalan', fallback ke 'alamat' jika ada
+    Alamat_Sekolah: (sekolah as any).jalan || sekolah.alamat || '-',
     Nama_Yayasan: sekolah.nama_yayasan || 'Yayasan NU Miftakhul Khoir Damarjati',
     Nama_Kepsek: sekolah.nama_kepsek || '',
     NIP_Kepsek: sekolah.nip_kepsek || '',
     Tahun_Pelajaran: sekolah.tahun_pelajaran || getTahunPelajaranOtomatis(),
+    Semester: sekolah.semester || getSemesterOtomatis(),
 
     // SIAKAD metadata
     siakadUserId: user.id_user,

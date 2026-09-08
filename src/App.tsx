@@ -45,7 +45,7 @@ const DEFAULT_CONFIG: Pengaturan = {
   Alamat_Sekolah: "Jalan Raya Lintas Sungai Penuh, Telp: (0748) 21102",
   Nama_Kepsek: "Hamdani, S.Pd., M.Si.",
   NIP_Kepsek: "19780514 200212 1 003",
-  Tempat_Tanda_Tangan: "Kerinci",
+  Tempat_Tanda_Tangan: "Karangrejo",
   Logo_Kiri: "https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds",
   Logo_Kanan: "https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds"
 };

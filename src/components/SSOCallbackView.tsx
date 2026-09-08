@@ -87,7 +87,7 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
           await savePengaturan({
             ...pengaturanData,
             Alamat_Sekolah: config?.Alamat_Sekolah || '',
-            Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || '',
+            Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
             Logo_Kiri: config?.Logo_Kiri || '',
             Logo_Kanan: config?.Logo_Kanan || '',
           });
