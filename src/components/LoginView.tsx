@@ -82,26 +82,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
       // Map data SIAKAD ke format Pengaturan APK Gen
       const pengaturanData = mapSiakadToPengaturan(result.user, result.pengaturan || {});
 
-      // Simpan ke Firebase pengaturan APK Gen (merge dengan data yang sudah ada)
-      try {
-        await savePengaturan({
-          ...pengaturanData,
-          // Pertahankan beberapa field yang mungkin sudah diisi manual
-          Alamat_Sekolah: config?.Alamat_Sekolah || '',
-          Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
-          Logo_Kiri: config?.Logo_Kiri || '',
-        });
-      } catch (saveErr) {
-        console.warn('⚠️ Gagal sync ke Firebase, tetap lanjut login:', saveErr);
-      }
-
-      // Simpan token auth ke localStorage
+      // ⚠️ CRITICAL: Simpan Supabase Auth UUID SEBELUM savePengaturan agar path Firebase benar
+      const supabaseUid = result.session?.user?.id || result.user.id_user;
+      localStorage.setItem("edadmin_user_id", supabaseUid);
       const token = result.session?.access_token || btoa(`siakad:${result.user.id_user}:${Date.now()}`);
       localStorage.setItem("edadmin_auth_token", token);
-      // Set userId untuk isolasi data per-akun di Firebase
-      localStorage.setItem("edadmin_user_id", result.user.id_user);
       localStorage.setItem("edadmin_user", JSON.stringify({
         id_user: result.user.id_user,
+        supabase_uid: supabaseUid,
         username: result.user.id_user,
         nama: result.user.nama,
         role: result.user.role,
@@ -109,6 +97,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
         mapel: result.user.mapel || '-',
         provider: 'siakad',
       }));
+
+      // Simpan ke Firebase pengaturan APK Gen (setelah user_id diset, path sudah benar)
+      try {
+        await savePengaturan({
+          ...pengaturanData,
+          Alamat_Sekolah: config?.Alamat_Sekolah || '',
+          Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
+          Logo_Kiri: config?.Logo_Kiri || '',
+        });
+        console.log('[Login] ✅ Pengaturan tersimpan ke Firebase path: users/' + supabaseUid);
+      } catch (saveErr) {
+        console.warn('⚠️ Gagal sync ke Firebase, tetap lanjut login:', saveErr);
+      }
 
       // Simpan refresh token jika ada
       if (result.session?.refresh_token) {

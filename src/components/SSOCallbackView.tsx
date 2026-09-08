@@ -71,7 +71,26 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
 
         setMessage("Menyinkronkan pengaturan aplikasi...");
 
-        // Simpan ke Firebase pengaturan APK Gen
+        // ⚠️ CRITICAL: Simpan Supabase Auth UUID sebagai Firebase path key SEBELUM savePengaturan
+        // Ini memastikan path users/{uid}/pengaturan/config menggunakan UUID yang benar
+        const supabaseUid = data.user.id; // Supabase Auth UUID (unik per akun)
+        localStorage.setItem("edadmin_user_id", supabaseUid);
+        localStorage.setItem("edadmin_auth_token", accessToken);
+        localStorage.setItem("edadmin_siakad_refresh", refreshToken);
+        const expiresAt = Date.now() + ((data.session?.expires_in || 3600) * 1000);
+        localStorage.setItem("edadmin_token_expires_at", expiresAt.toString());
+        localStorage.setItem("edadmin_user", JSON.stringify({
+          id_user: userData.id_user,
+          supabase_uid: supabaseUid,
+          username: userData.id_user,
+          nama: userData.nama,
+          role: userData.role,
+          rombel: userData.rombel || '',
+          mapel: userData.mapel || '-',
+          provider: 'siakad',
+        }));
+
+        // Simpan ke Firebase pengaturan APK Gen (setelah user_id diset)
         const pengaturanData = mapSiakadToPengaturan(userData, pengaturan || {});
         try {
           await savePengaturan({
@@ -80,26 +99,10 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
             Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
             Logo_Kiri: config?.Logo_Kiri || '',
           });
+          console.log('[SSO] ✅ Pengaturan tersimpan ke Firebase path: users/' + supabaseUid);
         } catch (saveErr) {
           console.warn('[SSO] Gagal sync Firebase (non-fatal):', saveErr);
         }
-
-        // Simpan semua auth info ke localStorage
-        localStorage.setItem("edadmin_auth_token", accessToken);
-        localStorage.setItem("edadmin_siakad_refresh", refreshToken);
-        const expiresAt = Date.now() + ((data.session?.expires_in || 3600) * 1000);
-        localStorage.setItem("edadmin_token_expires_at", expiresAt.toString());
-        // Set userId untuk isolasi data per-akun di Firebase
-        localStorage.setItem("edadmin_user_id", userData.id_user);
-        localStorage.setItem("edadmin_user", JSON.stringify({
-          id_user: userData.id_user,
-          username: userData.id_user,
-          nama: userData.nama,
-          role: userData.role,
-          rombel: userData.rombel || '',
-          mapel: userData.mapel || '-',
-          provider: 'siakad',
-        }));
 
         // Seed KBC State dari data rombel
         try {
