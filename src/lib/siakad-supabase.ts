@@ -117,48 +117,101 @@ export async function loginWithSiakad(
  */
 export async function fetchSiakadDataFromApi(token: string): Promise<{ user: SiakadMasterUser, sekolah: SiakadSekolahConfig }> {
   const apiUrl = "https://siakad-app-phi.vercel.app/api/apk-gen-sync";
-  const response = await fetch(apiUrl, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/json',
+
+  // Coba REST API JSON terlebih dahulu
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+      }
+    });
+
+    if (response.ok) {
+      const json = await response.json();
+      const sekolah: SiakadSekolahConfig = {
+        nama_sekolah: json.Nama_Sekolah,
+        nama_yayasan: json.Nama_Yayasan,
+        alamat: json.Jalan,
+        nama_kepsek: json.Nama_Kepsek,
+        nip_kepsek: json.NIP_Kepsek,
+        tahun_pelajaran: json.Tahun_Pelajaran,
+        semester: json.Semester,
+      };
+
+      const guruArr = json.Guru;
+      if (guruArr && Array.isArray(guruArr) && guruArr.length > 0) {
+        const guruData = guruArr[0];
+        const user: SiakadMasterUser = {
+          id_user: guruData.id_user || guruData.NIP_Guru || 'ID_UNKNOWN',
+          nama: guruData.Nama_Guru || '',
+          nip: guruData.NIP_Guru || '',
+          role: guruData.siakadRole || 'Guru Mapel',
+          mapel: guruData.siakadMapel === "-" ? "" : (guruData.siakadMapel || ""),
+          rombel: guruData.rombel || "",
+          status_aktif: 'Aktif',
+        };
+        console.log('✅ Data guru diambil dari REST API JSON');
+        return { user, sekolah };
+      }
     }
-  });
-
-  if (!response.ok) {
-    throw new Error(`Gagal mengambil data dari API Sync (${response.status})`);
+  } catch (apiErr) {
+    console.warn('⚠️ REST API gagal, fallback ke Supabase langsung:', apiErr);
   }
 
-  const json = await response.json();
+  // === Fallback: Ambil langsung dari Supabase SIAKAD ===
+  console.log('🔄 Menggunakan fallback Supabase untuk mengambil data profil...');
 
-  const sekolah: SiakadSekolahConfig = {
-    nama_sekolah: json.Nama_Sekolah,
-    nama_yayasan: json.Nama_Yayasan,
-    alamat: json.Jalan,
-    nama_kepsek: json.Nama_Kepsek,
-    nip_kepsek: json.NIP_Kepsek,
-    tahun_pelajaran: json.Tahun_Pelajaran,
-    semester: json.Semester,
-  };
-
-  const guruArr = json.Guru;
-  if (!guruArr || !Array.isArray(guruArr) || guruArr.length === 0) {
-    throw new Error("Data 'Guru' kosong pada respons API.");
+  // Dapatkan user ID dari session aktif
+  const { data: sessionData } = await siakadSupabase.auth.getUser(token);
+  if (!sessionData?.user) {
+    throw new Error('Sesi tidak valid. Silakan login ulang dari SIAKAD.');
   }
 
-  const guruData = guruArr[0]; // Karena API didesain hanya mengembalikan yang sedang login
-  
+  const { data: userData, error: userError } = await siakadSupabase
+    .from('master_user')
+    .select('*')
+    .eq('user_id', sessionData.user.id)
+    .maybeSingle();
+
+  if (userError || !userData) {
+    // Coba cari berdasarkan id_user jika user_id tidak cocok
+    const { data: userData2, error: userError2 } = await siakadSupabase
+      .from('master_user')
+      .select('*')
+      .eq('id_user', sessionData.user.email?.split('@')[0] || '')
+      .maybeSingle();
+
+    if (userError2 || !userData2) {
+      throw new Error('Data profil guru tidak ditemukan. Endpoint API /api/apk-gen-sync belum tersedia.');
+    }
+
+    const user: SiakadMasterUser = {
+      id_user: userData2.id_user,
+      nama: userData2.nama || '',
+      nip: userData2.nip || '',
+      role: userData2.role || 'Guru Mapel',
+      mapel: userData2.mapel || '',
+      rombel: userData2.rombel || '',
+      status_aktif: userData2.status_aktif || 'Aktif',
+    };
+
+    const sekolah = await fetchSiakadSekolahConfig();
+    return { user, sekolah };
+  }
+
   const user: SiakadMasterUser = {
-    // id_user diisi dari field JSON yang tersedia (id_user jika ada, jika tidak fallback ke NIP_Guru)
-    id_user: guruData.id_user || guruData.NIP_Guru || 'ID_UNKNOWN',
-    nama: guruData.Nama_Guru || '',
-    nip: guruData.NIP_Guru || '',
-    role: guruData.siakadRole || 'Guru Mapel',
-    mapel: guruData.siakadMapel === "-" ? "" : (guruData.siakadMapel || ""),
-    rombel: guruData.rombel || "", // User diinstruksikan untuk menambahkan field ini untuk Wali Kelas
-    status_aktif: 'Aktif',
+    id_user: userData.id_user,
+    nama: userData.nama || '',
+    nip: userData.nip || '',
+    role: userData.role || 'Guru Mapel',
+    mapel: userData.mapel || '',
+    rombel: userData.rombel || '',
+    status_aktif: userData.status_aktif || 'Aktif',
   };
 
+  const sekolah = await fetchSiakadSekolahConfig();
   return { user, sekolah };
 }
 
