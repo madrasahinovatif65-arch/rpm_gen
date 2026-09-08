@@ -156,6 +156,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nama Resmi Sekolah</label>
                 <Input
                   type="text"
@@ -166,6 +167,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   className={inputClassName}
                 />
               </div>
+
 
               <div className="md:col-span-2">
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Alamat Lengkap & Telepon Sekolah</label>

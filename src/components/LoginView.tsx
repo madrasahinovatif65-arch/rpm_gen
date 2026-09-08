@@ -82,7 +82,6 @@ export const LoginView: React.FC<LoginViewProps> = ({
           Alamat_Sekolah: config?.Alamat_Sekolah || '',
           Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
           Logo_Kiri: config?.Logo_Kiri || '',
-          Logo_Kanan: config?.Logo_Kanan || '',
         });
       } catch (saveErr) {
         console.warn('⚠️ Gagal sync ke Firebase, tetap lanjut login:', saveErr);
@@ -91,11 +90,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
       // Simpan token auth ke localStorage
       const token = result.session?.access_token || btoa(`siakad:${result.user.id_user}:${Date.now()}`);
       localStorage.setItem("edadmin_auth_token", token);
+      // Set userId untuk isolasi data per-akun di Firebase
+      localStorage.setItem("edadmin_user_id", result.user.id_user);
       localStorage.setItem("edadmin_user", JSON.stringify({
         id_user: result.user.id_user,
         username: result.user.id_user,
         nama: result.user.nama,
         role: result.user.role,
+        rombel: result.user.rombel || '',
         mapel: result.user.mapel || '-',
         provider: 'siakad',
       }));
@@ -150,6 +152,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
         const timestamp = Date.now();
         const token = btoa(`${String(username).trim()}:${timestamp}:edadmin_pro_secure_session`);
         localStorage.setItem("edadmin_auth_token", token);
+        // Admin selalu pakai userId 'admin' — data disimpan di path global (tidak per-user)
+        localStorage.setItem("edadmin_user_id", "admin");
         localStorage.setItem("edadmin_user", JSON.stringify({
           username: "madrasahinovatif",
           nama: "Madrasah Inovatif",

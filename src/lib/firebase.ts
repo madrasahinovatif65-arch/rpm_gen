@@ -84,6 +84,92 @@ export const COLLECTIONS = {
   PERANGKAT_KBC: "perangkat_kbc"
 };
 
+// ============================================================
+// Per-User Path Helpers
+// ============================================================
+
+/**
+ * Ambil userId yang sedang aktif dari localStorage.
+ * Mengembalikan null jika belum ada sesi / belum login.
+ */
+export function getCurrentUserId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('edadmin_user_id');
+}
+
+/**
+ * Cek apakah yang login adalah Admin (akun lokal madrasahinovatif).
+ */
+export function isAdminUser(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const userJson = localStorage.getItem('edadmin_user');
+    if (!userJson) return false;
+    const user = JSON.parse(userJson);
+    return user.provider === 'local' || user.username === 'madrasahinovatif';
+  } catch { return false; }
+}
+
+/**
+ * Path Firestore untuk Pengaturan:
+ * - Admin → `pengaturan/config` (global)
+ * - Guru SIAKAD → `users/{uid}/pengaturan/config`
+ */
+function getPengaturanDocRef() {
+  if (isAdminUser()) {
+    return doc(firestore, COLLECTIONS.PENGATURAN, 'config');
+  }
+  const uid = getCurrentUserId();
+  if (uid) {
+    return doc(firestore, 'users', uid, COLLECTIONS.PENGATURAN, 'config');
+  }
+  // Fallback ke global jika userId belum ada
+  return doc(firestore, COLLECTIONS.PENGATURAN, 'config');
+}
+
+/**
+ * Path Firestore untuk KBC State:
+ * - Admin → `kbc_state/main` (global)
+ * - Guru SIAKAD → `users/{uid}/kbc_state/main`
+ */
+function getKbcStateDocRef() {
+  if (isAdminUser()) {
+    return doc(firestore, COLLECTIONS.KBC_STATE, 'main');
+  }
+  const uid = getCurrentUserId();
+  if (uid) {
+    return doc(firestore, 'users', uid, COLLECTIONS.KBC_STATE, 'main');
+  }
+  return doc(firestore, COLLECTIONS.KBC_STATE, 'main');
+}
+
+/**
+ * Prefix collection path untuk Perangkat KBC:
+ * - Admin → `perangkat_kbc`
+ * - Guru SIAKAD → `users/{uid}/perangkat_kbc`
+ */
+export function getPerangkatCollectionRef() {
+  if (isAdminUser()) {
+    return collection(firestore, COLLECTIONS.PERANGKAT_KBC);
+  }
+  const uid = getCurrentUserId();
+  if (uid) {
+    return collection(firestore, 'users', uid, COLLECTIONS.PERANGKAT_KBC);
+  }
+  return collection(firestore, COLLECTIONS.PERANGKAT_KBC);
+}
+
+export function getPerangkatDocRef(docId: string) {
+  if (isAdminUser()) {
+    return doc(firestore, COLLECTIONS.PERANGKAT_KBC, docId);
+  }
+  const uid = getCurrentUserId();
+  if (uid) {
+    return doc(firestore, 'users', uid, COLLECTIONS.PERANGKAT_KBC, docId);
+  }
+  return doc(firestore, COLLECTIONS.PERANGKAT_KBC, docId);
+}
+
 // Helpers for isolated local storage fallback when running in a remixed environment
 function getRemixStorage<T>(collectionName: string): T[] {
   if (typeof window === "undefined") return [];
@@ -105,7 +191,7 @@ function setRemixStorage<T>(collectionName: string, data: T[]) {
   }
 }
 
-// Generic Realtime Subscription with offline fallback & authorization guard
+// Generic Realtime Subscription — otomatis pakai path per-user untuk PERANGKAT_KBC
 export function subscribeCollection<T>(collectionName: string, callback: (data: T[]) => void) {
   if (isIsolatedRemix()) {
     callback(getRemixStorage<T>(collectionName));
@@ -123,7 +209,11 @@ export function subscribeCollection<T>(collectionName: string, callback: (data: 
     return () => {};
   }
 
-  const colRef = collection(firestore, collectionName);
+  // Gunakan path per-user jika collection adalah perangkat_kbc
+  const colRef = collectionName === COLLECTIONS.PERANGKAT_KBC
+    ? getPerangkatCollectionRef()
+    : collection(firestore, collectionName);
+
   return onSnapshot(
     colRef, 
     (snapshot) => {
@@ -139,7 +229,7 @@ export function subscribeCollection<T>(collectionName: string, callback: (data: 
   );
 }
 
-// Single Document Save/Update with authorization guard
+// Single Document Save/Update — otomatis pakai path per-user untuk PERANGKAT_KBC
 export async function saveDocument(collectionName: string, id: string, data: Record<string, any>) {
   if (isIsolatedRemix()) {
     const current = getRemixStorage<any>(collectionName);
@@ -155,7 +245,10 @@ export async function saveDocument(collectionName: string, id: string, data: Rec
   }
 
   try {
-    const docRef = doc(firestore, collectionName, id);
+    // Gunakan path per-user jika collection adalah perangkat_kbc
+    const docRef = collectionName === COLLECTIONS.PERANGKAT_KBC
+      ? getPerangkatDocRef(id)
+      : doc(firestore, collectionName, id);
     await setDoc(docRef, { ...data, updatedAt: Date.now() }, { merge: true });
   } catch (err: any) {
     console.error(`Error saving document in ${collectionName}:`, err);
@@ -163,7 +256,7 @@ export async function saveDocument(collectionName: string, id: string, data: Rec
   }
 }
 
-// Single Document Delete with authorization guard
+// Single Document Delete — otomatis pakai path per-user untuk PERANGKAT_KBC
 export async function deleteDocument(collectionName: string, id: string) {
   // Always update local remix storage first so cached state clears immediately
   const current = getRemixStorage<any>(collectionName);
@@ -177,11 +270,12 @@ export async function deleteDocument(collectionName: string, id: string) {
   }
 
   try {
-    const docRef = doc(firestore, collectionName, id);
+    const docRef = collectionName === COLLECTIONS.PERANGKAT_KBC
+      ? getPerangkatDocRef(id)
+      : doc(firestore, collectionName, id);
     await deleteDoc(docRef);
   } catch (err: any) {
     console.error(`Error deleting document in ${collectionName}:`, err);
-    // Ignore error if document was already deleted or not found
     if (err?.code === "not-found" || err?.message?.includes("not found")) {
       return;
     }
@@ -228,7 +322,7 @@ export function checkPengaturanDatabaseAuthorization(): { authorized: boolean; r
   return { authorized: true };
 }
 
-// Pengaturan special helper (Doc ID: "config") with isolated database connection & security guard
+// Pengaturan special helper — path per-user untuk guru SIAKAD, global untuk Admin
 export async function savePengaturan(config: Pengaturan) {
   if (isIsolatedRemix()) {
     if (typeof window !== "undefined") {
@@ -239,7 +333,7 @@ export async function savePengaturan(config: Pengaturan) {
   }
 
   try {
-    const docRef = doc(firestore, COLLECTIONS.PENGATURAN, "config");
+    const docRef = getPengaturanDocRef();
     await setDoc(docRef, { ...config, updatedAt: Date.now() }, { merge: true });
     if (typeof window !== "undefined") {
       localStorage.setItem("edadmin_pengaturan_isolated", JSON.stringify(config));
@@ -255,30 +349,58 @@ export function subscribePengaturan(callback: (config: Pengaturan) => void) {
     if (typeof window !== "undefined") {
       const cached = localStorage.getItem("edadmin_remix_db_pengaturan") || localStorage.getItem("edadmin_pengaturan_isolated");
       if (cached) {
-        try {
-          callback(JSON.parse(cached));
-        } catch (e) {
+        try { callback(JSON.parse(cached)); } catch (e) {
           console.warn("Could not parse isolated local pengaturan cache:", e);
         }
       }
-      const handleUpdate = (e: any) => {
-        if (e.detail) callback(e.detail);
-      };
+      const handleUpdate = (e: any) => { if (e.detail) callback(e.detail); };
       window.addEventListener("edadmin_remix_db_update_pengaturan", handleUpdate);
       return () => window.removeEventListener("edadmin_remix_db_update_pengaturan", handleUpdate);
     }
     return () => {};
   }
 
-  const docRef = doc(firestore, COLLECTIONS.PENGATURAN, "config");
+  const userDocRef = getPengaturanDocRef();
+  const adminDocRef = doc(firestore, COLLECTIONS.PENGATURAN, 'config');
+
   return onSnapshot(
-    docRef, 
-    (docSnap) => {
+    userDocRef,
+    async (docSnap) => {
       if (docSnap.exists()) {
+        // Dokumen user sudah ada — pakai langsung
         const data = docSnap.data() as Pengaturan;
         callback(data);
         if (typeof window !== "undefined") {
           localStorage.setItem("edadmin_pengaturan_isolated", JSON.stringify(data));
+        }
+      } else if (!isAdminUser()) {
+        // Dokumen user belum ada — seed dari admin config sebagai referensi awal
+        try {
+          const adminSnap = await getDocs(collection(firestore, COLLECTIONS.PENGATURAN));
+          let adminConfig: Partial<Pengaturan> = {};
+          adminSnap.forEach(d => { if (d.id === 'config') adminConfig = d.data() as Pengaturan; });
+          if (Object.keys(adminConfig).length > 0) {
+            // Jangan timpa data pribadi guru (Nama, NIP, Role) yang sudah diset saat SSO
+            const personalData: Partial<Pengaturan> = {};
+            const cachedStr = localStorage.getItem("edadmin_pengaturan_isolated");
+            if (cachedStr) {
+              try {
+                const cached = JSON.parse(cachedStr) as Pengaturan;
+                if (cached.Nama_Guru) personalData.Nama_Guru = cached.Nama_Guru;
+                if (cached.NIP_Guru) personalData.NIP_Guru = cached.NIP_Guru;
+                if (cached.siakadRole) personalData.siakadRole = cached.siakadRole;
+                if (cached.siakadMapel) personalData.siakadMapel = cached.siakadMapel;
+                if (cached.siakadUserId) personalData.siakadUserId = cached.siakadUserId;
+                if (cached.authProvider) personalData.authProvider = cached.authProvider;
+              } catch { /* ignore */ }
+            }
+            const seededConfig = { ...adminConfig, ...personalData };
+            callback(seededConfig as Pengaturan);
+            // Simpan seed ke dokumen user agar tidak perlu seed lagi
+            await setDoc(userDocRef, { ...seededConfig, updatedAt: Date.now() }, { merge: true });
+          }
+        } catch (err) {
+          console.warn('⚠️ Gagal seed pengaturan dari admin config:', err);
         }
       }
     },
@@ -288,7 +410,7 @@ export function subscribePengaturan(callback: (config: Pengaturan) => void) {
   );
 }
 
-// KBC State special helper (Doc ID: "main") with isolated database connection
+// KBC State special helper — path per-user untuk guru SIAKAD, global untuk Admin
 export async function saveKbcState(state: any) {
   if (isIsolatedRemix()) {
     if (typeof window !== "undefined") {
@@ -299,7 +421,7 @@ export async function saveKbcState(state: any) {
   }
 
   try {
-    const docRef = doc(firestore, COLLECTIONS.KBC_STATE, "main");
+    const docRef = getKbcStateDocRef();
     await setDoc(docRef, { ...state, updatedAt: Date.now() }, { merge: true });
     if (typeof window !== "undefined") {
       localStorage.setItem("edadmin_kbc_state_isolated", JSON.stringify(state));
@@ -315,24 +437,20 @@ export function subscribeKbcState(callback: (state: any) => void) {
     if (typeof window !== "undefined") {
       const cached = localStorage.getItem("edadmin_remix_db_kbc_state") || localStorage.getItem("edadmin_kbc_state_isolated");
       if (cached) {
-        try {
-          callback(JSON.parse(cached));
-        } catch (e) {
+        try { callback(JSON.parse(cached)); } catch (e) {
           console.warn("Could not parse isolated local kbc state cache:", e);
         }
       }
-      const handleUpdate = (e: any) => {
-        if (e.detail) callback(e.detail);
-      };
+      const handleUpdate = (e: any) => { if (e.detail) callback(e.detail); };
       window.addEventListener("edadmin_remix_db_update_kbc_state", handleUpdate);
       return () => window.removeEventListener("edadmin_remix_db_update_kbc_state", handleUpdate);
     }
     return () => {};
   }
 
-  const docRef = doc(firestore, COLLECTIONS.KBC_STATE, "main");
+  const docRef = getKbcStateDocRef();
   return onSnapshot(
-    docRef, 
+    docRef,
     (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -348,60 +466,48 @@ export function subscribeKbcState(callback: (state: any) => void) {
   );
 }
 
-// Clear / Wipe All Collections in Database (Except Configuration) with authorization guard
+// Clear / Wipe — hanya menghapus data di path admin (global), TIDAK menyentuh data guru SIAKAD
 export async function clearAllDatabaseCollections() {
   localStorage.setItem("edadmin_database_cleared", "true");
 
-  const collectionsToClear: string[] = [];
+  // Hanya hapus collection global milik admin
+  const collectionsToClear: string[] = [COLLECTIONS.PERANGKAT_KBC];
 
-  // 1. Always purge local storage fallback for all collections & dispatch update events
-  collectionsToClear.forEach((colName) => {
-    setRemixStorage(colName, []);
-  });
+  // 1. Purge local storage remix fallback
+  collectionsToClear.forEach((colName) => { setRemixStorage(colName, []); });
 
-  if (isIsolatedRemix()) {
-    return;
-  }
+  if (isIsolatedRemix()) return;
 
-  // 2. Set isDatabaseCleared flag in Firestore configuration
+  // 2. Set isDatabaseCleared flag di config admin
   try {
-    const configDocRef = doc(firestore, COLLECTIONS.PENGATURAN, "config");
+    const configDocRef = doc(firestore, COLLECTIONS.PENGATURAN, 'config');
     await setDoc(configDocRef, { isDatabaseCleared: true, updatedAt: Date.now() }, { merge: true });
   } catch (err) {
-    console.warn("Could not set isDatabaseCleared flag in pengaturan collection:", err);
+    console.warn('Could not set isDatabaseCleared flag:', err);
   }
 
-  // 3. Clear all collections in Firestore (chunked batch deletes with individual fallback)
+  // 3. Hanya hapus dokumen di collection global (bukan users/{uid}/...)
   for (const colName of collectionsToClear) {
     try {
       const colRef = collection(firestore, colName);
       const snapshot = await getDocs(colRef);
       if (!snapshot.empty) {
         const docs = snapshot.docs;
-        // Batch delete in chunks of 200
         for (let i = 0; i < docs.length; i += 200) {
           const chunk = docs.slice(i, i + 200);
           try {
             const batch = writeBatch(firestore);
-            chunk.forEach((docSnap) => {
-              batch.delete(docSnap.ref);
-            });
+            chunk.forEach((docSnap) => { batch.delete(docSnap.ref); });
             await batch.commit();
           } catch (batchErr) {
-            console.warn(`Batch delete failed for ${colName}, attempting individual deletes:`, batchErr);
-            // Fallback to individual deletes if batch fails
             for (const docSnap of chunk) {
-              try {
-                await deleteDoc(docSnap.ref);
-              } catch (singleErr) {
-                console.warn(`Notice: Could not delete document ${docSnap.id} in ${colName}:`, singleErr);
-              }
+              try { await deleteDoc(docSnap.ref); } catch { /* ignore */ }
             }
           }
         }
       }
     } catch (err: any) {
-      console.warn(`Notice while fetching/clearing collection ${colName}:`, err);
+      console.warn(`Notice while clearing collection ${colName}:`, err);
     }
   }
 }

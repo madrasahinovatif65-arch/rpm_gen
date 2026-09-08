@@ -89,7 +89,6 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
             Alamat_Sekolah: config?.Alamat_Sekolah || '',
             Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
             Logo_Kiri: config?.Logo_Kiri || '',
-            Logo_Kanan: config?.Logo_Kanan || '',
           });
         } catch (saveErr) {
           console.warn('[SSO] Gagal sync Firebase (non-fatal):', saveErr);
@@ -100,14 +99,72 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
         localStorage.setItem("edadmin_siakad_refresh", refreshToken);
         const expiresAt = Date.now() + ((data.session?.expires_in || 3600) * 1000);
         localStorage.setItem("edadmin_token_expires_at", expiresAt.toString());
+        // Set userId untuk isolasi data per-akun di Firebase
+        localStorage.setItem("edadmin_user_id", userData.id_user);
         localStorage.setItem("edadmin_user", JSON.stringify({
           id_user: userData.id_user,
           username: userData.id_user,
           nama: userData.nama,
           role: userData.role,
+          rombel: userData.rombel || '',
           mapel: userData.mapel || '-',
           provider: 'siakad',
         }));
+
+        // Seed KBC State dari data rombel
+        try {
+          const { saveKbcState, subscribeKbcState } = await import("../lib/firebase");
+          const rombelStr: string = userData.rombel || '';
+          
+          let levelValue = rombelStr;
+          
+          // Jika role adalah Guru Mapel, kosongkan kelas karena mereka mengajar di banyak kelas
+          if (userData.role === "Guru Mapel") {
+            levelValue = "";
+          }
+          // Abaikan jika rombel berupa strip "-" atau kosong
+          else if (rombelStr === "-" || rombelStr.trim() === "") {
+            levelValue = "";
+          } 
+          // Jika rombel dari SIAKAD sudah mengandung kata "Fase", gunakan teks aslinya
+          else if (!rombelStr.toLowerCase().includes("fase") && rombelStr.length > 0) {
+            // Jika hanya "Kelas 1A", coba ekstrak angkanya
+            const kelasMatch = rombelStr.match(/(\d+[A-Za-z]*)\s*$/);
+            if (kelasMatch) {
+              levelValue = `Kelas ${kelasMatch[1]}`;
+            } else {
+              levelValue = `Kelas ${rombelStr}`; // fallback
+            }
+          }
+
+          // Cek dulu apakah user sudah punya KBC state sendiri
+          let hasExistingState = false;
+          const existingCached = localStorage.getItem("edadmin_kbc_state_isolated");
+          if (existingCached) {
+            try { const p = JSON.parse(existingCached); hasExistingState = !!p?.updatedAt; } catch { /* ignore */ }
+          }
+
+          if (!hasExistingState) {
+            await saveKbcState({
+              curriculum: {
+                school: pengaturanData.Nama_Sekolah || '',
+                year: pengaturanData.Tahun_Pelajaran || '',
+                level: levelValue,
+              },
+              school: {
+                teacher: userData.nama || '',
+                nipTeacher: userData.nip || '',
+                principal: pengaturanData.Nama_Kepsek || '',
+                nipPrincipal: pengaturanData.NIP_Kepsek || '',
+                cityDate: `Karangrejo, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`,
+              },
+              _seededFromSiakad: true,
+            });
+            console.log('[SSO] ✅ KBC State di-seed (rombel:', levelValue || 'kosong', ')');
+          }
+        } catch (kbcErr) {
+          console.warn('[SSO] Gagal seed KBC state (non-fatal):', kbcErr);
+        }
 
         // Hapus hash dari address bar demi keamanan (token tidak terlihat)
         // Sekaligus pindahkan path dari /sso ke / agar App.tsx render dashboard
@@ -118,6 +175,7 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
         console.log('[SSO] ✅ Login berhasil untuk:', userData.nama);
 
         setTimeout(() => onSuccess(), 1200);
+
 
       } catch (err: any) {
         console.error('[SSO] ❌ Error:', err);

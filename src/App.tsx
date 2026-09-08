@@ -40,14 +40,12 @@ import { Pengaturan } from "./types";
 const DEFAULT_CONFIG: Pengaturan = {
   Nama_Guru: "Drs. Yefri Haryanto, M.Pd.",
   NIP_Guru: "19850312 201001 1 008",
-  Pemerintah: "PEMERINTAH PROVINSI JAMBI",
   Nama_Sekolah: "SMP NEGERI 3 KERINCI",
   Alamat_Sekolah: "Jalan Raya Lintas Sungai Penuh, Telp: (0748) 21102",
   Nama_Kepsek: "Hamdani, S.Pd., M.Si.",
   NIP_Kepsek: "19780514 200212 1 003",
   Tempat_Tanda_Tangan: "Karangrejo",
   Logo_Kiri: "https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds",
-  Logo_Kanan: "https://lh3.googleusercontent.com/d/1k4q401pC_PhtybY9T73snaJj6WzONMds"
 };
 
 const AI_TOOLS_ITEMS = [
@@ -183,8 +181,11 @@ export default function App() {
   const handleLogout = () => {
     localStorage.removeItem("edadmin_auth_token");
     localStorage.removeItem("edadmin_user");
+    localStorage.removeItem("edadmin_user_id");
     localStorage.removeItem("edadmin_siakad_refresh");
     localStorage.removeItem("edadmin_token_expires_at");
+    localStorage.removeItem("edadmin_kbc_state_isolated");
+    localStorage.removeItem("edadmin_pengaturan_isolated");
     setIsAuthenticated(false);
   };
 
