@@ -28,8 +28,7 @@ import { CPDatabaseView } from "./components/CPDatabaseView";
 import { PengaturanView } from "./components/PengaturanView";
 import { ResetDatabaseView } from "./components/ResetDatabaseView";
 import { LoginView } from "./components/LoginView";
-import { SiakadCallbackView } from "./components/SiakadCallbackView";
-import { refreshAccessToken } from "./lib/siakad-auth";
+
 
 import { 
   subscribePengaturan, 
@@ -120,53 +119,45 @@ export default function App() {
     runMigration();
   }, []);
 
-  // Token auto-refresh: check expiry every minute and refresh 5 min before expiration
+  // Token auto-refresh untuk SIAKAD Supabase session
   useEffect(() => {
     const checkAndRefreshToken = async () => {
-      // Only check if authenticated and using SSO
       if (!isAuthenticated) return;
 
       const refreshToken = localStorage.getItem("edadmin_siakad_refresh");
       const expiresAtStr = localStorage.getItem("edadmin_token_expires_at");
       
-      // Skip if not SSO login (no refresh token)
+      // Skip jika bukan login SIAKAD (tidak ada refresh token)
       if (!refreshToken || !expiresAtStr) return;
 
       const expiresAt = parseInt(expiresAtStr, 10);
       const now = Date.now();
       const timeUntilExpiry = expiresAt - now;
-      const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+      const fiveMinutes = 5 * 60 * 1000;
 
-      // If token expires in less than 5 minutes, refresh it
+      // Refresh 5 menit sebelum expired
       if (timeUntilExpiry < fiveMinutes && timeUntilExpiry > 0) {
         try {
-          console.log('🔄 Auto-refreshing SSO token (expires soon)...');
-          const tokenResponse = await refreshAccessToken(refreshToken);
-          
-          // Update localStorage with new token
-          localStorage.setItem("edadmin_auth_token", tokenResponse.access_token);
-          if (tokenResponse.refresh_token) {
-            localStorage.setItem("edadmin_siakad_refresh", tokenResponse.refresh_token);
+          const { siakadSupabase } = await import("./lib/siakad-supabase");
+          const { data, error } = await siakadSupabase.auth.refreshSession();
+          if (!error && data.session) {
+            localStorage.setItem("edadmin_auth_token", data.session.access_token);
+            localStorage.setItem("edadmin_siakad_refresh", data.session.refresh_token);
+            const newExpiry = Date.now() + (data.session.expires_in * 1000);
+            localStorage.setItem("edadmin_token_expires_at", newExpiry.toString());
+            console.log('✅ SIAKAD session refreshed');
           }
-          const newExpiresAt = Date.now() + (tokenResponse.expires_in * 1000);
-          localStorage.setItem("edadmin_token_expires_at", newExpiresAt.toString());
-          
-          console.log('✅ SSO token refreshed successfully');
         } catch (error) {
-          console.error('❌ Token refresh failed:', error);
-          // If refresh fails, let token expire naturally (user will need to re-login)
+          console.error('❌ SIAKAD session refresh failed:', error);
         }
       }
     };
 
-    // Check immediately on mount
     checkAndRefreshToken();
-
-    // Then check every minute
-    const intervalId = setInterval(checkAndRefreshToken, 60000); // 60 seconds
-
+    const intervalId = setInterval(checkAndRefreshToken, 60000);
     return () => clearInterval(intervalId);
   }, [isAuthenticated]);
+
 
   // Save initial config if empty
   useEffect(() => {
@@ -197,32 +188,7 @@ export default function App() {
     setIsAuthenticated(false);
   };
 
-  // Check if we're on OAuth callback route
-  const isAuthCallback = typeof window !== 'undefined' && window.location.pathname === '/auth/callback';
-
-  if (isAuthCallback && isAuthenticated) {
-    return (
-      <SiakadCallbackView
-        onSuccess={() => {
-          // Callback already sets auth state, just ensure authenticated state is set
-          setIsAuthenticated(true);
-        }}
-        config={config}
-      />
-    );
-  }
-
   if (!isAuthenticated) {
-    // Also check if we're in OAuth callback before login is confirmed
-    if (isAuthCallback) {
-      return (
-        <SiakadCallbackView
-          onSuccess={() => setIsAuthenticated(true)}
-          config={config}
-        />
-      );
-    }
-    
     return (
       <LoginView
         onLoginSuccess={() => setIsAuthenticated(true)}
@@ -232,6 +198,7 @@ export default function App() {
       />
     );
   }
+
 
   return (
     <div className={`min-h-screen flex bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans transition-colors ${isDarkMode ? "dark" : ""}`}>

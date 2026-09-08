@@ -28,14 +28,18 @@ export interface Pengaturan {
   // Madrasah-level KBC fields (tetap, dikelola di Pengaturan Profil)
   Kantor_Kemenag?: string;
   Tahun_Pelajaran?: string;
+  Semester?: string;            // Semester aktif (dari SIAKAD)
+  Nama_Yayasan?: string;        // Nama yayasan madrasah (dari SIAKAD)
   username?: string;
   password?: string;
   isDatabaseCleared?: boolean;
   cpTemplates?: CpTemplate[];
-  // SIAKAD SSO fields
-  siakadUserId?: string;        // Guru ID from SIAKAD (primary key for SSO users)
-  siakadSyncedAt?: number;      // Last sync timestamp
-  authProvider?: 'local' | 'siakad';  // Track auth method
+  // SIAKAD Integration fields
+  siakadUserId?: string;        // Guru ID dari SIAKAD (primary key SSO users)
+  siakadRole?: string;          // Role guru di SIAKAD (Guru Mapel, Wali Kelas, dll)
+  siakadMapel?: string;         // Mata pelajaran yang diampu (dari SIAKAD)
+  siakadSyncedAt?: number;      // Timestamp terakhir sync dengan SIAKAD
+  authProvider?: 'local' | 'siakad';  // Metode autentikasi yang digunakan
 }
 
 
