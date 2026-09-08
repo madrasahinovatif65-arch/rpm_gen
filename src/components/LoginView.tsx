@@ -51,6 +51,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
       }
     };
     checkHealth();
+
+    // Auto-open local login (emergency access) if URL has ?admin=true
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("admin") === "true") {
+        setShowLocalLogin(true);
+      }
+    }
   }, []);
 
   // Handle SIAKAD login
