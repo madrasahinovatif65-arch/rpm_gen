@@ -127,14 +127,23 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
             }
           }
 
-          // Cek dulu apakah user sudah punya KBC state sendiri
-          let hasExistingState = false;
+          // Cek apakah user sudah punya KBC state sendiri (dan data lengkap)
+          let hasCompleteState = false;
           const existingCached = localStorage.getItem("edadmin_kbc_state_isolated");
           if (existingCached) {
-            try { const p = JSON.parse(existingCached); hasExistingState = !!p?.updatedAt; } catch { /* ignore */ }
+            try {
+              const p = JSON.parse(existingCached);
+              // Hanya skip seed jika data kepsek sudah ada (lengkap)
+              hasCompleteState = !!p?.updatedAt && !!p?.school?.principal && !!p?.school?.nipTeacher;
+            } catch { /* ignore */ }
           }
 
-          if (!hasExistingState) {
+          if (!hasCompleteState) {
+            const nipGuru = userData.nip || '';
+            const namaKepsek = pengaturanData.Nama_Kepsek || '';
+            const nipKepsek = pengaturanData.NIP_Kepsek || '';
+            console.log('[SSO] Seeding KBC dengan - NIP Guru:', nipGuru, '| Kepsek:', namaKepsek, '| NIP Kepsek:', nipKepsek);
+
             await saveKbcState({
               curriculum: {
                 school: pengaturanData.Nama_Sekolah || '',
@@ -143,9 +152,9 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
               },
               school: {
                 teacher: userData.nama || '',
-                nipTeacher: userData.nip || '',
-                principal: pengaturanData.Nama_Kepsek || '',
-                nipPrincipal: pengaturanData.NIP_Kepsek || '',
+                nipTeacher: nipGuru,
+                principal: namaKepsek,
+                nipPrincipal: nipKepsek,
                 cityDate: `Karangrejo, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`,
               },
               _seededFromSiakad: true,

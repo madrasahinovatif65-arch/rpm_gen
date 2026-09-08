@@ -9,9 +9,10 @@ import { Input } from "./ui/Input";
 interface PengaturanViewProps {
   config: Pengaturan;
   onNavigateToReset?: () => void;
+  readOnly?: boolean;
 }
 
-export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNavigateToReset }) => {
+export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNavigateToReset, readOnly = false }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<Pengaturan>({
     Nama_Guru: "",
@@ -71,14 +72,22 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xs border border-slate-200 dark:border-slate-800 space-y-6">
-        <div>
+      <div>
           <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
             <Settings className="w-5 h-5 text-blue-600" />
-            Pengaturan Profil Guru & Kop Sekolah
+            {readOnly ? 'Data Tersinkronisasi dari SIAKAD' : 'Pengaturan Profil Guru & Kop Sekolah'}
           </h2>
           <p className="text-xs text-slate-500">
-            Data ini digunakan secara otomatis pada Kop Surat Laporan PDF, Kartu Pelajar, dan Nama Penandatangan.
+            {readOnly
+              ? 'Data berikut diambil otomatis dari database SIAKAD saat login. Untuk mengubah, hubungi Admin SIAKAD.'
+              : 'Data ini digunakan secara otomatis pada Kop Surat Laporan PDF, Kartu Pelajar, dan Nama Penandatangan.'}
           </p>
+          {readOnly && (
+            <div className="mt-3 flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-xl px-3 py-2">
+              <ShieldCheck className="w-4 h-4 shrink-0" />
+              <span>Login via SIAKAD — data hanya bisa diubah oleh Admin. Tampilan ini untuk verifikasi data sinkronisasi.</span>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

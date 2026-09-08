@@ -219,10 +219,12 @@ export default function App() {
 
   const userJson = localStorage.getItem("edadmin_user");
   let isAdmin = false;
+  let isSiakadGuru = false;
   if (userJson) {
     try {
       const user = JSON.parse(userJson);
       isAdmin = user.provider === 'local' || user.username === 'madrasahinovatif';
+      isSiakadGuru = user.provider === 'siakad';
     } catch (e) {
       console.error("Gagal parse user data", e);
     }
@@ -302,11 +304,12 @@ export default function App() {
           {activeTab === "lkpdai" && <GeneratorLkpdAIView config={config} />}
           {activeTab === "ailainnya" && <GeneratorAILainnyaView />}
 
-          {/* Admin Only Views */}
-          {isAdmin && activeTab === "pengaturan" && (
+          {/* Admin & Guru: Pengaturan View (readonly untuk guru) */}
+          {(isAdmin || isSiakadGuru) && activeTab === "pengaturan" && (
             <PengaturanView
               config={config}
               onNavigateToReset={() => setActiveTab("resetdb")}
+              readOnly={isSiakadGuru && !isAdmin}
             />
           )}
 
@@ -352,20 +355,23 @@ export default function App() {
             <span className="text-[11px] mt-0.5 tracking-tight truncate">AI Tools</span>
           </button>
 
-          <button
-            onClick={() => {
-              setActiveCategorySheet(null);
-              setActiveTab("pengaturan");
-            }}
-            className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
-              activeTab === "pengaturan" || activeTab === "resetdb"
-                ? "text-slate-800 dark:text-white font-bold"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
-          >
-            <Settings className={`w-5 h-5 ${activeTab === "pengaturan" || activeTab === "resetdb" ? "scale-110" : ""}`} />
-            <span className="text-[11px] mt-0.5 tracking-tight truncate">Pengaturan</span>
-          </button>
+          {/* Pengaturan: tampil untuk Admin dan Guru SIAKAD */}
+          {(isAdmin || isSiakadGuru) && (
+            <button
+              onClick={() => {
+                setActiveCategorySheet(null);
+                setActiveTab("pengaturan");
+              }}
+              className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
+                activeTab === "pengaturan" || activeTab === "resetdb"
+                  ? "text-slate-800 dark:text-white font-bold"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
+            >
+              <Settings className={`w-5 h-5 ${activeTab === "pengaturan" || activeTab === "resetdb" ? "scale-110" : ""}`} />
+              <span className="text-[11px] mt-0.5 tracking-tight truncate">Profil Sync</span>
+            </button>
+          )}
         </nav>
 
         {/* Android Native Bottom Sheet Chooser Modal */}
