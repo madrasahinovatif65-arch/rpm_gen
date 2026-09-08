@@ -28,7 +28,7 @@ import { CPDatabaseView } from "./components/CPDatabaseView";
 import { PengaturanView } from "./components/PengaturanView";
 import { ResetDatabaseView } from "./components/ResetDatabaseView";
 import { LoginView } from "./components/LoginView";
-
+import { SSOCallbackView } from "./components/SSOCallbackView";
 
 import { 
   subscribePengaturan, 
@@ -187,6 +187,18 @@ export default function App() {
     localStorage.removeItem("edadmin_token_expires_at");
     setIsAuthenticated(false);
   };
+
+  // Check if we are handling SSO callback
+  const isSSOCallback = typeof window !== 'undefined' && window.location.pathname === '/sso';
+
+  if (isSSOCallback) {
+    return (
+      <SSOCallbackView 
+        onSuccess={() => setIsAuthenticated(true)}
+        config={config}
+      />
+    );
+  }
 
   if (!isAuthenticated) {
     return (
