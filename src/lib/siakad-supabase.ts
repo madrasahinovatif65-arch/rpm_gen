@@ -152,7 +152,6 @@ export async function fetchSiakadSekolahConfig(): Promise<SiakadSekolahConfig> {
         tahun_pelajaran: data.tahun_pelajaran,
         semester: data.semester,
         kantor_kemenag: data.kantor_kemenag,
-        pemerintah: data.pemerintah,
       };
     }
   } catch (err) {
@@ -163,7 +162,6 @@ export async function fetchSiakadSekolahConfig(): Promise<SiakadSekolahConfig> {
   return {
     nama_sekolah: 'MI Miftahul Khoir 1 Karangrejo',
     nama_yayasan: 'Yayasan Miftahul Khoir',
-    kantor_kemenag: 'KEMENTERIAN AGAMA KABUPATEN MAGELANG',
     pemerintah: 'PEMERINTAH KABUPATEN MAGELANG',
     tahun_pelajaran: getTahunPelajaranOtomatis(),
     semester: getSemesterOtomatis(),
@@ -220,8 +218,8 @@ export function mapSiakadToPengaturan(
 
     // Data sekolah dari SIAKAD
     Nama_Sekolah: sekolah.nama_sekolah || 'MI Miftahul Khoir 1 Karangrejo',
-    Pemerintah: sekolah.pemerintah || 'PEMERINTAH KABUPATEN MAGELANG',
-    Kantor_Kemenag: sekolah.kantor_kemenag || 'KEMENTERIAN AGAMA KABUPATEN MAGELANG',
+    Alamat_Sekolah: sekolah.alamat || '-',
+    Nama_Yayasan: sekolah.nama_yayasan || 'Yayasan NU Miftakhul Khoir Damarjati',
     Nama_Kepsek: sekolah.nama_kepsek || '',
     NIP_Kepsek: sekolah.nip_kepsek || '',
     Tahun_Pelajaran: sekolah.tahun_pelajaran || getTahunPelajaranOtomatis(),

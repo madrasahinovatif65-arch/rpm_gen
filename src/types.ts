@@ -17,16 +17,13 @@ export interface CpTemplate {
 export interface Pengaturan {
   Nama_Guru: string;
   NIP_Guru: string;
-  Pemerintah: string;
   Nama_Sekolah: string;
   Alamat_Sekolah: string;
   Nama_Kepsek: string;
   NIP_Kepsek: string;
   Tempat_Tanda_Tangan: string;
   Logo_Kiri: string;
-  Logo_Kanan: string;
   // Madrasah-level KBC fields (tetap, dikelola di Pengaturan Profil)
-  Kantor_Kemenag?: string;
   Tahun_Pelajaran?: string;
   Semester?: string;            // Semester aktif (dari SIAKAD)
   Nama_Yayasan?: string;        // Nama yayasan madrasah (dari SIAKAD)

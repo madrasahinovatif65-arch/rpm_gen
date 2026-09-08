@@ -156,19 +156,6 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Pemerintah Prov / Kab / Kota</label>
-                <Input
-                  type="text"
-                  id="Pemerintah"
-                  value={form.Pemerintah}
-                  onChange={handleChange}
-                  placeholder="PEMERINTAH PROVINSI / KABUPATEN"
-                  className={inputClassName}
-                />
-              </div>
-
-              <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nama Resmi Sekolah</label>
                 <Input
                   type="text"
@@ -205,11 +192,11 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">URL Logo Sekolah (Opsional)</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">URL Logo Sekolah (Sebelah Kiri Kop)</label>
                 <Input
                   type="text"
-                  id="Logo_Kanan"
-                  value={form.Logo_Kanan}
+                  id="Logo_Kiri"
+                  value={form.Logo_Kiri || ""}
                   onChange={handleChange}
                   placeholder="Link gambar HTTPS logo"
                   className={inputClassName}
@@ -231,13 +218,13 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="md:col-span-2">
-                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Kantor / Yayasan Kemenag</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nama Yayasan</label>
                 <Input
                   type="text"
-                  id="Kantor_Kemenag"
-                  value={form.Kantor_Kemenag || ""}
+                  id="Nama_Yayasan"
+                  value={form.Nama_Yayasan || ""}
                   onChange={handleChange}
-                  placeholder="Contoh: Kementerian Agama Kabupaten Pasuruan"
+                  placeholder="Contoh: Yayasan NU Miftakhul Khoir"
                   className={inputClassName}
                 />
               </div>
