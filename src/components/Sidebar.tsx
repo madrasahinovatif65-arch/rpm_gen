@@ -19,13 +19,15 @@ interface SidebarProps {
   setActiveTab: (tab: string) => void;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  isAdmin?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   setActiveTab,
   isOpen,
-  setIsOpen
+  setIsOpen,
+  isAdmin = false
 }) => {
   const navItems = [
     {
@@ -54,6 +56,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ]
     }
   ];
+
+  // Sembunyikan grup pengaturan jika bukan admin
+  const visibleNavItems = isAdmin 
+    ? navItems 
+    : navItems.filter(group => group.group !== "PENGATURAN");
 
   return (
     <>
@@ -102,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation */}
         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar pb-safe">
-          {navItems.map((group, idx) => (
+          {visibleNavItems.map((group, idx) => (
             <div key={idx} className="space-y-1">
               <p className="px-3 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">
                 {group.group}

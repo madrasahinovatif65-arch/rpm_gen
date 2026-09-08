@@ -216,6 +216,17 @@ export default function App() {
   }
 
 
+  const userJson = localStorage.getItem("edadmin_user");
+  let isAdmin = false;
+  if (userJson) {
+    try {
+      const user = JSON.parse(userJson);
+      isAdmin = user.provider === 'local' || user.username === 'madrasahinovatif';
+    } catch (e) {
+      console.error("Gagal parse user data", e);
+    }
+  }
+
   return (
     <div className={`min-h-screen flex bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans transition-colors ${isDarkMode ? "dark" : ""}`}>
       {/* Navigation Sidebar */}
@@ -224,6 +235,7 @@ export default function App() {
         setActiveTab={setActiveTab}
         isOpen={sidebarOpen}
         setIsOpen={setSidebarOpen}
+        isAdmin={isAdmin}
       />
 
       {/* Main Content Workspace */}
@@ -238,6 +250,7 @@ export default function App() {
           config={config}
           onLogout={handleLogout}
           onNavigateToDashboard={() => setActiveTab("dashboard")}
+          isAdmin={isAdmin}
         />
 
         {AI_TOOLS_ITEMS.some(item => item.id === activeTab) && (
@@ -288,14 +301,15 @@ export default function App() {
           {activeTab === "lkpdai" && <GeneratorLkpdAIView config={config} />}
           {activeTab === "ailainnya" && <GeneratorAILainnyaView />}
 
-          {activeTab === "pengaturan" && (
+          {/* Admin Only Views */}
+          {isAdmin && activeTab === "pengaturan" && (
             <PengaturanView
               config={config}
               onNavigateToReset={() => setActiveTab("resetdb")}
             />
           )}
 
-          {activeTab === "resetdb" && (
+          {isAdmin && activeTab === "resetdb" && (
             <ResetDatabaseView onSuccessReset={handleSuccessReset} />
           )}
         </main>
