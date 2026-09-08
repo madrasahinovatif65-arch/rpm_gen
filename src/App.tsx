@@ -188,13 +188,17 @@ export default function App() {
     setIsAuthenticated(false);
   };
 
-  // Check if we are handling SSO callback
-  const isSSOCallback = typeof window !== 'undefined' && window.location.pathname === '/sso';
+  // Check if we are handling SSO callback (hanya jika belum authenticated)
+  const isSSOCallback = typeof window !== 'undefined' 
+    && window.location.pathname === '/sso' 
+    && !isAuthenticated;
 
   if (isSSOCallback) {
     return (
       <SSOCallbackView 
-        onSuccess={() => setIsAuthenticated(true)}
+        onSuccess={() => {
+          setIsAuthenticated(true);
+        }}
         config={config}
       />
     );

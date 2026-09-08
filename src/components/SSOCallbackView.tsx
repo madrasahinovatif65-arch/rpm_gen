@@ -110,7 +110,8 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
         }));
 
         // Hapus hash dari address bar demi keamanan (token tidak terlihat)
-        window.history.replaceState({}, document.title, window.location.pathname);
+        // Sekaligus pindahkan path dari /sso ke / agar App.tsx render dashboard
+        window.history.replaceState({}, document.title, '/');
 
         setStatus("success");
         setMessage(`Selamat datang, ${userData.nama}!`);
