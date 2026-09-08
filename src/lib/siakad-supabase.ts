@@ -93,29 +93,13 @@ export async function loginWithSiakad(
       };
     }
 
-    // Ambil data profil guru dari master_user
-    const { data: userData, error: userError } = await siakadSupabase
-      .from('master_user')
-      .select('*')
-      .eq('user_id', authData.user.id)
-      .eq('status_aktif', 'Aktif')
-      .single();
+    // Ambil data profil guru dan konfigurasi sekolah dari Endpoint API JSON
+    const { user: userData, sekolah: pengaturan } = await fetchSiakadDataFromApi(authData.session.access_token);
 
-    if (userError || !userData) {
-      await siakadSupabase.auth.signOut();
-      return {
-        success: false,
-        message: 'Akun ditemukan tapi data profil guru tidak ada di database SIAKAD.',
-      };
-    }
-
-    // Ambil konfigurasi sekolah (tabel pengaturan jika ada, fallback dari env)
-    const pengaturan = await fetchSiakadSekolahConfig();
-
-    console.log('✅ SIAKAD login berhasil:', userData.nama);
+    console.log('✅ SIAKAD login berhasil via API:', userData.nama);
     return {
       success: true,
-      user: userData as SiakadMasterUser,
+      user: userData,
       session: authData.session,
       pengaturan,
     };
@@ -129,35 +113,59 @@ export async function loginWithSiakad(
 }
 
 /**
- * Ambil konfigurasi sekolah dari tabel pengaturan SIAKAD
- * Fallback ke default MI Miftahul Khoir jika tabel tidak ada
+ * Fetch data tersinkronisasi dari SIAKAD REST API (JSON)
  */
-export async function fetchSiakadSekolahConfig(): Promise<SiakadSekolahConfig> {
-  try {
-    // Coba ambil dari tabel 'pengaturan' (jika ada di SIAKAD)
-    const { data, error } = await siakadSupabase
-      .from('pengaturan')
-      .select('*')
-      .limit(1)
-      .single();
-
-    if (!error && data) {
-      return {
-        nama_sekolah: data.nama_sekolah,
-        nama_yayasan: data.nama_yayasan,
-        alamat: data.alamat,
-        nama_kepsek: data.nama_kepsek,
-        nip_kepsek: data.nip_kepsek,
-        logo_url: data.logo_url,
-        tahun_pelajaran: data.tahun_pelajaran,
-        semester: data.semester,
-        kantor_kemenag: data.kantor_kemenag,
-      };
+export async function fetchSiakadDataFromApi(token: string): Promise<{ user: SiakadMasterUser, sekolah: SiakadSekolahConfig }> {
+  const apiUrl = "https://siakad-app-phi.vercel.app/api/apk-gen-sync";
+  const response = await fetch(apiUrl, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
     }
-  } catch (err) {
-    console.warn('⚠️ Tabel pengaturan SIAKAD tidak ditemukan, menggunakan default');
+  });
+
+  if (!response.ok) {
+    throw new Error(`Gagal mengambil data dari API Sync (${response.status})`);
   }
 
+  const json = await response.json();
+
+  const sekolah: SiakadSekolahConfig = {
+    nama_sekolah: json.Nama_Sekolah,
+    nama_yayasan: json.Nama_Yayasan,
+    alamat: json.Jalan,
+    nama_kepsek: json.Nama_Kepsek,
+    nip_kepsek: json.NIP_Kepsek,
+    tahun_pelajaran: json.Tahun_Pelajaran,
+    semester: json.Semester,
+  };
+
+  const guruArr = json.Guru;
+  if (!guruArr || !Array.isArray(guruArr) || guruArr.length === 0) {
+    throw new Error("Data 'Guru' kosong pada respons API.");
+  }
+
+  const guruData = guruArr[0]; // Karena API didesain hanya mengembalikan yang sedang login
+  
+  const user: SiakadMasterUser = {
+    // id_user diisi dari field JSON yang tersedia (id_user jika ada, jika tidak fallback ke NIP_Guru)
+    id_user: guruData.id_user || guruData.NIP_Guru || 'ID_UNKNOWN',
+    nama: guruData.Nama_Guru || '',
+    nip: guruData.NIP_Guru || '',
+    role: guruData.siakadRole || 'Guru Mapel',
+    mapel: guruData.siakadMapel === "-" ? "" : (guruData.siakadMapel || ""),
+    rombel: guruData.rombel || "", // User diinstruksikan untuk menambahkan field ini untuk Wali Kelas
+    status_aktif: 'Aktif',
+  };
+
+  return { user, sekolah };
+}
+
+/**
+ * Fallback konfigurasi sekolah (jika API gagal untuk keperluan lain)
+ */
+export async function fetchSiakadSekolahConfig(): Promise<SiakadSekolahConfig> {
   // Default fallback untuk MI Miftahul Khoir 1 Karangrejo
   return {
     nama_sekolah: 'MI Miftahul Khoir 1 Karangrejo',

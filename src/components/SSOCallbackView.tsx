@@ -65,19 +65,9 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
         console.log('[SSO] Sesi aktif untuk user ID:', data.user.id);
         setMessage("Mengambil profil guru dari SIAKAD...");
 
-        // Ambil profil guru dari tabel master_user
-        const { data: userData, error: userError } = await siakadSupabase
-          .from("master_user")
-          .select("*")
-          .eq("user_id", data.user.id)
-          .maybeSingle();
-
-        if (userError || !userData) {
-          throw new Error("Data profil guru tidak ditemukan di tabel master_user SIAKAD.");
-        }
-
-        // Ambil konfigurasi sekolah
-        const pengaturan = await fetchSiakadSekolahConfig();
+        // Ambil profil guru dan konfigurasi sekolah dari Endpoint API JSON
+        const { fetchSiakadDataFromApi } = await import("../lib/siakad-supabase");
+        const { user: userData, sekolah: pengaturan } = await fetchSiakadDataFromApi(accessToken);
 
         setMessage("Menyinkronkan pengaturan aplikasi...");
 
