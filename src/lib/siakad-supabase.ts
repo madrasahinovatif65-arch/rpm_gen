@@ -134,8 +134,8 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
         nama_sekolah: json.Nama_Sekolah,
         nama_yayasan: json.Nama_Yayasan,
         alamat: json.Jalan,
-        nama_kepsek: json.Nama_Kepsek,
-        nip_kepsek: json.NIP_Kepsek,
+        nama_kepsek: json.Nama_Kepala_Madrasah || json.Nama_Kepsek || json.Kepala_Madrasah,
+        nip_kepsek: json.NIP_Kepala_Madrasah || json.NIP_Kepsek || json.NIP_Kepala,
         tahun_pelajaran: json.Tahun_Pelajaran,
         semester: json.Semester,
       };

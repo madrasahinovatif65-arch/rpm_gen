@@ -13,20 +13,20 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
     totalJp = "72 JP / Tahun",
     jpPerMinggu = "2 JP/Minggu",
     teacher = "M. Andry S.H., S.Ag.",
-    nipTeacher = "19850312 201001 1 008",
-    cityDate = "Kerinci, 14 Juli 2026",
-    principal = "Hamdani, S.Pd., M.Si.",
-    nipPrincipal = "19780514 200212 1 003",
+    nipTeacher = "-",
+    cityDate = "Pasuruan, 14 Juli 2026",
+    principal = "Nur Su'ud, S.Pd.I.",
+    nipPrincipal = "-",
     cpRasional = "",
     cpElemen = "",
-    learningModel = "Discovery Learning",
+    learningModel = "",
     sintakModel = "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
     kodeTp = "TP.AA.ELE.10.01",
     rumusanTp = "Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
-    elemenCp = "Akidah",
+    elemenCp = "Al-Qur'an Hadis",
     jumlahPertemuan = "3",
     jpPerPertemuan = "2",
-    topikLokal = "Pelestarian Lingkungan Hutan TNKS & Budaya Adat Mudik Kerinci"
+    topikLokal = "Surat Al-Ashr"
   } = formData || {};
 
   const cleanTotalJpNum = parseInt(totalJp) || 72;

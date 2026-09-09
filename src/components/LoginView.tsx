@@ -100,11 +100,18 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
       // Simpan ke Firebase pengaturan APK Gen (setelah user_id diset, path sudah benar)
       try {
+        const { getDocs, collection } = await import('firebase/firestore');
+        const { firestore, COLLECTIONS } = await import('../lib/firebase');
+        
+        // Ambil admin config terlebih dahulu agar tidak menimpa pengaturan global (seperti logo, dll)
+        const adminSnap = await getDocs(collection(firestore, COLLECTIONS.PENGATURAN));
+        let adminConfig: any = {};
+        adminSnap.forEach(d => { if (d.id === 'config') adminConfig = d.data(); });
+
         await savePengaturan({
+          ...adminConfig,
           ...pengaturanData,
-          Alamat_Sekolah: pengaturanData.Alamat_Sekolah && pengaturanData.Alamat_Sekolah !== '-' ? pengaturanData.Alamat_Sekolah : (config?.Alamat_Sekolah || ''),
-          Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
-          Logo_Kiri: config?.Logo_Kiri || '',
+          Alamat_Sekolah: pengaturanData.Alamat_Sekolah && pengaturanData.Alamat_Sekolah !== '-' ? pengaturanData.Alamat_Sekolah : (adminConfig.Alamat_Sekolah || config?.Alamat_Sekolah || ''),
         });
         console.log('[Login] ✅ Pengaturan tersimpan ke Firebase path: users/' + supabaseUid);
       } catch (saveErr) {

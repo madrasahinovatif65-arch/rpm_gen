@@ -36,8 +36,8 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
       setForm({
         Nama_Guru: config.Nama_Guru || "",
         NIP_Guru: config.NIP_Guru || "",
-        Pemerintah: config.Pemerintah || "PEMERINTAH PROVINSI",
-        Nama_Sekolah: config.Nama_Sekolah || "",
+        Pemerintah: config.Pemerintah || "",
+        Nama_Sekolah: config.Nama_Sekolah || "MI Miftahul Khoir 1 Karangrejo",
         Alamat_Sekolah: config.Alamat_Sekolah || "",
         Nama_Kepsek: config.Nama_Kepsek || "",
         NIP_Kepsek: config.NIP_Kepsek || "",
