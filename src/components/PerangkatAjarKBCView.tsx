@@ -145,7 +145,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       ...prev,
       school: {
         ...prev.school,
-        kemenagOffice: config.Kantor_Kemenag || config.Pemerintah || prev.school.kemenagOffice,
+        kemenagOffice: config.Nama_Yayasan || config.Kantor_Kemenag || config.Pemerintah || prev.school.kemenagOffice,
         schoolName: config.Nama_Sekolah || prev.school.schoolName,
         teacher: config.Nama_Guru || prev.school.teacher,
         nipTeacher: config.NIP_Guru || prev.school.nipTeacher,
