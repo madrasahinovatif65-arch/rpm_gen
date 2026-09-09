@@ -155,7 +155,7 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
             nip: guruData.NIP_Guru || '',
             role: guruData.siakadRole || 'Guru Mapel',
             mapel: guruData.siakadMapel === "-" ? "" : (guruData.siakadMapel || ""),
-            rombel: guruData.rombel || "",
+            rombel: guruData.siakadRombel || guruData.rombel || "",
             status_aktif: 'Aktif',
           };
           console.log('✅ Data guru diambil dari REST API JSON untuk:', user.nama);
