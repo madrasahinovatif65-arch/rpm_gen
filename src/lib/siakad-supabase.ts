@@ -182,6 +182,20 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
     .eq('user_id', sessionData.user.id)
     .maybeSingle();
 
+  function formatRombelFallback(r: string) {
+    if (!r || r === '-' || r.trim() === '') return '';
+    const match = r.match(/\d+/);
+    if (match) {
+      const grade = parseInt(match[0], 10);
+      let fase = '';
+      if (grade === 1 || grade === 2) fase = 'A';
+      else if (grade === 3 || grade === 4) fase = 'B';
+      else if (grade === 5 || grade === 6) fase = 'C';
+      if (fase) return `Fase ${fase} / Kelas ${grade}`;
+    }
+    return r;
+  }
+
   if (userError || !userData) {
     // Coba cari berdasarkan id_user jika user_id tidak cocok
     const { data: userData2, error: userError2 } = await siakadSupabase
@@ -200,7 +214,7 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
       nip: userData2.nip || '',
       role: userData2.role || 'Guru Mapel',
       mapel: userData2.mapel || '',
-      rombel: userData2.rombel || '',
+      rombel: formatRombelFallback(userData2.rombel || ''),
       status_aktif: userData2.status_aktif || 'Aktif',
     };
 
@@ -214,7 +228,7 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
     nip: userData.nip || '',
     role: userData.role || 'Guru Mapel',
     mapel: userData.mapel || '',
-    rombel: userData.rombel || '',
+    rombel: formatRombelFallback(userData.rombel || ''),
     status_aktif: userData.status_aktif || 'Aktif',
   };
 
@@ -226,13 +240,29 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
  * Fallback konfigurasi sekolah (jika API gagal untuk keperluan lain)
  */
 export async function fetchSiakadSekolahConfig(): Promise<SiakadSekolahConfig> {
-  // Default fallback untuk MI Miftahul Khoir 1 Karangrejo
+  // Ambil pengaturan sekolah (jika tabel ada)
+  const { data: pengaturan } = await siakadSupabase
+    .from('pengaturan_sekolah')
+    .select('tahun_ajaran, semester')
+    .limit(1)
+    .maybeSingle();
+
+  // Ambil data kepsek
+  const { data: kepsek } = await siakadSupabase
+    .from('master_user')
+    .select('nama, id_user')
+    .eq('role', 'Kepala Madrasah')
+    .limit(1)
+    .maybeSingle();
+
   return {
     nama_sekolah: 'MI Miftahul Khoir 1 Karangrejo',
-    nama_yayasan: 'Yayasan Miftahul Khoir',
-    pemerintah: 'PEMERINTAH KABUPATEN MAGELANG',
-    tahun_pelajaran: getTahunPelajaranOtomatis(),
-    semester: getSemesterOtomatis(),
+    nama_yayasan: 'Yayasan NU Miftakhul Khoir Damarjati',
+    alamat: 'Jalan Sumber Keling No. 11, Dsn. Krajan, Ds. Karangrejo',
+    nama_kepsek: kepsek?.nama || '-',
+    nip_kepsek: kepsek?.id_user || '-',
+    tahun_pelajaran: pengaturan?.tahun_ajaran || getTahunPelajaranOtomatis(),
+    semester: pengaturan?.semester || getSemesterOtomatis(),
   };
 }
 
