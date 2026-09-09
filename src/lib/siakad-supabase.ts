@@ -315,10 +315,9 @@ export function mapSiakadToPengaturan(
     NIP_Guru: user.nip || '',
 
     // Data sekolah dari SIAKAD
-    Nama_Sekolah: sekolah.nama_sekolah || 'MI Miftahul Khoir 1 Karangrejo',
-    // JSON SIAKAD menggunakan field 'Jalan', fallback ke 'alamat' jika ada
-    Alamat_Sekolah: (sekolah as any).jalan || sekolah.alamat || '-',
-    Nama_Yayasan: sekolah.nama_yayasan || 'Yayasan NU Miftakhul Khoir Damarjati',
+    Nama_Sekolah: sekolah.nama_sekolah || '',
+    Alamat_Sekolah: (sekolah as any).jalan || sekolah.alamat || '',
+    Nama_Yayasan: sekolah.nama_yayasan || '',
     Nama_Kepsek: sekolah.nama_kepsek || '',
     NIP_Kepsek: sekolah.nip_kepsek || '',
     Tahun_Pelajaran: sekolah.tahun_pelajaran || getTahunPelajaranOtomatis(),

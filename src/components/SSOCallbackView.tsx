@@ -93,12 +93,30 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
         // Simpan ke Firebase pengaturan APK Gen (setelah user_id diset)
         const pengaturanData = mapSiakadToPengaturan(userData, pengaturan || {});
         try {
-          await savePengaturan({
-            ...pengaturanData,
-            Alamat_Sekolah: config?.Alamat_Sekolah || '',
-            Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
-            Logo_Kiri: config?.Logo_Kiri || '',
-          });
+          // Ambil admin config terlebih dahulu agar tidak menimpa pengaturan global
+          const { getDocs, collection } = await import('firebase/firestore');
+          const { firestore, COLLECTIONS } = await import('../lib/firebase');
+          const adminSnap = await getDocs(collection(firestore, COLLECTIONS.PENGATURAN));
+          let adminConfig: any = {};
+          adminSnap.forEach(d => { if (d.id === 'config') adminConfig = d.data(); });
+
+          const payload: any = { ...adminConfig };
+          
+          if (pengaturanData.Nama_Guru) payload.Nama_Guru = pengaturanData.Nama_Guru;
+          if (pengaturanData.NIP_Guru) payload.NIP_Guru = pengaturanData.NIP_Guru;
+          if (pengaturanData.Nama_Sekolah) payload.Nama_Sekolah = pengaturanData.Nama_Sekolah;
+          if (pengaturanData.Alamat_Sekolah && pengaturanData.Alamat_Sekolah !== '-') payload.Alamat_Sekolah = pengaturanData.Alamat_Sekolah;
+          if (pengaturanData.Nama_Yayasan) payload.Nama_Yayasan = pengaturanData.Nama_Yayasan;
+          if (pengaturanData.Nama_Kepsek) payload.Nama_Kepsek = pengaturanData.Nama_Kepsek;
+          if (pengaturanData.NIP_Kepsek) payload.NIP_Kepsek = pengaturanData.NIP_Kepsek;
+          if (pengaturanData.Tahun_Pelajaran) payload.Tahun_Pelajaran = pengaturanData.Tahun_Pelajaran;
+          if (pengaturanData.Semester) payload.Semester = pengaturanData.Semester;
+
+          payload.siakadUserId = pengaturanData.siakadUserId;
+          payload.siakadSyncedAt = pengaturanData.siakadSyncedAt;
+          payload.authProvider = pengaturanData.authProvider;
+
+          await savePengaturan(payload);
           console.log('[SSO] ✅ Pengaturan tersimpan ke Firebase path: users/' + supabaseUid);
         } catch (saveErr) {
           console.warn('[SSO] Gagal sync Firebase (non-fatal):', saveErr);
@@ -130,28 +148,41 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
             }
           }
 
+          // Tentukan Mapel KBC: kosong untuk Wali Kelas, ambil yang pertama untuk Guru Mapel
+          let kbcMapel = "";
+          if (userData.role === "Guru Mapel" && userData.mapel && userData.mapel !== "-") {
+            kbcMapel = userData.mapel.split(",")[0].trim();
+          }
+
           // Cek apakah user sudah punya KBC state sendiri (dan data lengkap)
           let hasCompleteState = false;
           const existingCached = localStorage.getItem("edadmin_kbc_state_isolated");
           if (existingCached) {
             try {
               const p = JSON.parse(existingCached);
-              // Hanya skip seed jika data kepsek sudah ada (lengkap)
-              hasCompleteState = !!p?.updatedAt && !!p?.school?.principal && !!p?.school?.nipTeacher;
+              // Hanya skip seed jika data kepsek sudah ada secara riil (bukan default "-" atau "Kepala Madrasah")
+              const isNotDefaultPrincipal = p?.school?.principal && p.school.principal !== "Kepala Madrasah" && p.school.principal !== "-";
+              const isNotDefaultNip = p?.school?.nipTeacher && p.school.nipTeacher !== "-";
+              hasCompleteState = !!p?.updatedAt && isNotDefaultPrincipal && isNotDefaultNip;
             } catch { /* ignore */ }
           }
 
           if (!hasCompleteState) {
             const nipGuru = userData.nip || '';
-            const namaKepsek = pengaturanData.Nama_Kepsek || '';
-            const nipKepsek = pengaturanData.NIP_Kepsek || '';
+            // Gunakan nilai hasil merge (payload) untuk KBC state
+            const namaKepsek = payload.Nama_Kepsek || '';
+            const nipKepsek = payload.NIP_Kepsek || '';
+            const namaSekolah = payload.Nama_Sekolah || '';
+            const tahunPelajaran = payload.Tahun_Pelajaran || '';
             console.log('[SSO] Seeding KBC dengan - NIP Guru:', nipGuru, '| Kepsek:', namaKepsek, '| NIP Kepsek:', nipKepsek);
 
             await saveKbcState({
               curriculum: {
-                school: pengaturanData.Nama_Sekolah || '',
-                year: pengaturanData.Tahun_Pelajaran || '',
+                school: namaSekolah,
+                year: tahunPelajaran,
                 level: levelValue,
+                subject: kbcMapel,
+                learningModel: "", // Kosongkan model pembelajaran
               },
               school: {
                 teacher: userData.nama || '',
