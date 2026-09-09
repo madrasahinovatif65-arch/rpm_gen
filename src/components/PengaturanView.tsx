@@ -108,6 +108,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="Contoh: Budi Santoso, S.Pd., M.Pd."
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
 
@@ -120,6 +121,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="19900101 201501 1 002"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
             </div>
@@ -140,6 +142,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="Nama & Gelar Kepala Sekolah"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
 
@@ -152,6 +155,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="NIP Kepala Sekolah"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
             </div>
@@ -174,6 +178,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="SMA NEGERI 1 KOTA"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
 
@@ -187,6 +192,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="Jalan Pendidikan No. 1, Telp: 021-xxxxxx"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
 
@@ -199,6 +205,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="Contoh: Bandung / Jakarta"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
 
@@ -211,6 +218,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="Link gambar HTTPS logo"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
             </div>
@@ -237,6 +245,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="Contoh: Yayasan NU Miftakhul Khoir"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
               <div>
@@ -248,6 +257,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   onChange={handleChange}
                   placeholder="Contoh: 2026/2027"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
             </div>
@@ -274,6 +284,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   placeholder="www.yefriharyanto.id"
                   autoComplete="username"
                   className={inputClassName}
+                  disabled={readOnly}
                 />
               </div>
 
@@ -288,6 +299,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                     placeholder="123456"
                     autoComplete="current-password"
                     className="text-xs font-mono pr-12"
+                    disabled={readOnly}
                   />
                   <button
                     type="button"
@@ -303,11 +315,13 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
             </div>
           </div>
 
-          <div className="flex justify-end">
-            <Button type="submit" variant="primary" size="md" icon={Save}>
-              Simpan Pengaturan ke Firebase
-            </Button>
-          </div>
+          {!readOnly && (
+            <div className="flex justify-end">
+              <Button type="submit" variant="primary" size="md" icon={Save}>
+                Simpan Pengaturan ke Firebase
+              </Button>
+            </div>
+          )}
         </form>
 
         {/* Zona Bahaya / Reset Total */}

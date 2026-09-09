@@ -102,7 +102,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
       try {
         await savePengaturan({
           ...pengaturanData,
-          Alamat_Sekolah: config?.Alamat_Sekolah || '',
+          Alamat_Sekolah: pengaturanData.Alamat_Sekolah && pengaturanData.Alamat_Sekolah !== '-' ? pengaturanData.Alamat_Sekolah : (config?.Alamat_Sekolah || ''),
           Tempat_Tanda_Tangan: config?.Tempat_Tanda_Tangan || 'Karangrejo',
           Logo_Kiri: config?.Logo_Kiri || '',
         });
