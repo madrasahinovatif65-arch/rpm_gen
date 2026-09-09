@@ -118,6 +118,71 @@ export const LoginView: React.FC<LoginViewProps> = ({
         console.warn('⚠️ Gagal sync ke Firebase, tetap lanjut login:', saveErr);
       }
 
+      // Seed KBC State dari data rombel
+      try {
+        const { saveKbcState } = await import("../lib/firebase");
+        const userData = result.user;
+        const rombelStr: string = userData.rombel || '';
+        
+        let levelValue = rombelStr;
+        
+        // Jika role adalah Guru Mapel, kosongkan kelas karena mereka mengajar di banyak kelas
+        if (userData.role === "Guru Mapel") {
+          levelValue = "";
+        }
+        // Abaikan jika rombel berupa strip "-" atau kosong
+        else if (rombelStr === "-" || rombelStr.trim() === "") {
+          levelValue = "";
+        } 
+        // Jika rombel dari SIAKAD sudah mengandung kata "Fase", gunakan teks aslinya
+        else if (!rombelStr.toLowerCase().includes("fase") && rombelStr.length > 0) {
+          // Jika hanya "Kelas 1A", coba ekstrak angkanya
+          const kelasMatch = rombelStr.match(/(\d+[A-Za-z]*)\s*$/);
+          if (kelasMatch) {
+            levelValue = `Kelas ${kelasMatch[1]}`;
+          } else {
+            levelValue = `Kelas ${rombelStr}`; // fallback
+          }
+        }
+
+        // Cek apakah user sudah punya KBC state sendiri (dan data lengkap)
+        let hasCompleteState = false;
+        const existingCached = localStorage.getItem("edadmin_kbc_state_isolated");
+        if (existingCached) {
+          try {
+            const p = JSON.parse(existingCached);
+            // Hanya skip seed jika data kepsek sudah ada (lengkap)
+            hasCompleteState = !!p?.updatedAt && !!p?.school?.principal && !!p?.school?.nipTeacher;
+          } catch { /* ignore */ }
+        }
+
+        if (!hasCompleteState) {
+          const nipGuru = userData.nip || '';
+          const namaKepsek = pengaturanData.Nama_Kepsek || '';
+          const nipKepsek = pengaturanData.NIP_Kepsek || '';
+          console.log('[Login] Seeding KBC dengan - NIP Guru:', nipGuru, '| Kepsek:', namaKepsek, '| NIP Kepsek:', nipKepsek);
+
+          await saveKbcState({
+            curriculum: {
+              school: pengaturanData.Nama_Sekolah || '',
+              year: pengaturanData.Tahun_Pelajaran || '',
+              level: levelValue,
+            },
+            school: {
+              teacher: userData.nama || '',
+              nipTeacher: nipGuru,
+              principal: namaKepsek,
+              nipPrincipal: nipKepsek,
+              cityDate: `Karangrejo, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`,
+            },
+            _seededFromSiakad: true,
+          });
+          console.log('[Login] ✅ KBC State di-seed (rombel:', levelValue || 'kosong', ')');
+        }
+      } catch (kbcErr) {
+        console.warn('[Login] Gagal seed KBC state (non-fatal):', kbcErr);
+      }
+
       // Simpan refresh token jika ada
       if (result.session?.refresh_token) {
         localStorage.setItem("edadmin_siakad_refresh", result.session.refresh_token);
