@@ -87,6 +87,8 @@ export default function App() {
 
   // Subscribe to Firebase real-time collections
   useEffect(() => {
+    if (!isAuthenticated) return;
+    
     let unsubs: Array<() => void> = [];
 
     unsubs.push(subscribePengaturan((cfg) => {
@@ -99,7 +101,7 @@ export default function App() {
     return () => {
       unsubs.forEach((unsub) => unsub());
     };
-  }, []);
+  }, [isAuthenticated]);
 
   // Run migration once on mount
   useEffect(() => {
@@ -187,6 +189,7 @@ export default function App() {
     localStorage.removeItem("edadmin_kbc_state_isolated");
     localStorage.removeItem("edadmin_pengaturan_isolated");
     setIsAuthenticated(false);
+    window.location.reload();
   };
 
   // Check if we are handling SSO callback (hanya jika belum authenticated)
@@ -199,6 +202,7 @@ export default function App() {
       <SSOCallbackView 
         onSuccess={() => {
           setIsAuthenticated(true);
+          window.location.href = "/";
         }}
         config={config}
       />
@@ -208,7 +212,10 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <LoginView
-        onLoginSuccess={() => setIsAuthenticated(true)}
+        onLoginSuccess={() => {
+          setIsAuthenticated(true);
+          window.location.reload();
+        }}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
         config={config}

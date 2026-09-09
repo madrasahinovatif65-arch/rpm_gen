@@ -107,6 +107,13 @@ function notifyListeners() {
   }
 }
 
+// Reset state and subscription (dipanggil saat logout/login)
+export function resetKbcStateSubscription() {
+  isSubscribed = false;
+  globalState = defaultKbcState;
+  notifyListeners();
+}
+
 // Custom hook to use global KBC State
 export function useKbcState() {
   const [state, setState] = useState<KbcState>(globalState);
