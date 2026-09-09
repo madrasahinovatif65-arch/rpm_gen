@@ -27,7 +27,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
     Logo_Kanan: "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
     Kantor_Kemenag: "",
     Tahun_Pelajaran: "",
-    username: "www.yefriharyanto.id",
+    username: "madrasahinovatif",
     password: "123456"
   });
 
@@ -46,7 +46,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
         Logo_Kanan: config.Logo_Kanan || "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
         Kantor_Kemenag: config.Kantor_Kemenag || "",
         Tahun_Pelajaran: config.Tahun_Pelajaran || "",
-        username: config.username || "www.yefriharyanto.id",
+        username: config.username || "madrasahinovatif",
         password: config.password || "123456"
       });
     }
@@ -72,7 +72,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xs border border-slate-200 dark:border-slate-800 space-y-6">
-      <div>
+        <div>
           <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
             <Settings className="w-5 h-5 text-blue-600" />
             {readOnly ? 'Data Tersinkronisasi dari SIAKAD' : 'Pengaturan Profil Guru & Kop Sekolah'}
@@ -281,7 +281,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
                   id="username"
                   value={form.username || ""}
                   onChange={handleChange}
-                  placeholder="www.yefriharyanto.id"
+                  placeholder="admin.madrasah"
                   autoComplete="username"
                   className={inputClassName}
                   disabled={readOnly}

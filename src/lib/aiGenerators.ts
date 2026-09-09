@@ -12,7 +12,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
     year = "2026/2027",
     totalJp = "72 JP / Tahun",
     jpPerMinggu = "2 JP/Minggu",
-    teacher = "Drs. Yefri Haryanto, M.Pd.",
+    teacher = "M. Andry S.H., S.Ag.",
     nipTeacher = "19850312 201001 1 008",
     cityDate = "Kerinci, 14 Juli 2026",
     principal = "Hamdani, S.Pd., M.Si.",

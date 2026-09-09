@@ -3,7 +3,7 @@ import { Download, ExternalLink, ArrowRight, BookOpenCheck } from "lucide-react"
 import { Button } from "./ui";
 
 export const DownloadPerangkatAjarView: React.FC = () => {
-  const targetUrl = "https://www.yefriharyanto.id/2025/10/perangkat-ajar-deep-learning-.html";
+
 
   const handleOpenLink = () => {
     window.open(targetUrl, "_blank", "noopener,noreferrer");
@@ -23,7 +23,7 @@ export const DownloadPerangkatAjarView: React.FC = () => {
           </h2>
 
           <p className="text-slate-200 text-sm md:text-base leading-relaxed">
-            Unduh berkas Perangkat Ajar Deep Learning Kurikulum Merdeka terlengkap untuk semua jenjang dan mata pelajaran melalui portal resmi Yefri Haryanto di bawah ini.
+            Unduh berkas Perangkat Ajar Deep Learning Kurikulum Merdeka terlengkap untuk semua jenjang dan mata pelajaran melalui portal resmi di bawah ini.
           </p>
 
           <div className="pt-2 flex flex-wrap gap-4">

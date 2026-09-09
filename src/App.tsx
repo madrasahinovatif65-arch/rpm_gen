@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { 
-  PieChart, 
-  Sparkles, 
+import {
+  PieChart,
+  Sparkles,
   Settings,
   ChevronRight,
   X,
@@ -30,16 +30,16 @@ import { ResetDatabaseView } from "./components/ResetDatabaseView";
 import { LoginView } from "./components/LoginView";
 import { SSOCallbackView } from "./components/SSOCallbackView";
 
-import { 
-  subscribePengaturan, 
+import {
+  subscribePengaturan,
   savePengaturan,
 } from "./lib/firebase";
 
 import { Pengaturan } from "./types";
 
 const DEFAULT_CONFIG: Pengaturan = {
-  Nama_Guru: "Drs. Yefri Haryanto, M.Pd.",
-  NIP_Guru: "19850312 201001 1 008",
+  Nama_Guru: "M. Andry S.H., M.Pd.",
+  NIP_Guru: "19900101 201501 1 002",
   Nama_Sekolah: "SMP NEGERI 3 KERINCI",
   Alamat_Sekolah: "Jalan Raya Lintas Sungai Penuh, Telp: (0748) 21102",
   Nama_Kepsek: "Hamdani, S.Pd., M.Si.",
@@ -88,7 +88,7 @@ export default function App() {
   // Subscribe to Firebase real-time collections
   useEffect(() => {
     if (!isAuthenticated) return;
-    
+
     let unsubs: Array<() => void> = [];
 
     unsubs.push(subscribePengaturan((cfg) => {
@@ -126,7 +126,7 @@ export default function App() {
 
       const refreshToken = localStorage.getItem("edadmin_siakad_refresh");
       const expiresAtStr = localStorage.getItem("edadmin_token_expires_at");
-      
+
       // Skip jika bukan login SIAKAD (tidak ada refresh token)
       if (!refreshToken || !expiresAtStr) return;
 
@@ -193,13 +193,13 @@ export default function App() {
   };
 
   // Check if we are handling SSO callback (hanya jika belum authenticated)
-  const isSSOCallback = typeof window !== 'undefined' 
-    && window.location.pathname === '/sso' 
+  const isSSOCallback = typeof window !== 'undefined'
+    && window.location.pathname === '/sso'
     && !isAuthenticated;
 
   if (isSSOCallback) {
     return (
-      <SSOCallbackView 
+      <SSOCallbackView
         onSuccess={() => {
           setIsAuthenticated(true);
           window.location.href = "/";
@@ -265,7 +265,7 @@ export default function App() {
 
         {AI_TOOLS_ITEMS.some(item => item.id === activeTab) && (
           <div className="bg-emerald-50 dark:bg-slate-900 border-b border-emerald-200/50 dark:border-slate-800 px-3 py-2 flex items-center space-x-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
-            <button 
+            <button
               onClick={() => setActiveCategorySheet("ai")}
               className="flex items-center space-x-1 pr-2 border-r border-emerald-200 dark:border-slate-800 shrink-0 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs active:scale-95 transition-transform cursor-pointer"
               title="Buka Laci Menu AI Tools"
@@ -281,11 +281,10 @@ export default function App() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer active:scale-95 ${
-                    isActive
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer active:scale-95 ${isActive
                       ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-xs"
                       : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-100/50 dark:hover:bg-slate-700"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
@@ -326,7 +325,7 @@ export default function App() {
         </main>
 
         {/* Native Android Bottom Navigation Bar */}
-        <nav 
+        <nav
           className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-30 px-2 py-1.5 pb-safe shadow-lg flex items-center justify-around transition-colors select-none"
           aria-label="Navigasi Bawah Android"
         >
@@ -335,11 +334,10 @@ export default function App() {
               setActiveCategorySheet(null);
               setActiveTab("dashboard");
             }}
-            className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
-              activeTab === "dashboard"
+            className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${activeTab === "dashboard"
                 ? "text-teal-600 dark:text-teal-400 font-bold"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
+              }`}
           >
             <PieChart className={`w-5 h-5 ${activeTab === "dashboard" ? "scale-110" : ""}`} />
             <span className="text-[11px] mt-0.5 tracking-tight truncate">Dashboard</span>
@@ -352,11 +350,10 @@ export default function App() {
                 setActiveTab("modulai");
               }
             }}
-            className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
-              AI_TOOLS_ITEMS.some(i => i.id === activeTab)
+            className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${AI_TOOLS_ITEMS.some(i => i.id === activeTab)
                 ? "text-emerald-500 dark:text-emerald-400 font-bold"
                 : "text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400"
-            }`}
+              }`}
           >
             <Sparkles className={`w-5 h-5 ${AI_TOOLS_ITEMS.some(i => i.id === activeTab) ? "scale-110 text-emerald-500" : ""}`} />
             <span className="text-[11px] mt-0.5 tracking-tight truncate">AI Tools</span>
@@ -369,11 +366,10 @@ export default function App() {
                 setActiveCategorySheet(null);
                 setActiveTab("pengaturan");
               }}
-              className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${
-                activeTab === "pengaturan" || activeTab === "resetdb"
+              className={`flex flex-col items-center justify-center flex-1 min-w-[56px] py-1 px-2 rounded-xl transition-all active:scale-90 ${activeTab === "pengaturan" || activeTab === "resetdb"
                   ? "text-slate-800 dark:text-white font-bold"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-              }`}
+                }`}
             >
               <Settings className={`w-5 h-5 ${activeTab === "pengaturan" || activeTab === "resetdb" ? "scale-110" : ""}`} />
               <span className="text-[11px] mt-0.5 tracking-tight truncate">Profil Sync</span>
@@ -385,7 +381,7 @@ export default function App() {
         {activeCategorySheet === "ai" && (
           <div className="fixed inset-0 z-50 flex flex-col justify-end select-none">
             {/* Dark Backdrop */}
-            <div 
+            <div
               className="fixed inset-0 bg-slate-950/70 transition-opacity"
               onClick={() => setActiveCategorySheet(null)}
             />
@@ -411,7 +407,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={() => setActiveCategorySheet(null)}
                   className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white bg-slate-100 dark:bg-slate-800 min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer"
                 >
@@ -431,16 +427,14 @@ export default function App() {
                         setActiveTab(item.id);
                         setActiveCategorySheet(null);
                       }}
-                      className={`w-full flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.99] cursor-pointer ${
-                        isActive
+                      className={`w-full flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.99] cursor-pointer ${isActive
                           ? "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100 font-bold"
                           : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center space-x-3 min-w-0">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          isActive ? "bg-emerald-500 text-white" : "bg-white dark:bg-slate-700 text-emerald-500"
-                        }`}>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isActive ? "bg-emerald-500 text-white" : "bg-white dark:bg-slate-700 text-emerald-500"
+                          }`}>
                           <Icon className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
