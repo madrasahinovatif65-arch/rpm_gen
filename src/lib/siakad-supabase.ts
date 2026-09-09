@@ -94,7 +94,7 @@ export async function loginWithSiakad(
     }
 
     // Ambil data profil guru dan konfigurasi sekolah dari Endpoint API JSON
-    const { user: userData, sekolah: pengaturan } = await fetchSiakadDataFromApi(authData.session.access_token);
+    const { user: userData, sekolah: pengaturan } = await fetchSiakadDataFromApi(authData.session.access_token, idUser.trim());
 
     console.log('✅ SIAKAD login berhasil via API:', userData.nama);
     return {
@@ -115,7 +115,7 @@ export async function loginWithSiakad(
 /**
  * Fetch data tersinkronisasi dari SIAKAD REST API (JSON)
  */
-export async function fetchSiakadDataFromApi(token: string): Promise<{ user: SiakadMasterUser, sekolah: SiakadSekolahConfig }> {
+export async function fetchSiakadDataFromApi(token: string, expectedUserId: string): Promise<{ user: SiakadMasterUser, sekolah: SiakadSekolahConfig }> {
   const apiUrl = "https://siakad-app-phi.vercel.app/api/apk-gen-sync";
 
   // Coba REST API JSON terlebih dahulu
@@ -142,18 +142,25 @@ export async function fetchSiakadDataFromApi(token: string): Promise<{ user: Sia
 
       const guruArr = json.Guru;
       if (guruArr && Array.isArray(guruArr) && guruArr.length > 0) {
-        const guruData = guruArr[0];
-        const user: SiakadMasterUser = {
-          id_user: guruData.id_user || guruData.NIP_Guru || 'ID_UNKNOWN',
-          nama: guruData.Nama_Guru || '',
-          nip: guruData.NIP_Guru || '',
-          role: guruData.siakadRole || 'Guru Mapel',
-          mapel: guruData.siakadMapel === "-" ? "" : (guruData.siakadMapel || ""),
-          rombel: guruData.rombel || "",
-          status_aktif: 'Aktif',
-        };
-        console.log('✅ Data guru diambil dari REST API JSON');
-        return { user, sekolah };
+        // Find the specific guru matching the expectedUserId, or fallback to index 0 if only 1 is returned (new API format)
+        let guruData = guruArr.find(g => g.id_user === expectedUserId || g.NIP_Guru === expectedUserId);
+        if (!guruData && guruArr.length === 1) {
+            guruData = guruArr[0];
+        }
+
+        if (guruData) {
+          const user: SiakadMasterUser = {
+            id_user: guruData.id_user || guruData.NIP_Guru || 'ID_UNKNOWN',
+            nama: guruData.Nama_Guru || '',
+            nip: guruData.NIP_Guru || '',
+            role: guruData.siakadRole || 'Guru Mapel',
+            mapel: guruData.siakadMapel === "-" ? "" : (guruData.siakadMapel || ""),
+            rombel: guruData.rombel || "",
+            status_aktif: 'Aktif',
+          };
+          console.log('✅ Data guru diambil dari REST API JSON untuk:', user.nama);
+          return { user, sekolah };
+        }
       }
     }
   } catch (apiErr) {
