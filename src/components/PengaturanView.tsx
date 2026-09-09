@@ -26,6 +26,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
     Logo_Kiri: "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
     Logo_Kanan: "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
     Kantor_Kemenag: "",
+    Nama_Yayasan: "",
     Tahun_Pelajaran: "",
     username: "madrasahinovatif",
     password: "123456"
@@ -45,6 +46,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({ config, onNaviga
         Logo_Kiri: config.Logo_Kiri || "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
         Logo_Kanan: config.Logo_Kanan || "https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU",
         Kantor_Kemenag: config.Kantor_Kemenag || "",
+        Nama_Yayasan: config.Nama_Yayasan || "",
         Tahun_Pelajaran: config.Tahun_Pelajaran || "",
         username: config.username || "madrasahinovatif",
         password: config.password || "123456"

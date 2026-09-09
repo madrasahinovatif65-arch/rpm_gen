@@ -152,7 +152,7 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
           const user: SiakadMasterUser = {
             id_user: guruData.id_user || guruData.NIP_Guru || 'ID_UNKNOWN',
             nama: guruData.Nama_Guru || '',
-            nip: guruData.NIP_Guru || '',
+            nip: guruData.NIP_Guru || guruData.id_user || '',
             role: guruData.siakadRole || 'Guru Mapel',
             mapel: guruData.siakadMapel === "-" ? "" : (guruData.siakadMapel || ""),
             rombel: guruData.siakadRombel || guruData.rombel || "",
@@ -211,7 +211,7 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
     const user: SiakadMasterUser = {
       id_user: userData2.id_user,
       nama: userData2.nama || '',
-      nip: userData2.nip || '',
+      nip: userData2.nip || userData2.id_user || '',
       role: userData2.role || 'Guru Mapel',
       mapel: userData2.mapel || '',
       rombel: formatRombelFallback(userData2.rombel || ''),
@@ -225,7 +225,7 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
   const user: SiakadMasterUser = {
     id_user: userData.id_user,
     nama: userData.nama || '',
-    nip: userData.nip || '',
+    nip: userData.nip || userData.id_user || '',
     role: userData.role || 'Guru Mapel',
     mapel: userData.mapel || '',
     rombel: formatRombelFallback(userData.rombel || ''),

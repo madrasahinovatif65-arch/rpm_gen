@@ -187,13 +187,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
           await saveKbcState({
             curriculum: {
-              school: namaSekolah,
               year: tahunPelajaran,
               level: levelValue,
               subject: kbcMapel,
               learningModel: "", // Kosongkan model pembelajaran
             },
             school: {
+              kemenagOffice: payload.Nama_Yayasan || '',
+              schoolName: namaSekolah,
               teacher: userData.nama || '',
               nipTeacher: nipGuru,
               principal: namaKepsek,
