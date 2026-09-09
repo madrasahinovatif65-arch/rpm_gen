@@ -305,7 +305,10 @@ export async function batchSaveDocuments(collectionName: string, items: Array<{ 
   try {
     const batch = writeBatch(firestore);
     items.forEach((item) => {
-      const docRef = doc(firestore, collectionName, item.id);
+      // Gunakan path per-user untuk PERANGKAT_KBC, sama seperti saveDocument
+      const docRef = collectionName === COLLECTIONS.PERANGKAT_KBC
+        ? getPerangkatDocRef(item.id)
+        : doc(firestore, collectionName, item.id);
       batch.set(docRef, { ...item, updatedAt: Date.now() }, { merge: true });
     });
     await batch.commit();

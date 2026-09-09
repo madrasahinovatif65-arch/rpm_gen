@@ -36,6 +36,7 @@
       "title": "Log Absensi",
       "type": "object",
       "properties": {
+        "userId": { "type": "string", "description": "ID guru pemilik data ini (dari localStorage edadmin_user_id)" },
         "tanggal": { "type": "string" },
         "kelas": { "type": "string" },
         "mapel": { "type": "string" },
@@ -51,6 +52,7 @@
       "title": "Data Nilai",
       "type": "object",
       "properties": {
+        "userId": { "type": "string", "description": "ID guru pemilik data ini (dari localStorage edadmin_user_id)" },
         "waktu": { "type": "string" },
         "jenis": { "type": "string" },
         "mapel": { "type": "string" },
@@ -65,6 +67,7 @@
       "title": "Jurnal Agenda Mengajar",
       "type": "object",
       "properties": {
+        "userId": { "type": "string", "description": "ID guru pemilik data ini (dari localStorage edadmin_user_id)" },
         "tanggal": { "type": "string" },
         "jam": { "type": "string" },
         "kelas": { "type": "string" },
@@ -80,6 +83,7 @@
       "title": "Catatan Bimbingan Wali",
       "type": "object",
       "properties": {
+        "userId": { "type": "string", "description": "ID guru pemilik data ini (dari localStorage edadmin_user_id)" },
         "tanggal": { "type": "string" },
         "namaSiswa": { "type": "string" },
         "kelas": { "type": "string" },
@@ -93,14 +97,17 @@
       "title": "Daftar Siswa Bimbingan",
       "type": "object",
       "properties": {
+        "userId": { "type": "string", "description": "ID guru pemilik data ini (dari localStorage edadmin_user_id)" },
         "namaSiswa": { "type": "string" },
         "kelas": { "type": "string" }
       }
     },
     "pengaturan": {
       "title": "Pengaturan Aplikasi",
+      "description": "Disimpan per-user di path users/{uid}/pengaturan/config (guru SIAKAD) atau pengaturan/config (Admin)",
       "type": "object",
       "properties": {
+        "userId": { "type": "string", "description": "ID guru pemilik pengaturan ini" },
         "Nama_Guru": { "type": "string" },
         "NIP_Guru": { "type": "string" },
         "Pemerintah": { "type": "string" },
@@ -110,7 +117,9 @@
         "NIP_Kepsek": { "type": "string" },
         "Tempat_Tanda_Tangan": { "type": "string" },
         "Logo_Kiri": { "type": "string" },
-        "Logo_Kanan": { "type": "string" }
+        "Logo_Kanan": { "type": "string" },
+        "siakadUserId": { "type": "string", "description": "id_user dari SIAKAD Supabase (digunakan sebagai UID path Firestore)" },
+        "authProvider": { "type": "string", "description": "'local' untuk Admin madrasahinovatif, 'siakad' untuk Guru SIAKAD" }
       }
     }
   }

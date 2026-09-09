@@ -1,9 +1,41 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
+
+    // ============================================================
+    // Path Global (Admin madrasahinovatif)
+    // Akses terbuka untuk kompatibilitas mundur — tidak ada Firebase Auth
+    // ============================================================
+
+    // Pengaturan global Admin
+    match /pengaturan/{docId} {
       allow read, write: if true;
+    }
+
+    // KBC State global Admin
+    match /kbc_state/{docId} {
+      allow read, write: if true;
+    }
+
+    // Perangkat KBC global Admin
+    match /perangkat_kbc/{docId} {
+      allow read, write: if true;
+    }
+
+    // ============================================================
+    // Path Per-User (Guru SIAKAD)
+    // Isolation dilakukan via path naming di sisi aplikasi.
+    // Path: users/{uid}/pengaturan, users/{uid}/kbc_state, users/{uid}/perangkat_kbc
+    // ============================================================
+    match /users/{userId}/{document=**} {
+      allow read, write: if true;
+    }
+
+    // ============================================================
+    // Blokir semua path lain yang tidak diketahui
+    // ============================================================
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
-

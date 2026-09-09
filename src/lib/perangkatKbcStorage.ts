@@ -1,4 +1,4 @@
-import { saveDocument, subscribeCollection, deleteDocument, COLLECTIONS } from "./firebase";
+import { saveDocument, subscribeCollection, deleteDocument, COLLECTIONS, getCurrentUserId } from "./firebase";
 import { PerangkatDoc } from "../types";
 
 /**
@@ -48,7 +48,9 @@ function generateShareToken(docId: string): string {
 }
 
 /**
- * Save generated document to Firestore
+ * Save generated document to Firestore.
+ * Menyertakan userId sebagai ownership marker agar ada audit trail
+ * yang jelas tentang siapa pemilik dokumen ini.
  */
 export async function saveGeneratedDoc(
   docType: string,
@@ -59,6 +61,9 @@ export async function saveGeneratedDoc(
   const docId = generateDocId(docType);
   const shareToken = generateShareToken(docId);
   
+  // Ambil userId dari sesi aktif (null jika Admin lokal)
+  const userId = getCurrentUserId();
+
   const doc: Omit<PerangkatDoc, 'id'> = {
     docType,
     docTitle: getDocTitle(docType, formData),
@@ -66,6 +71,9 @@ export async function saveGeneratedDoc(
     formData,
     createdAt: Date.now(),
     createdBy: username,
+    // userId disimpan sebagai soft ownership marker untuk audit trail.
+    // Isolation sebenarnya dilakukan via path Firestore users/{uid}/perangkat_kbc/
+    ...(userId ? { userId } : {}),
     schoolName: formData.schoolName || formData.namaSekolah || "",
     subject: formData.subject || formData.mataPelajaran || "",
     shareToken
