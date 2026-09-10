@@ -16,29 +16,45 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
   const { state: kbcState } = useKbcState();
   const safeConfig = config || {} as Pengaturan;
 
-  const [form, setForm] = useState<ModulFormState>({
-    namaGuru: safeConfig?.Nama_Guru || "",
-    namaSekolah: safeConfig?.Nama_Sekolah || "",
-    tahunAjaran: kbcState?.curriculum?.year || safeConfig?.Tahun_Pelajaran || "",
-    jenjang: "MI",
-    fase: "",
-    kelas: "",
-    waktu: "",
-    mataPelajaran: kbcState?.curriculum?.subject || "",
-    topik: "",
-    subTopik: "",
-    jumlahPertemuan: "2",
-    model: "",
-    tujuan: "",
-    karakteristik: ""
+  const [form, setForm] = useState<ModulFormState>(() => {
+    let parsedFase = "";
+    let parsedKelas = "";
+    const kbcLevel = kbcState?.curriculum?.level || "";
+    
+    if (kbcLevel) {
+      const lvl = kbcLevel.toLowerCase();
+      if (lvl.includes("fase a")) parsedFase = "Fase A (Kelas 1-2)";
+      else if (lvl.includes("fase b")) parsedFase = "Fase B (Kelas 3-4)";
+      else if (lvl.includes("fase c")) parsedFase = "Fase C (Kelas 5-6)";
+      
+      const match = lvl.match(/kelas\s*([ivx0-9]+)/i);
+      if (match) parsedKelas = match[1].toUpperCase();
+    }
+
+    return {
+      namaGuru: safeConfig?.Nama_Guru || "",
+      namaSekolah: safeConfig?.Nama_Sekolah || "",
+      tahunAjaran: kbcState?.curriculum?.year || safeConfig?.Tahun_Pelajaran || "",
+      jenjang: "MI",
+      fase: parsedFase,
+      kelas: parsedKelas,
+      waktu: "",
+      mataPelajaran: kbcState?.curriculum?.subject || "",
+      topik: "",
+      subTopik: "",
+      jumlahPertemuan: kbcState?.module?.jumlahPertemuan?.toString() || "2",
+      model: kbcState?.module?.learningModel || kbcState?.curriculum?.learningModel || "",
+      tujuan: kbcState?.module?.rumusanTp || "",
+      metode: kbcState?.curriculum?.learningMethod || "",
+      karakteristik: safeConfig?.siakadKarakteristik || ""
+    };
   });
 
-  // Sinkronkan data dari KBC state ke form jika form masih kosong
+  // Sinkronkan data dari KBC state ke form jika ada perubahan real-time (Firebase)
   useEffect(() => {
     if (!kbcState) return;
 
     setForm(prev => {
-      // Ekstraksi nilai Fase & Kelas dari kbcLevel
       let parsedFase = prev.fase;
       let parsedKelas = prev.kelas;
       const kbcLevel = kbcState.curriculum?.level || "";
@@ -49,7 +65,6 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
         else if (lvl.includes("fase b")) parsedFase = "Fase B (Kelas 3-4)";
         else if (lvl.includes("fase c")) parsedFase = "Fase C (Kelas 5-6)";
         
-        // Cari angka/romawi setelah kata "kelas"
         const match = lvl.match(/kelas\s*([ivx0-9]+)/i);
         if (match) parsedKelas = match[1].toUpperCase();
       }
