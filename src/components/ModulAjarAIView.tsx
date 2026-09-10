@@ -6,6 +6,7 @@ import { notifySimpanSuccess, notifySimpanError, notifyCetakSuccess, notifyUnduh
 import { Button } from "./ui";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
 import { useKbcState } from "../store/kbcState";
+import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 
 interface ModulAjarAIViewProps {
   config: Pengaturan;
@@ -38,7 +39,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
       jenjang: "MI",
       fase: parsedFase,
       kelas: parsedKelas,
-      waktu: "",
+      waktu: (kbcState?.curriculum?.totalJp && kbcState?.curriculum?.jpPerMinggu) ? `${kbcState.curriculum.totalJp} JP / ${kbcState.curriculum.jpPerMinggu} JP per Minggu` : "",
       mataPelajaran: kbcState?.curriculum?.subject || "",
       topik: "",
       subTopik: "",
@@ -75,6 +76,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
         tahunAjaran: kbcState.curriculum?.year || prev.tahunAjaran,
         fase: parsedFase,
         kelas: parsedKelas,
+        waktu: (kbcState.curriculum?.totalJp && kbcState.curriculum?.jpPerMinggu) ? `${kbcState.curriculum.totalJp} JP / ${kbcState.curriculum.jpPerMinggu} JP per Minggu` : prev.waktu,
         model: kbcState.module?.learningModel || kbcState.curriculum?.learningModel || prev.model,
         tujuan: kbcState.module?.rumusanTp || prev.tujuan,
         metode: kbcState.curriculum?.learningMethod || prev.metode,
@@ -359,14 +361,17 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kelas *</label>
-                <input
-                  type="text"
+                <select
                   id="kelas"
                   value={form.kelas}
                   onChange={handleChange}
-                  placeholder="VII"
-                  className="w-full px-3 py-2 text-xs border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none"
-                />
+                  className="w-full px-3 py-2 text-xs font-semibold border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none"
+                >
+                  <option value="">— Pilih Kelas —</option>
+                  {[1, 2, 3, 4, 5, 6].map(num => (
+                    <option key={num} value={num.toString()}>{num}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -384,14 +389,18 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
 
             <div>
               <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Mata Pelajaran *</label>
-              <input
-                type="text"
+              <select
                 id="mataPelajaran"
                 value={form.mataPelajaran}
                 onChange={handleChange}
-                placeholder="Informatika"
-                className="w-full px-3 py-2 text-xs border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none"
-              />
+                className="w-full px-3 py-2 text-xs font-semibold border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none"
+              >
+                <option value="" disabled>Pilih Mata Pelajaran...</option>
+                {DATA_MAPEL_KEMENAG.map(m => (
+                  <option key={m.id} value={m.namaMapel}>{m.namaMapel}</option>
+                ))}
+                <option value="Lainnya">Lainnya (Ketik Manual)...</option>
+              </select>
             </div>
           </div>
 
