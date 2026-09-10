@@ -436,6 +436,18 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
                 />
                 <p className="text-[10px] text-slate-500 mt-1">Jika dikosongkan, AI akan menentukan metode terbaik secara otomatis.</p>
               </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-blue-900 dark:text-blue-200 uppercase mb-1">Karakteristik Siswa / Profil Kelas</label>
+                <textarea
+                  id="karakteristik"
+                  value={form.karakteristik || ""}
+                  onChange={handleChange}
+                  placeholder="Misal: Mayoritas siswa visual, 2 anak inklusi lambat belajar, sangat antusias pada praktik."
+                  className="w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-slate-800 border-blue-200 dark:border-blue-800 outline-none placeholder:text-slate-400 min-h-[60px] custom-scrollbar"
+                />
+                <p className="text-[10px] text-slate-500 mt-1">Panduan AI untuk meracik Modul Berdiferensiasi berdasarkan Asesmen Diagnostik.</p>
+              </div>
             </div>
           </div>
         </div>
