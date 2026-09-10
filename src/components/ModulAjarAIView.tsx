@@ -14,16 +14,17 @@ interface ModulAjarAIViewProps {
 export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
   const [showKamusModal, setShowKamusModal] = useState<string | null>(null);
   const { state: kbcState } = useKbcState();
+  const safeConfig = config || {} as Pengaturan;
 
   const [form, setForm] = useState<ModulFormState>({
-    namaGuru: config.Nama_Guru || "",
-    namaSekolah: config.Nama_Sekolah || "",
-    tahunAjaran: kbcState.curriculum?.year || config.Tahun_Pelajaran || "",
+    namaGuru: safeConfig?.Nama_Guru || "",
+    namaSekolah: safeConfig?.Nama_Sekolah || "",
+    tahunAjaran: kbcState?.curriculum?.year || safeConfig?.Tahun_Pelajaran || "",
     jenjang: "MI",
     fase: "",
     kelas: "",
     waktu: "",
-    mataPelajaran: kbcState.curriculum?.subject || "",
+    mataPelajaran: kbcState?.curriculum?.subject || "",
     topik: "",
     subTopik: "",
     jumlahPertemuan: "2",
@@ -36,10 +37,10 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
   useEffect(() => {
     setForm(prev => ({
       ...prev,
-      mataPelajaran: kbcState.curriculum?.subject || prev.mataPelajaran,
-      tahunAjaran: kbcState.curriculum?.year || prev.tahunAjaran,
+      mataPelajaran: kbcState?.curriculum?.subject || prev.mataPelajaran,
+      tahunAjaran: kbcState?.curriculum?.year || prev.tahunAjaran,
     }));
-  }, [kbcState.curriculum?.subject, kbcState.curriculum?.year]);
+  }, [kbcState?.curriculum?.subject, kbcState?.curriculum?.year]);
 
   const [loading, setLoading] = useState(false);
   const [generatedHtml, setGeneratedHtml] = useState<string>("");
