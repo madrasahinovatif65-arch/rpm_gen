@@ -139,7 +139,17 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
         nip_kepsek: json.NIP_Kepala_Madrasah || json.NIP_Kepsek || json.NIP_Kepala,
         tahun_pelajaran: json.Tahun_Pelajaran,
         semester: json.Semester,
-        siakad_karakteristik: json.siakadKarakteristik,
+        siakad_karakteristik: json.siakadKarakteristik || `[DATA SIMULASI FRONTEND - KARENA ASESMEN KOSONG / API VERCEL BELUM DIPERBARUI]
+Berdasarkan data asesmen diagnostik untuk 25 siswa Kelas Simulasi:
+
+Profil Non-Kognitif:
+- Kesiapan Sosial Emosional: Antusias (18), Biasa saja (5), Cemas/Takut (2)
+- Dukungan Belajar di Rumah: Didampingi (15), Mandiri (7), Sering kesulitan (3)
+- Minat Dominan: Teknologi (10), Olahraga (8), Seni (4), Membaca (3)
+
+Profil Kognitif (Asesmen Awal):
+- Kemampuan Literasi: Cakap (14), Berkembang (8), Perlu Bimbingan (3)
+- Kemampuan Numerasi: Cakap (10), Berkembang (11), Perlu Bimbingan (4)`,
       };
 
       const guruArr = json.Guru;
