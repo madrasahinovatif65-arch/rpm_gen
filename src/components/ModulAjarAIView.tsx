@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Wand2, Printer, Download, Sparkles, FileText, Loader2, AlertTriangle, BookOpen, HelpCircle } from "lucide-react";
 import { ModulFormState, Pengaturan } from "../types";
 import { generateModulAjarAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyCetakSuccess, notifyUnduhSuccess, notifyUnduhError } from "../lib/swal";
 import { Button } from "./ui";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
+import { useKbcState } from "../store/kbcState";
 
 interface ModulAjarAIViewProps {
   config: Pengaturan;
@@ -12,15 +13,17 @@ interface ModulAjarAIViewProps {
 
 export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
   const [showKamusModal, setShowKamusModal] = useState<string | null>(null);
+  const { state: kbcState } = useKbcState();
+
   const [form, setForm] = useState<ModulFormState>({
     namaGuru: config.Nama_Guru || "",
     namaSekolah: config.Nama_Sekolah || "",
-    tahunAjaran: config.Tahun_Pelajaran || "2026/2027",
+    tahunAjaran: kbcState.curriculum?.year || config.Tahun_Pelajaran || "",
     jenjang: "MI",
     fase: "",
     kelas: "",
     waktu: "",
-    mataPelajaran: (config as any).siakadMapel || config.siakadMapel || "",
+    mataPelajaran: kbcState.curriculum?.subject || "",
     topik: "",
     subTopik: "",
     jumlahPertemuan: "2",
@@ -28,6 +31,15 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
     tujuan: "",
     karakteristik: ""
   });
+
+  // Sinkronkan mapel & tahun ajaran reaktif dari KBC state
+  useEffect(() => {
+    setForm(prev => ({
+      ...prev,
+      mataPelajaran: kbcState.curriculum?.subject || prev.mataPelajaran,
+      tahunAjaran: kbcState.curriculum?.year || prev.tahunAjaran,
+    }));
+  }, [kbcState.curriculum?.subject, kbcState.curriculum?.year]);
 
   const [loading, setLoading] = useState(false);
   const [generatedHtml, setGeneratedHtml] = useState<string>("");
@@ -190,6 +202,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
   };
 
   return (
+    <>
     <div className="flex flex-col lg:flex-row gap-6 min-h-[80vh]">
       {/* Left Form Panel */}
       <div className="w-full lg:w-[420px] bg-white dark:bg-slate-800 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800 flex flex-col shrink-0 overflow-hidden">
@@ -268,20 +281,12 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
             </p>
 
             <div className="grid grid-cols-2 gap-2">
+              {/* Jenjang hardcode MI */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Jenjang *</label>
-                <select
-                  id="jenjang"
-                  value={form.jenjang}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 text-xs font-semibold border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none"
-                >
-                  <option value="PAUD/TK">PAUD/TK</option>
-                  <option value="SD">SD</option>
-                  <option value="SMP">SMP</option>
-                  <option value="SMA">SMA</option>
-                  <option value="SMK">SMK</option>
-                </select>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Jenjang</label>
+                <div className="w-full px-3 py-2 text-xs font-bold border rounded-lg bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 select-none">
+                  MI (Madrasah Ibtidaiyah)
+                </div>
               </div>
 
               <div>
@@ -292,13 +297,10 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
                   onChange={handleChange}
                   className="w-full px-3 py-2 text-xs font-semibold border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none"
                 >
-                  <option value="Fase Fondasi (PAUD)">Fase Fondasi</option>
+                  <option value="">— Pilih Fase —</option>
                   <option value="Fase A (Kelas 1-2)">Fase A (Kelas 1-2)</option>
                   <option value="Fase B (Kelas 3-4)">Fase B (Kelas 3-4)</option>
                   <option value="Fase C (Kelas 5-6)">Fase C (Kelas 5-6)</option>
-                  <option value="Fase D (Kelas 7-9)">Fase D (Kelas 7-9)</option>
-                  <option value="Fase E (Kelas 10)">Fase E (Kelas 10)</option>
-                  <option value="Fase F (Kelas 11-12)">Fase F (Kelas 11-12)</option>
                 </select>
               </div>
             </div>
@@ -524,10 +526,11 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
       </div>
     </div>
 
-      <KamusPedagogiModal
-        isOpen={!!showKamusModal}
-        initialTab={showKamusModal || "model"}
-        onClose={() => setShowKamusModal(null)}
-      />
+    <KamusPedagogiModal
+      isOpen={!!showKamusModal}
+      initialTab={showKamusModal || "model"}
+      onClose={() => setShowKamusModal(null)}
+    />
+    </>
   );
 };
