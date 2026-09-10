@@ -3,12 +3,12 @@
 
 export function generateKbcDocumentFallback(docType: string, formData: any): string {
   const {
-    schoolName = "MAN 1 Kerinci",
-    kemenagOffice = "KANTOR KEMENTERIAN AGAMA KABUPATEN KERINCI",
-    schoolAddress = "Jl. Raya Semurup No. 45, Semurup, Kabupaten Kerinci",
+    schoolName = "MI MIFTAHUL KHOIR 1 KARANGREJO",
+    kemenagOffice = "KANTOR KEMENTERIAN AGAMA KABUPATEN PASURUAN",
+    schoolAddress = "Jalan Sumber Keling No. 11, Dsn. Krajan, Ds. Karangrejo",
     subject = "Akidah Akhlak",
     singkatanMapel = "AA",
-    level = "Fase E / Kelas X",
+    level = "Fase B / Kelas 4",
     year = "2026/2027",
     totalJp = "72 JP / Tahun",
     jpPerMinggu = "2 JP/Minggu",
