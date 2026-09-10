@@ -180,7 +180,15 @@ export default function App() {
     setConfig((prev) => ({ ...prev, isDatabaseCleared: true }));
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Coba hapus sesi Supabase SIAKAD jika ada
+    try {
+      const { siakadSupabase } = await import("./lib/siakad-supabase");
+      await siakadSupabase.auth.signOut();
+    } catch (error) {
+      console.warn("Gagal logout dari Supabase", error);
+    }
+
     localStorage.removeItem("edadmin_auth_token");
     localStorage.removeItem("edadmin_user");
     localStorage.removeItem("edadmin_user_id");
@@ -189,7 +197,9 @@ export default function App() {
     localStorage.removeItem("edadmin_kbc_state_isolated");
     localStorage.removeItem("edadmin_pengaturan_isolated");
     setIsAuthenticated(false);
-    window.location.reload();
+    
+    // Redirect ke halaman SIAKAD
+    window.location.href = "https://siakad-app-phi.vercel.app/";
   };
 
   // Check if we are handling SSO callback (hanya jika belum authenticated)
