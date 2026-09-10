@@ -36,6 +36,7 @@ export interface Pengaturan {
   siakadRole?: string;          // Role guru di SIAKAD (Guru Mapel, Wali Kelas, dll)
   siakadMapel?: string;         // Mata pelajaran yang diampu (dari SIAKAD)
   siakadRombel?: string;        // Kelas / Rombel yang diampu (dari SIAKAD)
+  siakadKarakteristik?: string; // Rekap asesmen diagnostik untuk kelas (dari SIAKAD)
   siakadSyncedAt?: number;      // Timestamp terakhir sync dengan SIAKAD
   authProvider?: 'local' | 'siakad';  // Metode autentikasi yang digunakan
 }

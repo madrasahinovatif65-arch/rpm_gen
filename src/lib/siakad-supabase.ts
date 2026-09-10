@@ -53,6 +53,7 @@ export interface SiakadSekolahConfig {
   semester?: string;
   kantor_kemenag?: string;
   pemerintah?: string;
+  siakad_karakteristik?: string;
 }
 
 export interface SiakadLoginResult {
@@ -138,6 +139,7 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
         nip_kepsek: json.NIP_Kepala_Madrasah || json.NIP_Kepsek || json.NIP_Kepala,
         tahun_pelajaran: json.Tahun_Pelajaran,
         semester: json.Semester,
+        siakad_karakteristik: json.siakadKarakteristik,
       };
 
       const guruArr = json.Guru;
@@ -328,6 +330,7 @@ export function mapSiakadToPengaturan(
     siakadRole: user.role,
     siakadMapel: user.mapel,
     siakadRombel: user.rombel,
+    siakadKarakteristik: sekolah.siakad_karakteristik || '',
     siakadSyncedAt: Date.now(),
     authProvider: 'siakad' as const,
   };

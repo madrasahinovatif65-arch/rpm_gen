@@ -116,6 +116,7 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
           payload.siakadRole = pengaturanData.siakadRole;
           payload.siakadMapel = pengaturanData.siakadMapel;
           payload.siakadRombel = pengaturanData.siakadRombel;
+          if (pengaturanData.siakadKarakteristik) payload.siakadKarakteristik = pengaturanData.siakadKarakteristik;
           payload.siakadSyncedAt = pengaturanData.siakadSyncedAt;
           payload.authProvider = pengaturanData.authProvider;
 
