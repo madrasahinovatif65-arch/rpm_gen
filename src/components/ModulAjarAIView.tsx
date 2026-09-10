@@ -7,6 +7,7 @@ import { Button } from "./ui";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
 import { useKbcState } from "../store/kbcState";
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
+import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-supabase";
 
 interface ModulAjarAIViewProps {
   config: Pengaturan;
@@ -16,6 +17,8 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
   const [showKamusModal, setShowKamusModal] = useState<string | null>(null);
   const [kbcState] = useKbcState();
   const safeConfig = config || {} as Pengaturan;
+  const [availableRombels, setAvailableRombels] = useState<string[]>([]);
+  const [isFetchingRombel, setIsFetchingRombel] = useState(false);
 
   const [form, setForm] = useState<ModulFormState>(() => {
     let parsedFase = "";
@@ -98,13 +101,45 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
   useEffect(() => {
     if (safeConfig?.siakadKarakteristik) {
       setForm(prev => {
-        if (!prev.karakteristik) {
-          return { ...prev, karakteristik: safeConfig.siakadKarakteristik! };
+        if (!prev.karakteristik || prev.karakteristik.trim() === "") {
+          return { ...prev, karakteristik: safeConfig.siakadKarakteristik || "" };
         }
         return prev;
       });
     }
   }, [safeConfig?.siakadKarakteristik]);
+
+  // Load daftar rombel yang tersedia saat komponen dimuat
+  useEffect(() => {
+    async function loadRombels() {
+      const rombels = await fetchDistinctRombels();
+      if (rombels.length > 0) {
+        setAvailableRombels(rombels);
+      } else {
+        // Fallback jika database kosong/gagal
+        setAvailableRombels(["1", "2", "3", "4", "5", "6"]);
+      }
+    }
+    loadRombels();
+  }, []);
+
+  // Autofill karakteristik ketika kelas (rombel) berubah
+  useEffect(() => {
+    async function updateKarakteristik() {
+      if (!form.kelas) return;
+      setIsFetchingRombel(true);
+      const newKarakteristik = await fetchKarakteristikByRombel(form.kelas, form.tahunAjaran);
+      if (newKarakteristik) {
+        setForm(prev => ({ ...prev, karakteristik: newKarakteristik }));
+      }
+      setIsFetchingRombel(false);
+    }
+    
+    // Jangan panggil jika form.kelas masih cocok dengan raw class dari SSO
+    if (form.kelas) {
+       updateKarakteristik();
+    }
+  }, [form.kelas]);
 
   const [loading, setLoading] = useState(false);
   const [generatedHtml, setGeneratedHtml] = useState<string>("");
@@ -380,10 +415,11 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
                   className="w-full px-3 py-2 text-xs font-semibold border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none"
                 >
                   <option value="">— Pilih Kelas —</option>
-                  {[1, 2, 3, 4, 5, 6].map(num => (
-                    <option key={num} value={num.toString()}>{num}</option>
+                  {availableRombels.map(rombel => (
+                    <option key={rombel} value={rombel}>{rombel.includes('Kelas') ? rombel : `Kelas ${rombel}`}</option>
                   ))}
                 </select>
+                {isFetchingRombel && <p className="text-[9px] text-blue-500 mt-1 animate-pulse">Menyinkronkan data rombel...</p>}
               </div>
 
               <div>

@@ -131,6 +131,32 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
 
     if (response.ok) {
       const json = await response.json();
+      let guruData: any = null;
+      let activeRombelStr = 'Simulasi';
+      const guruArr = json.Guru;
+      if (guruArr && Array.isArray(guruArr) && guruArr.length > 0) {
+        // Find the specific guru matching the expectedUserId, or fallback to index 0 if only 1 is returned (new API format)
+        guruData = guruArr.find((g: any) => g.id_user === expectedUserId || g.NIP_Guru === expectedUserId);
+        if (!guruData && guruArr.length === 1) {
+            guruData = guruArr[0];
+        }
+        if (guruData && (guruData.siakadRombel || guruData.rombel)) {
+            activeRombelStr = guruData.siakadRombel || guruData.rombel;
+        }
+      }
+
+      let jumlahSiswa = 25;
+      let cleanRombelStr = activeRombelStr.replace(/Fase\s+[A-F]\s*\/\s*/i, '');
+      
+      if (activeRombelStr !== 'Simulasi') {
+        const { count } = await siakadSupabase
+          .from('master_user')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'Siswa')
+          .eq('rombel', guruData?.rombel || activeRombelStr);
+        if (count) jumlahSiswa = count;
+      }
+
       const sekolah: SiakadSekolahConfig = {
         nama_sekolah: json.Nama_Sekolah,
         nama_yayasan: json.Nama_Yayasan,
@@ -139,8 +165,8 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
         nip_kepsek: json.NIP_Kepala_Madrasah || json.NIP_Kepsek || json.NIP_Kepala,
         tahun_pelajaran: json.Tahun_Pelajaran,
         semester: json.Semester,
-        siakad_karakteristik: json.siakadKarakteristik || `[DATA SIMULASI FRONTEND - KARENA ASESMEN KOSONG / API VERCEL BELUM DIPERBARUI]
-Berdasarkan data asesmen diagnostik untuk 25 siswa Kelas Simulasi:
+        siakad_karakteristik: json.siakadKarakteristik || `[Data Simulasi]
+Berdasarkan data asesmen diagnostik untuk ${jumlahSiswa} siswa ${cleanRombelStr.includes('Kelas') ? cleanRombelStr : `Kelas ${cleanRombelStr}`}:
 
 Profil Non-Kognitif:
 - Kesiapan Sosial Emosional: Antusias (18), Biasa saja (5), Cemas/Takut (2)
@@ -151,14 +177,6 @@ Profil Kognitif (Asesmen Awal):
 - Kemampuan Literasi: Cakap (14), Berkembang (8), Perlu Bimbingan (3)
 - Kemampuan Numerasi: Cakap (10), Berkembang (11), Perlu Bimbingan (4)`,
       };
-
-      const guruArr = json.Guru;
-      if (guruArr && Array.isArray(guruArr) && guruArr.length > 0) {
-        // Find the specific guru matching the expectedUserId, or fallback to index 0 if only 1 is returned (new API format)
-        let guruData = guruArr.find(g => g.id_user === expectedUserId || g.NIP_Guru === expectedUserId);
-        if (!guruData && guruArr.length === 1) {
-            guruData = guruArr[0];
-        }
 
         if (guruData) {
           const user: SiakadMasterUser = {
@@ -203,7 +221,7 @@ Profil Kognitif (Asesmen Awal):
       if (grade === 1 || grade === 2) fase = 'A';
       else if (grade === 3 || grade === 4) fase = 'B';
       else if (grade === 5 || grade === 6) fase = 'C';
-      if (fase) return `Fase ${fase} / Kelas ${grade}`;
+      if (fase) return `Fase ${fase} / Kelas ${r.trim()}`;
     }
     return r;
   }
@@ -230,7 +248,7 @@ Profil Kognitif (Asesmen Awal):
       status_aktif: userData2.status_aktif || 'Aktif',
     };
 
-    const sekolah = await fetchSiakadSekolahConfig();
+    const sekolah = await fetchSiakadSekolahConfig(userData2.rombel || 'Simulasi');
     return { user, sekolah };
   }
 
@@ -244,14 +262,23 @@ Profil Kognitif (Asesmen Awal):
     status_aktif: userData.status_aktif || 'Aktif',
   };
 
-  const sekolah = await fetchSiakadSekolahConfig();
+  const sekolah = await fetchSiakadSekolahConfig(userData.rombel || 'Simulasi');
   return { user, sekolah };
 }
 
 /**
  * Fallback konfigurasi sekolah (jika API gagal untuk keperluan lain)
  */
-export async function fetchSiakadSekolahConfig(): Promise<SiakadSekolahConfig> {
+export async function fetchSiakadSekolahConfig(rombel: string = 'Simulasi'): Promise<SiakadSekolahConfig> {
+  let jumlahSiswa = 25;
+  if (rombel && rombel !== 'Simulasi') {
+    const { count } = await siakadSupabase
+      .from('master_user')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'Siswa')
+      .eq('rombel', rombel);
+    if (count) jumlahSiswa = count;
+  }
   // Ambil pengaturan sekolah (jika tabel ada)
   const { data: pengaturan } = await siakadSupabase
     .from('pengaturan_sekolah')
@@ -275,8 +302,8 @@ export async function fetchSiakadSekolahConfig(): Promise<SiakadSekolahConfig> {
     nip_kepsek: kepsek?.id_user || '-',
     tahun_pelajaran: pengaturan?.tahun_ajaran || getTahunPelajaranOtomatis(),
     semester: pengaturan?.semester || getSemesterOtomatis(),
-    siakad_karakteristik: `[DATA SIMULASI FRONTEND (FALLBACK) - API VERCEL GAGAL/KOSONG]
-Berdasarkan data asesmen diagnostik untuk 25 siswa Kelas Simulasi:
+    siakad_karakteristik: `[Data Simulasi]
+Berdasarkan data asesmen diagnostik untuk ${jumlahSiswa} siswa ${rombel.replace(/Fase\s+[A-F]\s*\/\s*/i, '').includes('Kelas') ? rombel.replace(/Fase\s+[A-F]\s*\/\s*/i, '') : `Kelas ${rombel.replace(/Fase\s+[A-F]\s*\/\s*/i, '')}`}:
 
 Profil Non-Kognitif:
 - Kesiapan Sosial Emosional: Antusias (18), Biasa saja (5), Cemas/Takut (2)
@@ -292,10 +319,127 @@ Profil Kognitif (Asesmen Awal):
 /**
  * Logout dari SIAKAD
  */
-export async function logoutFromSiakad(): Promise<void> {
-  await siakadSupabase.auth.signOut();
+export async function logoutSIAKAD(): Promise<void> {
+  const { error } = await siakadSupabase.auth.signOut();
+  if (error) {
+    console.error('Logout SIAKAD gagal:', error.message);
+    throw new Error(error.message);
+  }
   localStorage.removeItem('siakad_apk_session');
   localStorage.removeItem('edadmin_siakad_user');
+}
+
+/**
+ * Mengambil daftar rombel yang unik dari database (untuk dropdown)
+ */
+export async function fetchDistinctRombels(): Promise<string[]> {
+  try {
+    const { data, error } = await siakadSupabase
+      .from('master_user')
+      .select('rombel')
+      .eq('role', 'Siswa')
+      .neq('rombel', null)
+      .neq('rombel', '')
+      .neq('rombel', '-');
+      
+    if (error || !data) return [];
+    
+    const uniqueRombels = Array.from(new Set(data.map(d => d.rombel))).sort();
+    return uniqueRombels;
+  } catch (err) {
+    return [];
+  }
+}
+
+/**
+ * Mengambil rekap karakteristik siswa secara spesifik berdasarkan rombel
+ */
+export async function fetchKarakteristikByRombel(rombel: string, tahunPelajaran: string = '2026/2027', semester: string = 'Ganjil'): Promise<string> {
+  if (!rombel) return '';
+  
+  let rekapKarakteristik = '';
+  
+  try {
+    // Non-Kognitif
+    const { data: nkData, error: nkError } = await siakadSupabase
+      .from('profil_non_kognitif')
+      .select('sosial_emosional, dukungan_belajar, minat_dominan')
+      .eq('rombel', rombel)
+      .eq('tahun_ajaran', tahunPelajaran);
+      
+    if (!nkError && nkData && nkData.length > 0) {
+      const total = nkData.length;
+      const counts: any = { sosial: {}, dukungan: {}, minat: {} };
+      nkData.forEach(d => {
+        if (d.sosial_emosional) counts.sosial[d.sosial_emosional] = (counts.sosial[d.sosial_emosional] || 0) + 1;
+        if (d.dukungan_belajar) counts.dukungan[d.dukungan_belajar] = (counts.dukungan[d.dukungan_belajar] || 0) + 1;
+        if (d.minat_dominan) counts.minat[d.minat_dominan] = (counts.minat[d.minat_dominan] || 0) + 1;
+      });
+
+      rekapKarakteristik = `Berdasarkan data asesmen diagnostik untuk ${total} siswa ${rombel.includes('Kelas') ? rombel : `Kelas ${rombel}`}:\n`;
+      rekapKarakteristik += `Profil Non-Kognitif:\n`;
+      rekapKarakteristik += `- Kesiapan Sosial Emosional: ${Object.entries(counts.sosial).map(([k,v]) => `${k} (${v})`).join(', ')}\n`;
+      rekapKarakteristik += `- Dukungan Belajar di Rumah: ${Object.entries(counts.dukungan).map(([k,v]) => `${k} (${v})`).join(', ')}\n`;
+      rekapKarakteristik += `- Minat Dominan: ${Object.entries(counts.minat).map(([k,v]) => `${k} (${v})`).join(', ')}\n`;
+    }
+
+    // Kognitif Umum
+    const { data: kogData, error: kogError } = await siakadSupabase
+      .from('hasil_kognitif_murid')
+      .select('kategori_literasi, kategori_numerasi')
+      .eq('rombel', rombel)
+      .eq('tahun_ajaran', tahunPelajaran)
+      .eq('semester', semester);
+
+    if (!kogError && kogData && kogData.length > 0) {
+      const countsKog: any = { literasi: {}, numerasi: {} };
+      kogData.forEach(d => {
+        if (d.kategori_literasi) countsKog.literasi[d.kategori_literasi] = (countsKog.literasi[d.kategori_literasi] || 0) + 1;
+        if (d.kategori_numerasi) countsKog.numerasi[d.kategori_numerasi] = (countsKog.numerasi[d.kategori_numerasi] || 0) + 1;
+      });
+      
+      if (!rekapKarakteristik) {
+        // Jika tidak ada data non-kognitif, kita buat header default
+        const { count } = await siakadSupabase.from('master_user').select('*', { count: 'exact', head: true }).eq('role', 'Siswa').eq('rombel', rombel);
+        rekapKarakteristik = `Berdasarkan data asesmen diagnostik untuk ${count || kogData.length} siswa ${rombel.includes('Kelas') ? rombel : `Kelas ${rombel}`}:\n`;
+      }
+      
+      rekapKarakteristik += `\nProfil Kognitif (Asesmen Awal):\n`;
+      rekapKarakteristik += `- Kemampuan Literasi: ${Object.entries(countsKog.literasi).map(([k,v]) => `${k} (${v})`).join(', ')}\n`;
+      rekapKarakteristik += `- Kemampuan Numerasi: ${Object.entries(countsKog.numerasi).map(([k,v]) => `${k} (${v})`)}`;
+    }
+
+    // Fallback Simulasi jika kosong
+    if (!rekapKarakteristik) {
+      let jumlahSiswa = 25;
+      const { count } = await siakadSupabase
+        .from('master_user')
+        .select('*', { count: 'exact', head: true })
+        .eq('role', 'Siswa')
+        .eq('rombel', rombel);
+      if (count) jumlahSiswa = count;
+      
+      const cleanRombel = rombel.replace(/Fase\s+[A-F]\s*\/\s*/i, '');
+      const rombelLabel = cleanRombel.includes('Kelas') ? cleanRombel : `Kelas ${cleanRombel}`;
+      
+      rekapKarakteristik = `[Data Simulasi]
+Berdasarkan data asesmen diagnostik untuk ${jumlahSiswa} siswa ${rombelLabel}:
+
+Profil Non-Kognitif:
+- Kesiapan Sosial Emosional: Antusias (18), Biasa saja (5), Cemas/Takut (2)
+- Dukungan Belajar di Rumah: Didampingi (15), Mandiri (7), Sering kesulitan (3)
+- Minat Dominan: Teknologi (10), Olahraga (8), Seni (4), Membaca (3)
+
+Profil Kognitif (Asesmen Awal):
+- Kemampuan Literasi: Cakap (14), Berkembang (8), Perlu Bimbingan (3)
+- Kemampuan Numerasi: Cakap (10), Berkembang (11), Perlu Bimbingan (4)`;
+    }
+
+    return rekapKarakteristik;
+  } catch (err) {
+    console.error('Gagal mengambil karakteristik per rombel:', err);
+    return '';
+  }
 }
 
 /**
