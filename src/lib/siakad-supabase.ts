@@ -275,6 +275,17 @@ export async function fetchSiakadSekolahConfig(): Promise<SiakadSekolahConfig> {
     nip_kepsek: kepsek?.id_user || '-',
     tahun_pelajaran: pengaturan?.tahun_ajaran || getTahunPelajaranOtomatis(),
     semester: pengaturan?.semester || getSemesterOtomatis(),
+    siakad_karakteristik: `[DATA SIMULASI FRONTEND (FALLBACK) - API VERCEL GAGAL/KOSONG]
+Berdasarkan data asesmen diagnostik untuk 25 siswa Kelas Simulasi:
+
+Profil Non-Kognitif:
+- Kesiapan Sosial Emosional: Antusias (18), Biasa saja (5), Cemas/Takut (2)
+- Dukungan Belajar di Rumah: Didampingi (15), Mandiri (7), Sering kesulitan (3)
+- Minat Dominan: Teknologi (10), Olahraga (8), Seni (4), Membaca (3)
+
+Profil Kognitif (Asesmen Awal):
+- Kemampuan Literasi: Cakap (14), Berkembang (8), Perlu Bimbingan (3)
+- Kemampuan Numerasi: Cakap (10), Berkembang (11), Perlu Bimbingan (4)`,
   };
 }
 

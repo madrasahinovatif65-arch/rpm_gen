@@ -67,7 +67,8 @@ export const SSOCallbackView: React.FC<SSOCallbackViewProps> = ({ onSuccess, con
 
         // Ambil profil guru dan konfigurasi sekolah dari Endpoint API JSON
         const { fetchSiakadDataFromApi } = await import("../lib/siakad-supabase");
-        const { user: userData, sekolah: pengaturan } = await fetchSiakadDataFromApi(accessToken);
+        const expectedUserId = data.user.email?.split('@')[0] || '';
+        const { user: userData, sekolah: pengaturan } = await fetchSiakadDataFromApi(accessToken, expectedUserId);
 
         setMessage("Menyinkronkan pengaturan aplikasi...");
 
