@@ -94,6 +94,18 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
     kbcState?.module?.jumlahPertemuan,
   ]);
 
+  // Sinkronkan data dari config Pengaturan jika berubah
+  useEffect(() => {
+    if (safeConfig?.siakadKarakteristik) {
+      setForm(prev => {
+        if (!prev.karakteristik) {
+          return { ...prev, karakteristik: safeConfig.siakadKarakteristik! };
+        }
+        return prev;
+      });
+    }
+  }, [safeConfig?.siakadKarakteristik]);
+
   const [loading, setLoading] = useState(false);
   const [generatedHtml, setGeneratedHtml] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
