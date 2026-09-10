@@ -152,7 +152,7 @@ export async function fetchSiakadDataFromApi(token: string, expectedUserId: stri
         const { count } = await siakadSupabase
           .from('master_user')
           .select('*', { count: 'exact', head: true })
-          .eq('role', 'Siswa')
+          .eq('role', 'Murid')
           .eq('rombel', guruData?.rombel || activeRombelStr);
         if (count) jumlahSiswa = count;
       }
@@ -336,7 +336,7 @@ export async function fetchDistinctRombels(): Promise<string[]> {
     const { data, error } = await siakadSupabase
       .from('master_user')
       .select('rombel')
-      .eq('role', 'Siswa')
+      .eq('role', 'Murid')
       .neq('rombel', null)
       .neq('rombel', '')
       .neq('rombel', '-');
@@ -399,7 +399,7 @@ export async function fetchKarakteristikByRombel(rombel: string, tahunPelajaran:
       
       if (!rekapKarakteristik) {
         // Jika tidak ada data non-kognitif, kita buat header default
-        const { count } = await siakadSupabase.from('master_user').select('*', { count: 'exact', head: true }).eq('role', 'Siswa').eq('rombel', rombel);
+        const { count } = await siakadSupabase.from('master_user').select('*', { count: 'exact', head: true }).eq('role', 'Murid').eq('rombel', rombel);
         rekapKarakteristik = `Berdasarkan data asesmen diagnostik untuk ${count || kogData.length} siswa ${rombel.includes('Kelas') ? rombel : `Kelas ${rombel}`}:\n`;
       }
       
@@ -414,7 +414,7 @@ export async function fetchKarakteristikByRombel(rombel: string, tahunPelajaran:
       const { count } = await siakadSupabase
         .from('master_user')
         .select('*', { count: 'exact', head: true })
-        .eq('role', 'Siswa')
+        .eq('role', 'Murid')
         .eq('rombel', rombel);
       if (count) jumlahSiswa = count;
       
