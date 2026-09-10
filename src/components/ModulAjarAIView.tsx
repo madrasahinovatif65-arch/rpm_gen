@@ -35,6 +35,24 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
       if (match) parsedKelas = match[1].toUpperCase();
     }
 
+    const userJson = localStorage.getItem("edadmin_user");
+    let defaultRombel = "";
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        // Jika Wali Kelas dan punya rombel valid, auto-select rombel tersebut
+        if (user.role === 'Wali Kelas' && user.rombel && user.rombel !== '-') {
+          defaultRombel = user.rombel;
+        }
+      } catch (e) {}
+    }
+
+    if (defaultRombel) {
+      parsedKelas = defaultRombel;
+    } else {
+      parsedKelas = ""; // Guru Mapel / Admin default kosong
+    }
+
     return {
       namaGuru: safeConfig?.Nama_Guru || "",
       namaSekolah: safeConfig?.Nama_Sekolah || "",
@@ -70,7 +88,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
         else if (lvl.includes("fase c")) parsedFase = "Fase C (Kelas 5-6)";
         
         const match = lvl.match(/kelas\s*([ivx0-9]+)/i);
-        if (match) parsedKelas = match[1].toUpperCase();
+        if (match && !prev.kelas) parsedKelas = match[1].toUpperCase();
       }
 
       return {
