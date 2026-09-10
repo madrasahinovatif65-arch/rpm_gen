@@ -38,12 +38,12 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
     if (!kbcState) return;
 
     setForm(prev => {
-      // Ekstraksi nilai Fase & Kelas dari string "Fase A / Kelas 1"
+      // Ekstraksi nilai Fase & Kelas dari kbcLevel
       let parsedFase = prev.fase;
       let parsedKelas = prev.kelas;
       const kbcLevel = kbcState.curriculum?.level || "";
       
-      if (kbcLevel && !prev.fase && !prev.kelas) {
+      if (kbcLevel) {
         const lvl = kbcLevel.toLowerCase();
         if (lvl.includes("fase a")) parsedFase = "Fase A (Kelas 1-2)";
         else if (lvl.includes("fase b")) parsedFase = "Fase B (Kelas 3-4)";
@@ -56,14 +56,14 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
 
       return {
         ...prev,
-        mataPelajaran: prev.mataPelajaran || kbcState.curriculum?.subject || "",
-        tahunAjaran: prev.tahunAjaran || kbcState.curriculum?.year || "",
+        mataPelajaran: kbcState.curriculum?.subject || prev.mataPelajaran,
+        tahunAjaran: kbcState.curriculum?.year || prev.tahunAjaran,
         fase: parsedFase,
         kelas: parsedKelas,
-        model: prev.model || kbcState.module?.learningModel || kbcState.curriculum?.learningModel || "",
-        tujuan: prev.tujuan || kbcState.module?.rumusanTp || "",
-        metode: prev.metode || kbcState.curriculum?.learningMethod || "",
-        jumlahPertemuan: prev.jumlahPertemuan === "2" ? (kbcState.module?.jumlahPertemuan?.toString() || "2") : prev.jumlahPertemuan,
+        model: kbcState.module?.learningModel || kbcState.curriculum?.learningModel || prev.model,
+        tujuan: kbcState.module?.rumusanTp || prev.tujuan,
+        metode: kbcState.curriculum?.learningMethod || prev.metode,
+        jumlahPertemuan: kbcState.module?.jumlahPertemuan?.toString() || prev.jumlahPertemuan,
       };
     });
   }, [
