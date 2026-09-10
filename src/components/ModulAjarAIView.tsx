@@ -1,30 +1,32 @@
 import React, { useState } from "react";
-import { Wand2, Printer, Download, Sparkles, FileText, Loader2, AlertTriangle, BookOpen } from "lucide-react";
+import { Wand2, Printer, Download, Sparkles, FileText, Loader2, AlertTriangle, BookOpen, HelpCircle } from "lucide-react";
 import { ModulFormState, Pengaturan } from "../types";
 import { generateModulAjarAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyCetakSuccess, notifyUnduhSuccess, notifyUnduhError } from "../lib/swal";
 import { Button } from "./ui";
+import { KamusPedagogiModal } from "./KamusPedagogiModal";
 
 interface ModulAjarAIViewProps {
   config: Pengaturan;
 }
 
 export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
+  const [showKamusModal, setShowKamusModal] = useState<string | null>(null);
   const [form, setForm] = useState<ModulFormState>({
     namaGuru: config.Nama_Guru || "",
     namaSekolah: config.Nama_Sekolah || "",
-    tahunAjaran: "2026/2027",
-    jenjang: "SMP",
-    fase: "Fase D (Kelas 7-9)",
-    kelas: "VII",
-    waktu: "2 x 45 JP",
-    mataPelajaran: "Informatika",
-    topik: "Berpikir Komputasional dan Algoritma Dasar",
-    subTopik: "Pengenalan Flowchart dan Pseudocode",
+    tahunAjaran: config.Tahun_Pelajaran || "2026/2027",
+    jenjang: "MI",
+    fase: "",
+    kelas: "",
+    waktu: "",
+    mataPelajaran: (config as any).siakadMapel || config.siakadMapel || "",
+    topik: "",
+    subTopik: "",
     jumlahPertemuan: "2",
-    model: "Problem Based Learning (PBL)",
+    model: "",
     tujuan: "",
-    karakteristik: "Siswa senang dengan tantangan logika visual dan kerja kelompok."
+    karakteristik: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -388,20 +390,36 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-blue-900 dark:text-blue-200 uppercase mb-1">Model Pembelajaran *</label>
-                <select
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] font-bold text-blue-900 dark:text-blue-200 uppercase">Model Pembelajaran *</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowKamusModal("model")}
+                    title="Lihat Kamus Pedagogi"
+                    className="text-emerald-600 hover:text-emerald-500 transition-colors"
+                  >
+                    <HelpCircle className="w-4 h-4" />
+                  </button>
+                </div>
+                <input
+                  type="text"
                   id="model"
+                  list="modul-ai-model-list"
                   value={form.model}
                   onChange={handleChange}
+                  placeholder="Pilih atau ketik model pembelajaran..."
                   className="w-full px-3 py-2 text-xs font-semibold border rounded-lg bg-white dark:bg-slate-800 border-blue-200 dark:border-blue-800 outline-none"
-                >
-                  <option value="Problem Based Learning (PBL)">Problem Based Learning (PBL)</option>
-                  <option value="Project Based Learning (PjBL)">Project Based Learning (PjBL)</option>
-                  <option value="Discovery Learning">Discovery Learning</option>
-                  <option value="Inquiry Learning">Inquiry Learning</option>
-                  <option value="Cooperative Learning">Cooperative Learning</option>
-                  <option value="Teaching at the Right Level (TaRL)">Teaching at the Right Level (TaRL)</option>
-                </select>
+                />
+                <datalist id="modul-ai-model-list">
+                  <option value="Problem Based Learning (PBL)" />
+                  <option value="Project Based Learning (PjBL)" />
+                  <option value="Discovery Learning" />
+                  <option value="Inquiry Learning" />
+                  <option value="Cooperative Learning" />
+                  <option value="Pembelajaran Berdiferensiasi" />
+                  <option value="Flipped Classroom" />
+                  <option value="Teaching at the Right Level (TaRL)" />
+                </datalist>
               </div>
 
               <div>
@@ -505,5 +523,11 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
         </div>
       </div>
     </div>
+
+      <KamusPedagogiModal
+        isOpen={!!showKamusModal}
+        initialTab={showKamusModal || "model"}
+        onClose={() => setShowKamusModal(null)}
+      />
   );
 };
