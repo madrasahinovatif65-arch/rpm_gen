@@ -33,14 +33,49 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
     karakteristik: ""
   });
 
-  // Sinkronkan mapel & tahun ajaran reaktif dari KBC state
+  // Sinkronkan data dari KBC state ke form jika form masih kosong
   useEffect(() => {
-    setForm(prev => ({
-      ...prev,
-      mataPelajaran: kbcState?.curriculum?.subject || prev.mataPelajaran,
-      tahunAjaran: kbcState?.curriculum?.year || prev.tahunAjaran,
-    }));
-  }, [kbcState?.curriculum?.subject, kbcState?.curriculum?.year]);
+    if (!kbcState) return;
+
+    setForm(prev => {
+      // Ekstraksi nilai Fase & Kelas dari string "Fase A / Kelas 1"
+      let parsedFase = prev.fase;
+      let parsedKelas = prev.kelas;
+      const kbcLevel = kbcState.curriculum?.level || "";
+      
+      if (kbcLevel && !prev.fase && !prev.kelas) {
+        const lvl = kbcLevel.toLowerCase();
+        if (lvl.includes("fase a")) parsedFase = "Fase A (Kelas 1-2)";
+        else if (lvl.includes("fase b")) parsedFase = "Fase B (Kelas 3-4)";
+        else if (lvl.includes("fase c")) parsedFase = "Fase C (Kelas 5-6)";
+        
+        // Cari angka/romawi setelah kata "kelas"
+        const match = lvl.match(/kelas\s*([ivx0-9]+)/i);
+        if (match) parsedKelas = match[1].toUpperCase();
+      }
+
+      return {
+        ...prev,
+        mataPelajaran: prev.mataPelajaran || kbcState.curriculum?.subject || "",
+        tahunAjaran: prev.tahunAjaran || kbcState.curriculum?.year || "",
+        fase: parsedFase,
+        kelas: parsedKelas,
+        model: prev.model || kbcState.module?.learningModel || kbcState.curriculum?.learningModel || "",
+        tujuan: prev.tujuan || kbcState.module?.rumusanTp || "",
+        metode: prev.metode || kbcState.curriculum?.learningMethod || "",
+        jumlahPertemuan: prev.jumlahPertemuan === "2" ? (kbcState.module?.jumlahPertemuan?.toString() || "2") : prev.jumlahPertemuan,
+      };
+    });
+  }, [
+    kbcState?.curriculum?.subject,
+    kbcState?.curriculum?.year,
+    kbcState?.curriculum?.level,
+    kbcState?.curriculum?.learningModel,
+    kbcState?.curriculum?.learningMethod,
+    kbcState?.module?.learningModel,
+    kbcState?.module?.rumusanTp,
+    kbcState?.module?.jumlahPertemuan,
+  ]);
 
   const [loading, setLoading] = useState(false);
   const [generatedHtml, setGeneratedHtml] = useState<string>("");
