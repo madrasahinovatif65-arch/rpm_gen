@@ -325,6 +325,9 @@ export function mapSiakadToPengaturan(
 
     // SIAKAD metadata
     siakadUserId: user.id_user,
+    siakadRole: user.role,
+    siakadMapel: user.mapel,
+    siakadRombel: user.rombel,
     siakadSyncedAt: Date.now(),
     authProvider: 'siakad' as const,
   };

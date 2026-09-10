@@ -141,6 +141,27 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       notifySimpanError("Gagal mengambil data profil pengaturan.");
       return;
     }
+
+    // Format Rombel jika ada
+    let levelValue = prev => prev.curriculum.level;
+    if (config.siakadRombel !== undefined) {
+      const rombelStr = config.siakadRombel || "";
+      if (config.siakadRole === "Guru Mapel") {
+        levelValue = () => ""; // Kosongkan untuk Guru Mapel
+      } else if (rombelStr === "-" || rombelStr.trim() === "") {
+        levelValue = () => "";
+      } else if (!rombelStr.toLowerCase().includes("fase") && rombelStr.length > 0) {
+        const kelasMatch = rombelStr.match(/(\d+[A-Za-z]*)\s*$/);
+        if (kelasMatch) {
+          levelValue = () => `Kelas ${kelasMatch[1]}`;
+        } else {
+          levelValue = () => `Kelas ${rombelStr}`;
+        }
+      } else if (rombelStr.length > 0) {
+        levelValue = () => rombelStr;
+      }
+    }
+
     updateState((prev) => ({
       ...prev,
       school: {
@@ -155,7 +176,8 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       },
       curriculum: {
         ...prev.curriculum,
-        year: config.Tahun_Pelajaran || prev.curriculum.year
+        year: config.Tahun_Pelajaran || prev.curriculum.year,
+        level: levelValue(prev),
       }
     }));
     notifySimpanSuccess("Berhasil menyalin data dari Profil Madrasah!");

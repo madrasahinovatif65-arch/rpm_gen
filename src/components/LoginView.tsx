@@ -122,6 +122,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
         if (pengaturanData.Semester) payload.Semester = pengaturanData.Semester;
 
         payload.siakadUserId = pengaturanData.siakadUserId;
+        payload.siakadRole = pengaturanData.siakadRole;
+        payload.siakadMapel = pengaturanData.siakadMapel;
+        payload.siakadRombel = pengaturanData.siakadRombel;
         payload.siakadSyncedAt = pengaturanData.siakadSyncedAt;
         payload.authProvider = pengaturanData.authProvider;
 
