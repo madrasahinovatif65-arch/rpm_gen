@@ -191,7 +191,6 @@ Profil Kognitif (Asesmen Awal):
           console.log('✅ Data guru diambil dari REST API JSON untuk:', user.nama);
           return { user, sekolah };
         }
-      }
     }
   } catch (apiErr) {
     console.warn('⚠️ REST API gagal, fallback ke Supabase langsung:', apiErr);
