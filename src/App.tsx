@@ -181,14 +181,6 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    // Coba hapus sesi Supabase SIAKAD jika ada
-    try {
-      const { siakadSupabase } = await import("./lib/siakad-supabase");
-      await siakadSupabase.auth.signOut();
-    } catch (error) {
-      console.warn("Gagal logout dari Supabase", error);
-    }
-
     localStorage.removeItem("edadmin_auth_token");
     localStorage.removeItem("edadmin_user");
     localStorage.removeItem("edadmin_user_id");
