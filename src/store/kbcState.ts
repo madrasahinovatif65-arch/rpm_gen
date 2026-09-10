@@ -41,13 +41,13 @@ export interface KbcState {
 
 export const defaultKbcState: KbcState = {
   school: {
-    kemenagOffice: "KANTOR KEMENTERIAN AGAMA",
+    kemenagOffice: "Yayasan NU Miftakhul Khoir Damarjati",
     schoolName: "Madrasah Inovatif",
     teacher: "Guru Pengampu",
     nipTeacher: "-",
     principal: "Kepala Madrasah",
     nipPrincipal: "-",
-    cityDate: "Jakarta, 14 Juli 2026",
+    cityDate: "Pasuruan, 14 Juli 2026",
   },
   curriculum: {
     subject: "Akidah Akhlak",
@@ -56,7 +56,7 @@ export const defaultKbcState: KbcState = {
     year: "2026/2027",
     totalJp: 72,
     jpPerMinggu: 2,
-    learningModel: "Discovery Learning",
+    learningModel: "",
     learningMethod: "",
   },
   cp: {
@@ -68,7 +68,7 @@ export const defaultKbcState: KbcState = {
     kodeTp: "TP.AA.ELE.10.01",
     rumusanTp: "Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
     elemenCp: "Akidah",
-    learningModel: "Discovery Learning",
+    learningModel: "",
     sintakModel: "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
     jumlahPertemuan: 3,
     jpPerPertemuan: 2,
@@ -86,7 +86,7 @@ let isSubscribed = false;
 function initFirebaseSubscription() {
   if (isSubscribed) return;
   isSubscribed = true;
-  
+
   subscribeKbcState((data) => {
     if (data) {
       // Merge with default state to ensure all fields exist
@@ -120,11 +120,11 @@ export function useKbcState() {
 
   useEffect(() => {
     initFirebaseSubscription();
-    
+
     const listener = (newState: KbcState) => {
       setState({ ...newState });
     };
-    
+
     listeners.push(listener);
     return () => {
       listeners = listeners.filter(l => l !== listener);
@@ -135,7 +135,7 @@ export function useKbcState() {
     const newState = updater(globalState);
     globalState = newState;
     notifyListeners();
-    
+
     // Debounce save to firebase to prevent too many writes
     debouncedSave(newState);
   };
