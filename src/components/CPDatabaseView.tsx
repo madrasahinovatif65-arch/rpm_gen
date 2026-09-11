@@ -20,6 +20,13 @@ interface ImportRow {
   karakteristikMapel: string;
   cpFase: string;
   elemen: string;
+  mataPelajaran?: string;
+  singkatanMapel?: string;
+  faseKelas?: string;
+  jpPerMinggu?: string;
+  alokasiWaktuTotal?: string;
+  modelPembelajaran?: string;
+  metodePembelajaran?: string;
   valid: boolean;
   error?: string;
 }
@@ -81,11 +88,11 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Nama Template", "Rasional Mapel", "Tujuan Mapel", "Karakteristik Mapel", "CP Fase Umum", "CP Per Elemen"],
-      ["CP Akidah Akhlak Fase B", "Mata pelajaran Akidah Akhlak bertujuan...", "Tujuan mapel ini adalah...", "Mempelajari aqidah dan akhlak...", "Pada akhir Fase B, peserta didik...", "Elemen Akidah: Peserta didik mampu...\n\nElemen Akhlak: ..."],
-      ["CP Fikih Fase C", "Mata pelajaran Fikih menekankan...", "Tujuan mapel ini adalah...", "Mempelajari ibadah dan muamalah...", "Pada akhir Fase C, peserta didik...", "Elemen Fikih Ibadah: ...\n\nElemen Fikih Muamalah: ..."],
+      ["Nama Template", "Rasional Mapel", "Tujuan Mapel", "Karakteristik Mapel", "CP Fase Umum", "CP Per Elemen", "Mata Pelajaran (Opsional)", "Singkatan Mapel (Opsional)", "Fase / Kelas (Opsional)", "JP per Minggu (Opsional)", "Total JP (Opsional)", "Model Pembelajaran (Opsional)", "Metode Pembelajaran (Opsional)"],
+      ["CP Akidah Akhlak Fase B", "Mata pelajaran Akidah Akhlak bertujuan...", "Tujuan mapel ini adalah...", "Mempelajari aqidah dan akhlak...", "Pada akhir Fase B, peserta didik...", "Elemen Akidah: Peserta didik mampu...\n\nElemen Akhlak: ...", "Akidah Akhlak", "AA", "Fase B / Kelas 3", "2", "72", "Problem Based Learning (PBL)", "Diskusi"],
+      ["CP Fikih Fase C", "Mata pelajaran Fikih menekankan...", "Tujuan mapel ini adalah...", "Mempelajari ibadah dan muamalah...", "Pada akhir Fase C, peserta didik...", "Elemen Fikih Ibadah: ...\n\nElemen Fikih Muamalah: ...", "Fikih", "FI", "Fase C / Kelas 5", "2", "72", "Project Based Learning (PjBL)", "Role Playing"],
     ]);
-    ws["!cols"] = [{ wch: 30 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 60 }];
+    ws["!cols"] = [{ wch: 30 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 60 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 30 }, { wch: 30 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Template CP");
     XLSX.writeFile(wb, "Template_Import_CP_KBC.xlsx");
@@ -98,13 +105,16 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
       return;
     }
 
-    const exportData = templates.map(t => [t.name, t.rasional || "", t.tujuanMapel || "", t.karakteristikMapel || "", t.cpFase || "", t.elemen || ""]);
+    const exportData = templates.map(t => [
+      t.name, t.rasional || "", t.tujuanMapel || "", t.karakteristikMapel || "", t.cpFase || "", t.elemen || "",
+      t.mataPelajaran || "", t.singkatanMapel || "", t.faseKelas || "", t.jpPerMinggu || "", t.alokasiWaktuTotal || "", t.modelPembelajaran || "", t.metodePembelajaran || ""
+    ]);
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Nama Template", "Rasional Mapel", "Tujuan Mapel", "Karakteristik Mapel", "CP Fase Umum", "CP Per Elemen"],
+      ["Nama Template", "Rasional Mapel", "Tujuan Mapel", "Karakteristik Mapel", "CP Fase Umum", "CP Per Elemen", "Mata Pelajaran (Opsional)", "Singkatan Mapel (Opsional)", "Fase / Kelas (Opsional)", "JP per Minggu (Opsional)", "Total JP (Opsional)", "Model Pembelajaran (Opsional)", "Metode Pembelajaran (Opsional)"],
       ...exportData
     ]);
     
-    ws["!cols"] = [{ wch: 30 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 60 }];
+    ws["!cols"] = [{ wch: 30 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 60 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 30 }, { wch: 30 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Database CP");
     
@@ -133,6 +143,14 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
           const karakteristikMapel = String(row[3] || "").trim();
           const cpFase = String(row[4] || "").trim();
           const elemen = String(row[5] || "").trim();
+          const mataPelajaran = String(row[6] || "").trim();
+          const singkatanMapel = String(row[7] || "").trim();
+          const faseKelas = String(row[8] || "").trim();
+          const jpPerMinggu = String(row[9] || "").trim();
+          const alokasiWaktuTotal = String(row[10] || "").trim();
+          const modelPembelajaran = String(row[11] || "").trim();
+          const metodePembelajaran = String(row[12] || "").trim();
+          
           const valid = name.length > 0 && elemen.length > 0;
           return {
             rowIndex: idx + 2,
@@ -142,6 +160,13 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
             karakteristikMapel,
             cpFase,
             elemen,
+            mataPelajaran,
+            singkatanMapel,
+            faseKelas,
+            jpPerMinggu,
+            alokasiWaktuTotal,
+            modelPembelajaran,
+            metodePembelajaran,
             valid,
             error: !name ? "Kolom 'Nama Template' wajib diisi" : !elemen ? "Kolom 'CP Per Elemen' wajib diisi" : undefined
           };
@@ -170,7 +195,14 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
       tujuanMapel: r.tujuanMapel,
       karakteristikMapel: r.karakteristikMapel,
       cpFase: r.cpFase,
-      elemen: r.elemen
+      elemen: r.elemen,
+      mataPelajaran: r.mataPelajaran,
+      singkatanMapel: r.singkatanMapel,
+      faseKelas: r.faseKelas,
+      jpPerMinggu: r.jpPerMinggu,
+      alokasiWaktuTotal: r.alokasiWaktuTotal,
+      modelPembelajaran: r.modelPembelajaran,
+      metodePembelajaran: r.metodePembelajaran
     }));
 
     const updatedConfig = {
