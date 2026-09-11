@@ -6,6 +6,7 @@ import { notifySimpanSuccess, notifySimpanError } from "../lib/swal";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
 import { Button } from "./ui";
 import * as XLSX from "xlsx";
+import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 
 interface CPDatabaseViewProps {
   config: Pengaturan;
@@ -328,7 +329,24 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div className="sm:col-span-2">
                   <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Mata Pelajaran <span className="text-red-500">*</span></label>
-                  <input type="text" value={editForm.mataPelajaran || ""} onChange={e => setEditForm({ ...editForm, mataPelajaran: e.target.value })} placeholder="Contoh: Al Qur'an Hadis" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                  <select
+                    value={editForm.mataPelajaran || ""}
+                    onChange={(e) => {
+                      const subj = e.target.value;
+                      const mapelData = DATA_MAPEL_KEMENAG.find(m => m.namaMapel === subj);
+                      setEditForm({
+                        ...editForm,
+                        mataPelajaran: subj,
+                        singkatanMapel: mapelData ? mapelData.singkatan : editForm.singkatanMapel
+                      });
+                    }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm"
+                  >
+                    <option value="">-- Pilih Mata Pelajaran --</option>
+                    {DATA_MAPEL_KEMENAG.map(mapel => (
+                      <option key={mapel.namaMapel} value={mapel.namaMapel}>{mapel.namaMapel}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Singkatan / Kode TP</label>
@@ -336,15 +354,37 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Fase / Kelas</label>
-                  <input type="text" value={editForm.faseKelas || ""} onChange={e => setEditForm({ ...editForm, faseKelas: e.target.value })} placeholder="Contoh: Fase D / Kelas VII" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                  <select
+                    value={editForm.faseKelas || ""}
+                    onChange={e => setEditForm({ ...editForm, faseKelas: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm"
+                  >
+                    <option value="">-- Pilih Fase / Kelas --</option>
+                    <option value="Fase A (Kelas 1-2)">Fase A (Kelas 1-2)</option>
+                    <option value="Fase B (Kelas 3-4)">Fase B (Kelas 3-4)</option>
+                    <option value="Fase C (Kelas 5-6)">Fase C (Kelas 5-6)</option>
+                    <option value="Fase D (Kelas 7-9)">Fase D (Kelas 7-9)</option>
+                    <option value="Fase E (Kelas 10)">Fase E (Kelas 10)</option>
+                    <option value="Fase F (Kelas 11-12)">Fase F (Kelas 11-12)</option>
+                  </select>
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">JP per Minggu</label>
-                  <input type="text" value={editForm.jpPerMinggu || ""} onChange={e => setEditForm({ ...editForm, jpPerMinggu: e.target.value })} placeholder="Contoh: 2" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                  <input 
+                    type="number" 
+                    value={editForm.jpPerMinggu || ""} 
+                    onChange={e => {
+                      const jp = e.target.value;
+                      const totalJp = jp ? String(parseInt(jp) * 36) : "";
+                      setEditForm({ ...editForm, jpPerMinggu: jp, alokasiWaktuTotal: totalJp });
+                    }} 
+                    placeholder="Contoh: 2" 
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" 
+                  />
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1 text-sm">Alokasi Waktu Total (JP)</label>
-                  <input type="text" value={editForm.alokasiWaktuTotal || ""} onChange={e => setEditForm({ ...editForm, alokasiWaktuTotal: e.target.value })} placeholder="Contoh: 72" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
+                  <input type="number" value={editForm.alokasiWaktuTotal || ""} onChange={e => setEditForm({ ...editForm, alokasiWaktuTotal: e.target.value })} placeholder="Contoh: 72" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-all text-sm" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
