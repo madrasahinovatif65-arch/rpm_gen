@@ -118,13 +118,14 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     if (userJson) {
       try {
         const user = JSON.parse(userJson);
-        if (user.role && user.rombel && user.role !== "Guru Mapel") {
+        // Set rombel only if it's still the default value (Fase ...) to prevent overwriting user's choice
+        if (user.role && user.rombel && user.role !== "Guru Mapel" && (!state.curriculum.level || state.curriculum.level.includes("Fase"))) {
           updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: user.rombel } }));
         }
       } catch (e) {}
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [state.curriculum.level]);
 
   const formData = {
     ...state.school,
@@ -135,7 +136,8 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   const formDataModul = {
     ...state.school,
     ...state.curriculum,
-    ...state.module
+    ...state.module,
+    learningModel: state.curriculum.learningModel
   };
 
 
@@ -1067,13 +1069,13 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   value={formDataModul.subject}
                   onChange={(e) => {
                     const subj = e.target.value;
-                    const mapelData = DATA_MAPEL_KEMENAG.find(m => m.name === subj);
+                    const mapelData = DATA_MAPEL_KEMENAG.find(m => m.namaMapel === subj);
                     updateState(s => ({
                       ...s,
                       curriculum: {
                         ...s.curriculum,
                         subject: subj,
-                        singkatanMapel: mapelData ? mapelData.short : s.curriculum.singkatanMapel
+                        singkatanMapel: mapelData ? mapelData.singkatan : s.curriculum.singkatanMapel
                       }
                     }));
                   }}
@@ -1081,7 +1083,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 >
                   <option value="">-- Pilih Mata Pelajaran --</option>
                   {DATA_MAPEL_KEMENAG.map(mapel => (
-                    <option key={mapel.name} value={mapel.name}>{mapel.name}</option>
+                    <option key={mapel.namaMapel} value={mapel.namaMapel}>{mapel.namaMapel}</option>
                   ))}
                 </select>
               </div>
