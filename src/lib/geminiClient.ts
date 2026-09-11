@@ -149,13 +149,13 @@ ATURAN UTAMA:
 - Fase: ${formData.fase || 'Fase D (Kelas 7-9)'}
 - Kelas: ${formData.kelas || 'VII'}
 - Alokasi Waktu: ${formData.waktu || '2 x 45 JP'}
-- Mata Pelajaran: ${formData.mataPelajaran || 'Umum'}
+- Mata Pelajaran: ${formData.curriculum?.subject || formData.mataPelajaran || 'Umum'}
 - Bab/Topik Utama: ${formData.topik || 'Topik Utama'} ${formData.subTopik ? `- ${formData.subTopik}` : ''}
 - Jumlah Pertemuan: ${formData.jumlahPertemuan || '1'} Pertemuan
 - Model Pembelajaran: ${formData.model || 'Problem Based Learning (PBL)'}
 - Metode Pembelajaran: ${metodeText}
 - Tujuan Pembelajaran Spesifik: ${formData.tujuan || 'Siswa dapat memahami dan mengaplikasikan konsep dengan cermat.'}
-- Karakteristik Murid: ${formData.karakteristik || 'Heterogen, siap belajar aktif.'}
+- Karakteristik Murid: ${formData.module?.karakteristik || formData.karakteristik || 'Heterogen, siap belajar aktif.'}
 
 FORMAT WAJIB LAYOUT HTML:
 

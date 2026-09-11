@@ -36,6 +36,7 @@ export interface KbcState {
     jpPerPertemuan: number;
     minutesPerJp: number;
     topikLokal: string;
+    karakteristik?: string;
   };
 }
 
@@ -74,6 +75,7 @@ export const defaultKbcState: KbcState = {
     jpPerPertemuan: 2,
     minutesPerJp: 45,
     topikLokal: "Pelestarian Lingkungan Hutan TNKS & Budaya Adat Mudik Kerinci (Panca Cinta & PPRA)",
+    karakteristik: "",
   }
 };
 

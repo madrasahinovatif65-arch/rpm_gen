@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
+import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-supabase";
 import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { useKbcState, defaultKbcState } from "../store/kbcState";
@@ -58,6 +59,17 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   const [generatedJson, setGeneratedJson] = useState<Record<string, any>>({});
   const [jobs, setJobs] = useState<Record<string, AIJob>>({});
 
+  const [availableRombels, setAvailableRombels] = useState<string[]>([]);
+  const [isFetchingRombel, setIsFetchingRombel] = useState(false);
+
+  React.useEffect(() => {
+    async function loadRombels() {
+      const rombels = await fetchDistinctRombels();
+      setAvailableRombels(rombels);
+    }
+    loadRombels();
+  }, []);
+
   React.useEffect(() => {
     const unsubscribe = subscribeToJobs((updatedJobs) => {
       setJobs(updatedJobs);
@@ -83,6 +95,23 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   }, []);
 
   const [state, updateState] = useKbcState();
+
+  React.useEffect(() => {
+    async function syncKarakteristik() {
+      if (!state.curriculum.level) return;
+      // Gunakan level sebagai rombel pencarian.
+      setIsFetchingRombel(true);
+      const newKarakteristik = await fetchKarakteristikByRombel(state.curriculum.level, state.curriculum.year);
+      if (newKarakteristik) {
+        updateState(s => ({
+          ...s,
+          module: { ...s.module, karakteristik: newKarakteristik }
+        }));
+      }
+      setIsFetchingRombel(false);
+    }
+    syncKarakteristik();
+  }, [state.curriculum.level, state.curriculum.year, updateState]);
 
   const formData = {
     ...state.school,
@@ -1029,13 +1058,24 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Fase / Kelas</label>
-                <input
-                  type="text"
+                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                  Kelas (Pilih Rombel)
+                </label>
+                <select
                   value={formDataModul.level}
                   onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
+                >
+                  <option value="">-- Pilih Kelas --</option>
+                  {availableRombels.map(r => (
+                    <option key={r} value={r}>Kelas {r}</option>
+                  ))}
+                </select>
+                {isFetchingRombel && (
+                  <p className="text-[10px] text-emerald-600 mt-1 flex items-center">
+                    <Loader2 className="w-3 h-3 animate-spin mr-1" /> Menyinkronkan data rombel...
+                  </p>
+                )}
               </div>
 
               <div>
@@ -1140,6 +1180,8 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               else if (umumStatus === "success") isFinished = true;
             }
             
+            const isModulType = doc.id === "modul_ajar" || doc.id === "lkpd" || doc.id === "rubrik";
+            
             return (
               <button
                 key={doc.id}
@@ -1147,7 +1189,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${
                   activeDoc === doc.id
                     ? "bg-emerald-50 dark:bg-emerald-900/50 border-emerald-500 dark:border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-sm"
-                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 hover:border-emerald-300"
+                    : isModulType 
+                      ? "bg-white dark:bg-slate-800 border-amber-300 dark:border-amber-500/50 text-slate-600 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                      : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 hover:border-emerald-300"
                 }`}
                 title={doc.fullTitle}
               >
