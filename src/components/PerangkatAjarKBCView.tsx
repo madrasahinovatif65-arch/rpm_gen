@@ -140,10 +140,49 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.Alamat_Sekolah, state.school.schoolAddress]);
 
+  // Auto-select CP Template jika Mapel dan Fase cocok
+  React.useEffect(() => {
+    if (!config?.cpTemplates) return;
+    const { subject, level } = state.curriculum;
+    if (!subject || !level) return;
+    
+    // Cari template yang persis sama Mapel dan Fasenya
+    const matchingTemplate = config.cpTemplates.find(t => 
+      t.mataPelajaran === subject && 
+      t.faseKelas === level
+    );
+    
+    if (matchingTemplate) {
+      // Cegah infinite loop jika data sudah sama
+      if (state.cp.elemen !== matchingTemplate.elemen || state.cp.rasional !== matchingTemplate.rasional) {
+         updateState(s => ({
+            ...s,
+            cp: {
+              rasional: matchingTemplate.rasional,
+              tujuanMapel: matchingTemplate.tujuanMapel || "",
+              karakteristikMapel: matchingTemplate.karakteristikMapel || "",
+              cpFase: matchingTemplate.cpFase || "",
+              elemen: matchingTemplate.elemen
+            },
+            curriculum: {
+              ...s.curriculum,
+              jpPerMinggu: matchingTemplate.jpPerMinggu ? parseInt(matchingTemplate.jpPerMinggu) : s.curriculum.jpPerMinggu,
+              totalJp: matchingTemplate.alokasiWaktuTotal ? parseInt(matchingTemplate.alokasiWaktuTotal) : s.curriculum.totalJp,
+              learningModel: matchingTemplate.modelPembelajaran || s.curriculum.learningModel,
+              learningMethod: matchingTemplate.metodePembelajaran || s.curriculum.learningMethod
+            }
+         }));
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.curriculum.subject, state.curriculum.level, config?.cpTemplates]);
+
   const formData = {
     ...state.school,
     ...state.curriculum,
-    ...state.cp
+    ...state.cp,
+    cpRasional: state.cp.rasional,
+    cpElemen: state.cp.elemen
   };
 
   const formDataModul = {
@@ -845,10 +884,49 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
               <div className="flex flex-col h-full">
                 <label className="font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Tujuan Mata Pelajaran
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.tujuanMapel || ""}
+                  onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, tujuanMapel: e.target.value } }))}
+                  placeholder="Bila kosong, AI akan merumuskan mandiri..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
+                />
+              </div>
+
+              <div className="flex flex-col h-full">
+                <label className="font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Karakteristik Mata Pelajaran
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.karakteristikMapel || ""}
+                  onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, karakteristikMapel: e.target.value } }))}
+                  placeholder="Bila kosong, AI akan merumuskan mandiri..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
+                />
+              </div>
+
+              <div className="flex flex-col h-full">
+                <label className="font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Capaian Pembelajaran (CP) Fase Umum <span className="font-normal text-slate-500">(Opsional)</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.cpFase || ""}
+                  onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, cpFase: e.target.value } }))}
+                  placeholder="Tulis rangkuman CP Umum sebelum dipecah per elemen (jika ada)..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
+                />
+              </div>
+
+              <div className="flex flex-col h-full md:col-span-2">
+                <label className="font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Capaian Pembelajaran (CP) Per Elemen
                 </label>
                 <textarea
-                  rows={4}
+                  rows={5}
                   value={formData.cpElemen}
                   onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, elemen: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"
