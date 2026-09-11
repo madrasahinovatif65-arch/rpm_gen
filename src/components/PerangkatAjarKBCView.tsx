@@ -120,12 +120,25 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         const user = JSON.parse(userJson);
         // Set rombel only if it's still the default value (Fase ...) to prevent overwriting user's choice
         if (user.role && user.rombel && user.role !== "Guru Mapel" && (!state.curriculum.level || state.curriculum.level.includes("Fase"))) {
-          updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: user.rombel } }));
+          let parsedRombel = user.rombel;
+          const match = parsedRombel.match(/(\d+[A-Za-z]*)\s*$/);
+          if (match && !parsedRombel.toLowerCase().includes("fase")) {
+            parsedRombel = match[1];
+          }
+          updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: parsedRombel } }));
         }
       } catch (e) {}
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.curriculum.level]);
+
+  // Auto-fill Alamat Sekolah dari config jika masih default
+  React.useEffect(() => {
+    if (config?.Alamat_Sekolah && state.school.schoolAddress === defaultKbcState.school.schoolAddress) {
+      updateState(s => ({ ...s, school: { ...s.school, schoolAddress: config.Alamat_Sekolah } }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config?.Alamat_Sekolah, state.school.schoolAddress]);
 
   const formData = {
     ...state.school,
