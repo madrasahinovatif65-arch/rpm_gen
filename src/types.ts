@@ -3,6 +3,9 @@ export interface CpTemplate {
   id: string;
   name: string;
   rasional: string;
+  tujuanMapel?: string;
+  karakteristikMapel?: string;
+  cpFase?: string;
   elemen: string;
   // Per-mapel fields (dikelola di Kelola CP Elemen)
   mataPelajaran?: string;

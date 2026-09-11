@@ -16,6 +16,9 @@ interface ImportRow {
   rowIndex: number;
   name: string;
   rasional: string;
+  tujuanMapel: string;
+  karakteristikMapel: string;
+  cpFase: string;
   elemen: string;
   valid: boolean;
   error?: string;
@@ -78,11 +81,11 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Nama Template", "Rasional Mapel", "CP Per Elemen"],
-      ["CP Akidah Akhlak Fase B (MI Kelas 3-4)", "Mata pelajaran Akidah Akhlak bertujuan membentuk peserta didik yang beriman, berakhlak mulia...", "Elemen Akidah: Peserta didik mampu memahami dan meyakini rukun iman...\n\nElemen Akhlak: Peserta didik mampu mengamalkan perilaku terpuji..."],
-      ["CP Fikih Fase C (MI Kelas 5-6)", "Mata pelajaran Fikih menekankan kemampuan peserta didik dalam memahami dan mempraktikkan hukum Islam...", "Elemen Fikih Ibadah: Peserta didik mampu melaksanakan ibadah mahdhah dengan benar...\n\nElemen Fikih Muamalah: Peserta didik mampu menjelaskan hukum muamalah dasar..."],
+      ["Nama Template", "Rasional Mapel", "Tujuan Mapel", "Karakteristik Mapel", "CP Fase Umum", "CP Per Elemen"],
+      ["CP Akidah Akhlak Fase B", "Mata pelajaran Akidah Akhlak bertujuan...", "Tujuan mapel ini adalah...", "Mempelajari aqidah dan akhlak...", "Pada akhir Fase B, peserta didik...", "Elemen Akidah: Peserta didik mampu...\n\nElemen Akhlak: ..."],
+      ["CP Fikih Fase C", "Mata pelajaran Fikih menekankan...", "Tujuan mapel ini adalah...", "Mempelajari ibadah dan muamalah...", "Pada akhir Fase C, peserta didik...", "Elemen Fikih Ibadah: ...\n\nElemen Fikih Muamalah: ..."],
     ]);
-    ws["!cols"] = [{ wch: 35 }, { wch: 60 }, { wch: 80 }];
+    ws["!cols"] = [{ wch: 30 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 60 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Template CP");
     XLSX.writeFile(wb, "Template_Import_CP_KBC.xlsx");
@@ -95,13 +98,13 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
       return;
     }
 
-    const exportData = templates.map(t => [t.name, t.rasional || "", t.elemen || ""]);
+    const exportData = templates.map(t => [t.name, t.rasional || "", t.tujuanMapel || "", t.karakteristikMapel || "", t.cpFase || "", t.elemen || ""]);
     const ws = XLSX.utils.aoa_to_sheet([
-      ["Nama Template", "Rasional Mapel", "CP Per Elemen"],
+      ["Nama Template", "Rasional Mapel", "Tujuan Mapel", "Karakteristik Mapel", "CP Fase Umum", "CP Per Elemen"],
       ...exportData
     ]);
     
-    ws["!cols"] = [{ wch: 35 }, { wch: 60 }, { wch: 80 }];
+    ws["!cols"] = [{ wch: 30 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 60 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Database CP");
     
@@ -126,12 +129,18 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
         const parsed: ImportRow[] = rows.slice(1).filter(r => r.some(cell => cell !== undefined && cell !== "")).map((row, idx) => {
           const name = String(row[0] || "").trim();
           const rasional = String(row[1] || "").trim();
-          const elemen = String(row[2] || "").trim();
+          const tujuanMapel = String(row[2] || "").trim();
+          const karakteristikMapel = String(row[3] || "").trim();
+          const cpFase = String(row[4] || "").trim();
+          const elemen = String(row[5] || "").trim();
           const valid = name.length > 0 && elemen.length > 0;
           return {
             rowIndex: idx + 2,
             name,
             rasional,
+            tujuanMapel,
+            karakteristikMapel,
+            cpFase,
             elemen,
             valid,
             error: !name ? "Kolom 'Nama Template' wajib diisi" : !elemen ? "Kolom 'CP Per Elemen' wajib diisi" : undefined
@@ -158,6 +167,9 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
       id: `import_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       name: r.name,
       rasional: r.rasional,
+      tujuanMapel: r.tujuanMapel,
+      karakteristikMapel: r.karakteristikMapel,
+      cpFase: r.cpFase,
       elemen: r.elemen
     }));
 
@@ -313,6 +325,18 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                 <span className="ml-2 text-[10px] font-normal bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full">âœ¨ KBC otomatis</span>
               </label>
               <textarea rows={4} value={editForm.rasional} onChange={e => setEditForm({ ...editForm, rasional: e.target.value })} placeholder="Tulis rasional mapel secara ringkas. Integrasi 8 DPL, Panca Cinta & PPRA dilakukan otomatis oleh AI." className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400 placeholder:font-normal" />
+            </div>
+            <div>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Tujuan Mata Pelajaran</label>
+              <textarea rows={3} value={editForm.tujuanMapel || ""} onChange={e => setEditForm({ ...editForm, tujuanMapel: e.target.value })} placeholder="Tulis tujuan spesifik mata pelajaran sesuai standar..." className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
+            </div>
+            <div>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Karakteristik Mata Pelajaran</label>
+              <textarea rows={3} value={editForm.karakteristikMapel || ""} onChange={e => setEditForm({ ...editForm, karakteristikMapel: e.target.value })} placeholder="Tulis ruang lingkup materi dan karakteristik mapel..." className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
+            </div>
+            <div>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Capaian Pembelajaran (CP) Fase Umum <span className="text-slate-400 font-normal">(Opsional)</span></label>
+              <textarea rows={3} value={editForm.cpFase || ""} onChange={e => setEditForm({ ...editForm, cpFase: e.target.value })} placeholder="Tulis rangkuman CP Umum untuk fase ini sebelum dipecah per elemen (jika ada)..." className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
             </div>
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Capaian Pembelajaran (CP) Per Elemen <span className="text-red-500">*</span></label>

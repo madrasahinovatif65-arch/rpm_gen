@@ -338,6 +338,9 @@ export const generatePerangkatAjarAPI = async (docType: string, formData: any) =
   const nipPrincipal = formData?.nipPrincipal || "19720514 200003 1 002";
 
   const cpRasional = formData?.cpRasional || "Pada akhir Fase E, peserta didik memiliki kemampuan berbahasa untuk berkomunikasi dan bernalar sesuai dengan tujuan, konteks sosial, akademis, dan dunia kerja.";
+  const tujuanMapel = formData?.tujuanMapel || "";
+  const karakteristikMapel = formData?.karakteristikMapel || "";
+  const cpFase = formData?.cpFase || "";
   const cpElemen = formData?.cpElemen || `Elemen 1 — Menyimak: Peserta didik mampu mengevaluasi dan mengkreasi informasi berupa gagasan dari berbagai tipe teks lisan.\nElemen 2 — Membaca dan Memirsa: Peserta didik mampu mengevaluasi informasi berupa gagasan dari teks deskripsi, laporan, narasi, eksplanasi, eksposisi.\nElemen 3 — Berbicara dan Mempresentasikan: Peserta didik mampu mengolah dan menyajikan gagasan untuk tujuan pengajuan usul dan solusi.\nElemen 4 — Menulis: Peserta didik mampu menulis gagasan tertulis secara logis, kritis, dan kreatif.`;
 
   const generalRules = `
@@ -365,15 +368,18 @@ ${generalRules}
 - Nama Kepala Sekolah: ${principal}
 - NIP Kepala Sekolah: ${nipPrincipal}
 - Rasional CP Umum: ${cpRasional}
+- Tujuan Mata Pelajaran: ${tujuanMapel}
+- Karakteristik Mata Pelajaran: ${karakteristikMapel}
+- CP Fase Umum: ${cpFase}
 - CP Per Elemen: ${cpElemen}
 
 STRUKTUR DOKUMEN HTML WAJIB (7 Bagian Wajib):
 1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-CP-${singkatanMapel}-${level.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
 2. BAGIAN A — IDENTITAS (Tabel 2 Kolom)
 3. BAGIAN B — RASIONAL MATA PELAJARAN (Tabel 3 kolom: No | Uraian | Deskripsi) -> 1. Pentingnya Mapel, 2. Kaitan dengan 8 Dimensi Profil Lulusan, 3. Orientasi Pembelajaran.
-4. BAGIAN C — TUJUAN MATA PELAJARAN (Tabel 3 kolom: No | Tujuan | Indikator Umum - min 3 tujuan terukur)
-5. BAGIAN D — KARAKTERISTIK MATA PELAJARAN & ELEMEN CP (Tabel 4 kolom: No | Elemen | Deskripsi Elemen | Cakupan Konten Utama - daftar 5-7 topik konkret per elemen)
-6. BAGIAN E — CAPAIAN PEMBELAJARAN FASE (Tabel 4 kolom: Fase | Capaian Pembelajaran | Kompetensi Kunci | Konten / Materi Pokok)
+4. BAGIAN C — TUJUAN MATA PELAJARAN (Jika "Tujuan Mata Pelajaran" ada di Data Input Guru, WAJIB SALIN PERSIS teks tersebut. Jika kosong, rangkai 3 tujuan secara mandiri).
+5. BAGIAN D — KARAKTERISTIK MATA PELAJARAN & ELEMEN CP (Tampilkan teks "Karakteristik Mata Pelajaran" dari Data Input secara verbatim di awal jika ada. Kemudian buat Tabel 4 kolom: No | Elemen | Deskripsi Elemen | Cakupan Konten Utama).
+6. BAGIAN E — CAPAIAN PEMBELAJARAN FASE (Tampilkan "CP Fase Umum" dari Data Input secara verbatim di awal tabel. Lalu buat Tabel 4 kolom: Fase | Capaian Pembelajaran | Kompetensi Kunci | Konten / Materi Pokok)
 7. BAGIAN F — PENJABARAN KATA KERJA OPERASIONAL (KKO) PER ELEMEN (Tabel 3 kolom: No | Elemen | KKO & Arah Tujuan Pembelajaran)
 8. BAGIAN G — KETERKAITAN DENGAN 8 DIMENSI PROFIL LULUSAN (Tabel 4 kolom: No | Dimensi Profil Lulusan | Elemen Terkait | Relevansi ✔)
 9. BAGIAN PENUTUP — TANDA TANGAN SEJAJAR KEPSEK & GURU DENGAN TABEL TANPA BORDER.

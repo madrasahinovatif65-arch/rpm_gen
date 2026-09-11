@@ -24,6 +24,9 @@ export interface KbcState {
   };
   cp: {
     rasional: string;
+    tujuanMapel?: string;
+    karakteristikMapel?: string;
+    cpFase?: string;
     elemen: string;
   };
   module: {
@@ -63,6 +66,9 @@ export const defaultKbcState: KbcState = {
   },
   cp: {
     rasional: "",
+    tujuanMapel: "",
+    karakteristikMapel: "",
+    cpFase: "",
     elemen: "",
   },
   module: {

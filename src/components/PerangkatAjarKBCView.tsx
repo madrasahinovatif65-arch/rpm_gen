@@ -246,6 +246,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       ...s,
       cp: {
         rasional: "Mata pelajaran ini diarahkan untuk membentuk peserta didik yang berpengetahuan luas, berakhlak mulia, dan mampu berpikir kritis serta kreatif. Pembelajaran dirancang agar siswa dapat memahami, menganalisis, dan mengaplikasikan ilmu pengetahuan secara bermakna dalam kehidupan nyata yang moderat dan toleran.",
+        tujuanMapel: "Peserta didik diharapkan mampu menyelaraskan ilmu agama dengan kehidupan modern secara harmonis.",
+        karakteristikMapel: "Mengedepankan pemahaman literasi agama, integrasi kearifan lokal, dan pemikiran kritis progresif.",
+        cpFase: "Peserta didik menguasai fondasi utama ilmu secara komprehensif, mampu memecahkan masalah kontekstual, dan mempraktikkan toleransi aktif di tengah masyarakat.",
         elemen: "Elemen Pemahaman Konsep: Peserta didik mampu menganalisis dan menjelaskan ruang lingkup materi secara mendalam dan komprehensif.\n\nElemen Keterampilan Proses: Peserta didik mampu mengamati, menanya, mengeksplorasi, merumuskan kesimpulan, serta mengkomunikasikan hasil karya secara lisan maupun tulisan."
       }
     }));
@@ -266,6 +269,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         ...s,
         cp: {
           rasional: template.rasional,
+          tujuanMapel: template.tujuanMapel || "",
+          karakteristikMapel: template.karakteristikMapel || "",
+          cpFase: template.cpFase || "",
           elemen: template.elemen
         },
         curriculum: {
