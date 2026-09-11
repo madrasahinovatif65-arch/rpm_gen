@@ -10,6 +10,7 @@ export interface KbcState {
     principal: string;
     nipPrincipal: string;
     cityDate: string;
+    schoolAddress: string;
   };
   curriculum: {
     subject: string;
@@ -30,7 +31,6 @@ export interface KbcState {
     kodeTp: string;
     rumusanTp: string;
     elemenCp: string;
-    learningModel: string;
     sintakModel: string | string[];
     jumlahPertemuan: number;
     jpPerPertemuan: number;
@@ -49,6 +49,7 @@ export const defaultKbcState: KbcState = {
     principal: "Kepala Madrasah",
     nipPrincipal: "-",
     cityDate: "Pasuruan, 14 Juli 2026",
+    schoolAddress: "Jl. Karangrejo, Purwosari, Pasuruan",
   },
   curriculum: {
     subject: "Akidah Akhlak",
@@ -69,7 +70,6 @@ export const defaultKbcState: KbcState = {
     kodeTp: "TP.AA.ELE.10.01",
     rumusanTp: "Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
     elemenCp: "Akidah",
-    learningModel: "",
     sintakModel: "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
     jumlahPertemuan: 3,
     jpPerPertemuan: 2,

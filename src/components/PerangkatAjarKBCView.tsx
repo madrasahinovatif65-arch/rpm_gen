@@ -99,10 +99,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   React.useEffect(() => {
     async function syncKarakteristik() {
       if (!state.curriculum.level) return;
-      // Gunakan level sebagai rombel pencarian.
       setIsFetchingRombel(true);
       const newKarakteristik = await fetchKarakteristikByRombel(state.curriculum.level, state.curriculum.year);
-      if (newKarakteristik) {
+      if (newKarakteristik && newKarakteristik !== state.module.karakteristik) {
         updateState(s => ({
           ...s,
           module: { ...s.module, karakteristik: newKarakteristik }
@@ -111,7 +110,21 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       setIsFetchingRombel(false);
     }
     syncKarakteristik();
-  }, [state.curriculum.level, state.curriculum.year, updateState]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.curriculum.level, state.curriculum.year]);
+
+  React.useEffect(() => {
+    const userJson = localStorage.getItem("edadmin_user");
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        if (user.role && user.rombel && user.role !== "Guru Mapel") {
+          updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: user.rombel } }));
+        }
+      } catch (e) {}
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const formData = {
     ...state.school,
@@ -182,9 +195,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       } else if (!rombelStr.toLowerCase().includes("fase") && rombelStr.length > 0) {
         const kelasMatch = rombelStr.match(/(\d+[A-Za-z]*)\s*$/);
         if (kelasMatch) {
-          levelValue = () => `Kelas ${kelasMatch[1]}`;
+          levelValue = () => kelasMatch[1];
         } else {
-          levelValue = () => `Kelas ${rombelStr}`;
+          levelValue = () => rombelStr;
         }
       } else if (rombelStr.length > 0) {
         levelValue = () => rombelStr;
@@ -201,7 +214,8 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         nipTeacher: config.NIP_Guru || prev.school.nipTeacher,
         principal: config.Nama_Kepsek || prev.school.principal,
         nipPrincipal: config.NIP_Kepsek || prev.school.nipPrincipal,
-        cityDate: `${config.Tempat_Tanda_Tangan || "Karangrejo"}, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`
+        cityDate: `${config.Tempat_Tanda_Tangan || "Karangrejo"}, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`,
+        schoolAddress: config.Alamat_Sekolah || prev.school.schoolAddress
       },
       curriculum: {
         ...prev.curriculum,
@@ -935,7 +949,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   type="text"
                   list="model-pembelajaran-list-2"
                   value={formDataModul.learningModel}
-                  onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, learningModel: e.target.value } }))}
+                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, learningModel: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold text-emerald-700 dark:text-emerald-400"
                   placeholder="Pilih atau ketik model..."
                 />
@@ -1041,7 +1055,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Alamat Lengkap Madrasah</label>
                 <input
                   type="text"
-                  value={formDataModul.schoolAddress}
+                  value={formDataModul.schoolAddress || ""}
                   onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, schoolAddress: e.target.value } }))}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
@@ -1049,12 +1063,27 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
               <div>
                 <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Mata Pelajaran</label>
-                <input
-                  type="text"
+                <select
                   value={formDataModul.subject}
-                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, subject: e.target.value } }))}
+                  onChange={(e) => {
+                    const subj = e.target.value;
+                    const mapelData = DATA_MAPEL_KEMENAG.find(m => m.name === subj);
+                    updateState(s => ({
+                      ...s,
+                      curriculum: {
+                        ...s.curriculum,
+                        subject: subj,
+                        singkatanMapel: mapelData ? mapelData.short : s.curriculum.singkatanMapel
+                      }
+                    }));
+                  }}
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
+                >
+                  <option value="">-- Pilih Mata Pelajaran --</option>
+                  {DATA_MAPEL_KEMENAG.map(mapel => (
+                    <option key={mapel.name} value={mapel.name}>{mapel.name}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
