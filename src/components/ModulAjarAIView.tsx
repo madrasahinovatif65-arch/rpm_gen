@@ -160,7 +160,12 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
   }, [form.kelas]);
 
   const [loading, setLoading] = useState(false);
-  const [generatedHtml, setGeneratedHtml] = useState<string>("");
+  const [generatedHtml, setGeneratedHtml] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("modul_ajar_ai_html_cache") || "";
+    }
+    return "";
+  });
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
 
@@ -207,6 +212,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
       if (res.status === "success" && res.html) {
         const cleaned = cleanHtmlContent(res.html);
         setGeneratedHtml(cleaned);
+        localStorage.setItem("modul_ajar_ai_html_cache", cleaned);
         notifySimpanSuccess("Modul Ajar AI berhasil dibuat dan siap dicetak!");
       } else {
         throw new Error((res as any).message || "Gagal membuat modul AI.");
