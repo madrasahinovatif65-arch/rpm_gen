@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { renderToString } from "react-dom/server";
 import { 
   History, 
   Eye, 
@@ -104,7 +105,6 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
   };
 
   const handleDownloadWord = (doc: PerangkatDoc) => {
-    const { renderToString } = require("react-dom/server");
     const htmlToPrint = renderToString(renderPreviewDocument(doc));
     
     const content = `
