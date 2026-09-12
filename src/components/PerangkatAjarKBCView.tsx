@@ -1041,15 +1041,24 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   onChange={(e) => {
                     const selectedKode = e.target.value;
                     const tpList = generatedJson["tp"]?.daftarTp || [];
+                    const atpList = generatedJson["atp"]?.alur || [];
                     const selectedTp = tpList.find((t: any) => t.kodeTp === selectedKode);
+                    
                     if (selectedTp) {
+                      // Attempt to find matching ATP for context
+                      const matchingAtp = atpList.find((a: any) => a.kodeTp === selectedKode);
+                      const autofillKonteks = matchingAtp 
+                        ? `${matchingAtp.materiPokok} (${matchingAtp.integrasiNilai})` 
+                        : selectedTp.integrasiNilai;
+
                       updateState(s => ({ 
                         ...s, 
                         module: { 
                           ...s.module, 
                           kodeTp: selectedTp.kodeTp,
                           elemenCp: selectedTp.elemen,
-                          rumusanTp: selectedTp.rumusanTp
+                          rumusanTp: selectedTp.rumusanTp,
+                          konteksLokal: autofillKonteks
                         } 
                       }));
                     }
