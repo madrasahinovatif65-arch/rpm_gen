@@ -24,7 +24,7 @@ export const getAiClient = () => {
 };
 
 // Helper for resilient Gemini API calls with model fallback and exponential retry
-const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any) => {
+const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any, config?: any) => {
   if (!ai) {
     throw new Error("GEMINI_API_KEY tidak dikonfigurasi.");
   }
@@ -36,7 +36,8 @@ const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any) =
       try {
         const response = await ai.models.generateContent({
           model: modelCandidate,
-          contents
+          contents,
+          config
         });
         if (response && response.text) {
           return response;
@@ -91,7 +92,11 @@ export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPromp
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const response = await generateContentWithRetry(ai, [{ role: "user", parts: [{ text: currentPrompt }] }]);
+      const response = await generateContentWithRetry(
+        ai, 
+        [{ role: "user", parts: [{ text: currentPrompt }] }],
+        { responseMimeType: "application/json" }
+      );
       let text = response?.text || "";
       text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
       
@@ -108,11 +113,11 @@ export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPromp
       }
     } catch (err: any) {
       console.warn(`JSON parsing failed on attempt ${attempt + 1}:`, err);
-      // Jika ini bukan error karena JSON parse (misalnya error API Rate Limit 429), lemparkan ke atas
-      if (!(err instanceof SyntaxError) && !err.message?.includes("Unexpected token")) {
+      // Jika ini bukan error karena JSON parse, lemparkan ke atas
+      if (!(err instanceof SyntaxError) && !err.message?.includes("Unexpected token") && !err.message?.includes("Unexpected end of JSON")) {
         throw err;
       }
-      currentPrompt = `You previously returned invalid JSON that could not be parsed. Error: ${String(err)}\n\nPlease ensure your response is ONLY a valid JSON object with no extra text.`;
+      currentPrompt = `You previously returned invalid JSON that could not be parsed. Error: ${String(err)}\n\nPlease ensure your response is ONLY a valid JSON object. Do not include markdown blocks.`;
     }
   }
   
