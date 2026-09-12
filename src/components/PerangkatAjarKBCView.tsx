@@ -1437,7 +1437,11 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               size="sm"
               icon={Printer}
               onClick={handlePrintF4}
-              disabled={!generatedDocs[activeDoc]}
+              disabled={
+                !(activeDoc === "modul_ajar" 
+                  ? (generatedJson["modul_ajar_umum"] || generatedDocs["modul_ajar_umum"] || jobs["modul_ajar_umum"]?.data) 
+                  : (generatedJson[activeDoc] || generatedDocs[activeDoc] || jobs[activeDoc]?.data))
+              }
             >
               Cetak F4
             </Button>
@@ -1447,7 +1451,11 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               size="sm"
               icon={Download}
               onClick={handleDownloadWord}
-              disabled={!generatedDocs[activeDoc]}
+              disabled={
+                !(activeDoc === "modul_ajar" 
+                  ? (generatedJson["modul_ajar_umum"] || generatedDocs["modul_ajar_umum"] || jobs["modul_ajar_umum"]?.data) 
+                  : (generatedJson[activeDoc] || generatedDocs[activeDoc] || jobs[activeDoc]?.data))
+              }
             >
               Unduh Word (.doc)
             </Button>
@@ -1455,34 +1463,44 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </div>
 
         <div className="p-6 overflow-x-auto min-h-[500px] bg-slate-50 dark:bg-slate-900">
-          {generatedDocs[activeDoc] ? (
-            <div id="kbc-document-render-area" className="a4-preview-container bg-white text-black p-8 rounded-lg shadow-inner min-h-[800px] relative">
-              {renderDocument(activeDoc)}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-              <div className="w-16 h-16 bg-emerald-100 dark:bg-slate-800 text-emerald-600 rounded-full flex items-center justify-center">
-                <HeartHandshake className="w-8 h-8" />
+          {(() => {
+            const hasContent = activeDoc === "modul_ajar"
+              ? (generatedJson["modul_ajar_umum"] || generatedDocs["modul_ajar_umum"] || jobs["modul_ajar_umum"]?.data)
+              : (generatedJson[activeDoc] || generatedDocs[activeDoc] || jobs[activeDoc]?.data);
+              
+            if (hasContent) {
+              return (
+                <div id="kbc-document-render-area" className="a4-preview-container bg-white text-black p-8 rounded-lg shadow-inner min-h-[800px] relative">
+                  {renderDocument(activeDoc)}
+                </div>
+              );
+            }
+            
+            return (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                <div className="w-16 h-16 bg-emerald-100 dark:bg-slate-800 text-emerald-600 rounded-full flex items-center justify-center">
+                  <HeartHandshake className="w-8 h-8" />
+                </div>
+                <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-lg">
+                  Belum ada dokumen {docTypeList.find((d) => d.id === activeDoc)?.label}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
+                  Klik tombol "Generate {docTypeList.find((d) => d.id === activeDoc)?.label}" di atas untuk menyusun dokumen KBC secara otomatis menggunakan AI.
+                </p>
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="md"
+                  icon={Sparkles}
+                  loading={isGenerating}
+                  onClick={() => handleGenerateDoc(activeDoc)}
+                  disabled={isGenerating}
+                >
+                  Mulai Generate {docTypeList.find((d) => d.id === activeDoc)?.label}
+                </Button>
               </div>
-              <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-lg">
-                Belum ada dokumen {docTypeList.find((d) => d.id === activeDoc)?.label}
-              </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
-                Klik tombol "Generate {docTypeList.find((d) => d.id === activeDoc)?.label}" di atas untuk menyusun dokumen KBC secara otomatis menggunakan AI.
-              </p>
-              <Button
-                type="button"
-                variant="primary"
-                size="md"
-                icon={Sparkles}
-                loading={isGenerating}
-                onClick={() => handleGenerateDoc(activeDoc)}
-                disabled={isGenerating}
-              >
-                Mulai Generate {docTypeList.find((d) => d.id === activeDoc)?.label}
-              </Button>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </div>
       
