@@ -22,7 +22,8 @@ function getDocTitle(docType: string, formData: any): string {
     kktp: "KKTP",
     modul_ajar_umum: "Modul Ajar",
     lkpd: "LKPD",
-    rubrik: "Rubrik Penilaian"
+    rubrik: "Rubrik Penilaian",
+    modul_ajar_ai_html: "Modul Ajar AI (Full HTML)"
   };
   
   // Handle meeting docs

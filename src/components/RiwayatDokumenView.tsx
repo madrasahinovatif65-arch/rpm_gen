@@ -64,6 +64,38 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
         return <ModulAjarRenderer umum={doc.data} meetings={[]} context={normalizedContext} />;
       case 'lkpd': return <LkpdRenderer data={doc.data} context={normalizedContext} />;
       case 'rubrik': return <RubrikRenderer data={doc.data} context={normalizedContext} />;
+      case 'modul_ajar_ai_html':
+        return (
+          <div className="overflow-x-auto pb-8">
+            <div 
+               className="mx-auto bg-white shadow-xl border border-slate-200 relative" 
+               style={{ 
+                 width: '816px', 
+                 minHeight: '1248px', 
+                 padding: '48px',
+                 boxSizing: 'border-box'
+               }}
+            >
+              <style>{`
+                .preview-modul-ai { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.25; color: #000000; }
+                .preview-modul-ai h1 { font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 14pt; text-transform: uppercase; color: #000000; border: none; font-family: 'Times New Roman', Times, serif; }
+                .preview-modul-ai h2 { font-size: 12pt; font-weight: bold; border-bottom: 1.5pt solid #000000; padding-bottom: 3pt; margin-top: 16pt; margin-bottom: 8pt; color: #000000; text-transform: uppercase; }
+                .preview-modul-ai h3 { font-size: 11pt; font-weight: bold; margin-top: 12pt; margin-bottom: 6pt; color: #000000; }
+                .preview-modul-ai p { margin-bottom: 6pt; text-align: justify; color: #000000; }
+                .preview-modul-ai table { width: 100%; border-collapse: collapse; margin-bottom: 12pt; }
+                .preview-modul-ai th { border: 1px solid #000000; padding: 6pt 8pt; vertical-align: middle; text-align: center; font-size: 10pt; font-weight: bold; background-color: #1e3a8a !important; color: #ffffff !important; }
+                .preview-modul-ai td { border: 1px solid #000000; padding: 6pt 8pt; vertical-align: top; text-align: left; font-size: 10pt; color: #000000 !important; background-color: #ffffff !important; }
+                .preview-modul-ai ul, .preview-modul-ai ol { margin-bottom: 6pt; padding-left: 18pt; }
+                .preview-modul-ai li { margin-bottom: 3pt; color: #000000; }
+                .preview-modul-ai img { max-height: 75px; width: auto; object-fit: contain; float: left; margin-right: 15px; }
+              `}</style>
+              <div
+                dangerouslySetInnerHTML={{ __html: doc.data?.html || "" }}
+                className="preview-modul-ai"
+              />
+            </div>
+          </div>
+        );
       default:
         if (doc.docType.startsWith('modul_ajar_meeting_')) {
            return <ModulAjarRenderer umum={{} as any} meetings={[doc.data]} context={normalizedContext} />;
@@ -167,7 +199,7 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
       
       const mainTypes = [
         "analisis_cp", "tp", "atp", "prota", "prosem", "kktp", 
-        "modul_ajar_umum", "lkpd", "rubrik"
+        "modul_ajar_umum", "lkpd", "rubrik", "modul_ajar_ai_html"
       ];
 
       const docsToExport: PerangkatDoc[] = [];
@@ -187,6 +219,37 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
       }
 
       const exportFiles = docsToExport.map(doc => {
+        if (doc.docType === 'modul_ajar_ai_html') {
+          const header = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+              <meta charset='utf-8'>
+              <title>${doc.docTitle}</title>
+              <style>
+                @page { size: 8.5in 13in; margin: 0.5in; }
+                body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.25; color: #000000; }
+                h1 { font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 14pt; text-transform: uppercase; color: #000000; }
+                h2 { font-size: 12pt; font-weight: bold; border-bottom: 1.5pt solid #000000; padding-bottom: 3pt; margin-top: 16pt; margin-bottom: 8pt; color: #000000; text-transform: uppercase; }
+                h3 { font-size: 11pt; font-weight: bold; margin-top: 12pt; margin-bottom: 6pt; color: #000000; }
+                p { margin-bottom: 6pt; text-align: justify; color: #000000; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 12pt; page-break-inside: auto; }
+                thead { display: table-header-group; }
+                tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+                th { border: 1pt solid #000000; padding: 6pt 8pt; vertical-align: middle; text-align: center; font-size: 10pt; font-weight: bold; background-color: #1e3a8a !important; color: #ffffff !important; }
+                td { border: 1pt solid #000000; padding: 6pt 8pt; vertical-align: top; text-align: left; font-size: 10pt; color: #000000 !important; background-color: #ffffff !important; }
+                ul, ol { margin-bottom: 6pt; padding-left: 18pt; }
+                li { margin-bottom: 3pt; color: #000000; }
+              </style>
+            </head>
+            <body>
+          `;
+          return {
+            filename: doc.docTitle,
+            content: header + (doc.data?.html || "") + "</body></html>",
+            folder: "modul" as "admin" | "modul"
+          };
+        }
+
         const htmlToPrint = renderToString(renderPreviewDocument(doc));
         const isLandscape = doc.docType === "atp" || doc.docType === "prosem" || doc.docType === "kktp" || doc.docType === "rubrik";
         const size = isLandscape ? "13in 8.5in" : "8.5in 13in";

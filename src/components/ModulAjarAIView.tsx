@@ -8,6 +8,7 @@ import { KamusPedagogiModal } from "./KamusPedagogiModal";
 import { useKbcState } from "../store/kbcState";
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-supabase";
+import { saveGeneratedDoc } from "../lib/perangkatKbcStorage";
 
 interface ModulAjarAIViewProps {
   config: Pengaturan;
@@ -213,6 +214,17 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
         const cleaned = cleanHtmlContent(res.html);
         setGeneratedHtml(cleaned);
         localStorage.setItem("modul_ajar_ai_html_cache", cleaned);
+        
+        try {
+          const userStr = localStorage.getItem('edadmin_user');
+          const user = userStr ? JSON.parse(userStr) : {};
+          const username = user.username || user.nama || 'anonim';
+          
+          await saveGeneratedDoc("modul_ajar_ai_html", { html: cleaned }, form, username);
+        } catch (saveErr) {
+          console.warn("Failed to save Modul Ajar AI to Firestore history:", saveErr);
+        }
+
         notifySimpanSuccess("Modul Ajar AI berhasil dibuat dan siap dicetak!");
       } else {
         throw new Error((res as any).message || "Gagal membuat modul AI.");
