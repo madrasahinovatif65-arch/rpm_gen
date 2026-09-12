@@ -106,8 +106,12 @@ export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPromp
         console.warn(`JSON validation failed on attempt ${attempt + 1}:`, errorMsg);
         currentPrompt = `You previously returned invalid JSON. Please fix the following validation errors:\n${errorMsg}\n\nPrevious JSON:\n${text}\n\nReturn ONLY the corrected JSON object.`;
       }
-    } catch (err) {
+    } catch (err: any) {
       console.warn(`JSON parsing failed on attempt ${attempt + 1}:`, err);
+      // Jika ini bukan error karena JSON parse (misalnya error API Rate Limit 429), lemparkan ke atas
+      if (!(err instanceof SyntaxError) && !err.message?.includes("Unexpected token")) {
+        throw err;
+      }
       currentPrompt = `You previously returned invalid JSON that could not be parsed. Error: ${String(err)}\n\nPlease ensure your response is ONLY a valid JSON object with no extra text.`;
     }
   }
