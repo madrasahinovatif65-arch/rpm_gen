@@ -18,7 +18,6 @@ import {
 import { PerangkatDoc } from "../types";
 import { subscribePerangkatDocs, deletePerangkatDoc } from "../lib/perangkatKbcStorage";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
-import { exportAll9Documents } from "../lib/exportBatchZip";
 import { Button } from "./ui/Button";
 import { Badge } from "./ui/Badge";
 import { Card } from "./ui/Card";
@@ -164,7 +163,66 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
 
   const handleExportAll = async () => {
     try {
-      await exportAll9Documents(docs);
+      const { exportDocumentsAsZip } = await import("../lib/exportBatchZip");
+      
+      const mainTypes = [
+        "analisis_cp", "tp", "atp", "prota", "prosem", "kktp", 
+        "modul_ajar_umum", "lkpd", "rubrik"
+      ];
+
+      const docsToExport: PerangkatDoc[] = [];
+      for (const type of mainTypes) {
+        const latestDoc = docs
+          .filter(d => d.docType === type)
+          .sort((a, b) => b.createdAt - a.createdAt)[0];
+        if (latestDoc) docsToExport.push(latestDoc);
+      }
+
+      const modulMeetings = docs.filter(d => d.docType.startsWith("modul_ajar_meeting_"));
+      docsToExport.push(...modulMeetings);
+
+      if (docsToExport.length === 0) {
+        notifySimpanError("Belum ada dokumen untuk diekspor");
+        return;
+      }
+
+      const exportFiles = docsToExport.map(doc => {
+        const htmlToPrint = renderToString(renderPreviewDocument(doc));
+        const isLandscape = doc.docType === "atp" || doc.docType === "prosem" || doc.docType === "kktp" || doc.docType === "rubrik";
+        const size = isLandscape ? "13in 8.5in" : "8.5in 13in";
+        const margin = "0.5in 0.5in 0.5in 0.5in";
+
+        const content = `
+          <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+          <head>
+            <meta charset='utf-8'>
+            <title>${doc.docTitle}</title>
+            <style>
+              @page WordSection1 { size: ${size}; margin: ${margin}; mso-header-margin: 0.5in; mso-footer-margin: 0.5in; mso-paper-source: 0; }
+              div.WordSection1 { page: WordSection1; }
+              body { font-family: Arial, sans-serif; color: #000; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+              th, td { border: 1px solid #333; padding: 6px; font-size: 10pt; }
+              th { background-color: #eee; }
+            </style>
+          </head>
+          <body>
+            <div class="WordSection1">${htmlToPrint}</div>
+          </body>
+          </html>
+        `;
+
+        const isModulDoc = doc.docType === "modul_ajar_umum" || doc.docType.startsWith("modul_ajar_meeting_") || doc.docType === "lkpd" || doc.docType === "rubrik";
+        
+        return {
+          filename: doc.docTitle,
+          content: content,
+          folder: isModulDoc ? "modul" : "admin" as "admin" | "modul"
+        };
+      });
+
+      const timestamp = new Date().toISOString().slice(0, 10);
+      await exportDocumentsAsZip(exportFiles, `Perangkat_KBC_Lengkap_${timestamp}.zip`);
       notifyUnduhSuccess("Ekspor ZIP berhasil!");
     } catch (err: any) {
       notifySimpanError(`Gagal ekspor: ${err.message}`);
