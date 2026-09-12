@@ -104,14 +104,25 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
   };
 
   const handleDownloadWord = (doc: PerangkatDoc) => {
+    const { renderToString } = require("react-dom/server");
+    const htmlToPrint = renderToString(renderPreviewDocument(doc));
+    
     const content = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>${doc.docTitle}</title></head><body>
-      <h1>${doc.docTitle}</h1>
-      <p><strong>Sekolah:</strong> ${doc.schoolName}</p>
-      <p><strong>Mata Pelajaran:</strong> ${doc.subject}</p>
-      <pre>${JSON.stringify(doc.data, null, 2)}</pre>
-      </body></html>
+      <head>
+        <meta charset='utf-8'>
+        <title>${doc.docTitle}</title>
+        <style>
+          body { font-family: Arial, sans-serif; color: #000; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+          th, td { border: 1px solid #333; padding: 6px; font-size: 10pt; }
+          th { background-color: #eee; }
+        </style>
+      </head>
+      <body>
+      ${htmlToPrint}
+      </body>
+      </html>
     `;
     const blob = new Blob([content], { type: "application/msword" });
     const url = URL.createObjectURL(blob);
