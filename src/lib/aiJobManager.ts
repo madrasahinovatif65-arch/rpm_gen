@@ -22,28 +22,47 @@ let isProcessingQueue = false;
 
 // Hydrate jobsRecord from localStorage on startup
 const loadInitialJobsRecord = (): Record<string, AIJob> => {
+  if (typeof window === "undefined") return {};
   const initial: Record<string, AIJob> = {};
+  const mainTypes = [
+    "analisis_cp", "tp", "atp", "prota", "prosem", "kktp", 
+    "modul_ajar_umum", "lkpd", "rubrik"
+  ];
+
   try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("kbc_cache_")) {
-        const jobId = key.replace("kbc_cache_", "");
-        const dataStr = localStorage.getItem(key);
-        if (dataStr) {
-          initial[jobId] = {
-            id: jobId,
-            docType: jobId,
-            status: "success",
-            progressMessage: "Dimuat dari riwayat lokal",
-            data: JSON.parse(dataStr),
-            lastUpdated: Date.now()
-          };
-        }
+    mainTypes.forEach(type => {
+      const dataStr = localStorage.getItem(`kbc_cache_${type}`);
+      if (dataStr) {
+        initial[type] = {
+          id: type,
+          docType: type,
+          status: "success",
+          progressMessage: "Dimuat dari riwayat lokal",
+          data: JSON.parse(dataStr),
+          lastUpdated: Date.now()
+        };
+      }
+    });
+
+    // Load up to 50 possible meetings
+    for (let i = 1; i <= 50; i++) {
+      const meetingKey = `modul_ajar_meeting_${i}`;
+      const dataStr = localStorage.getItem(`kbc_cache_${meetingKey}`);
+      if (dataStr) {
+        initial[meetingKey] = {
+          id: meetingKey,
+          docType: meetingKey,
+          status: "success",
+          progressMessage: "Dimuat dari riwayat lokal",
+          data: JSON.parse(dataStr),
+          lastUpdated: Date.now()
+        };
       }
     }
   } catch (e) {
     console.warn("Failed to load initial cache", e);
   }
+
   return initial;
 };
 

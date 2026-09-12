@@ -514,18 +514,32 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   const renderDocument = (docType: string) => {
     // Penanganan khusus untuk Modul Ajar karena ia tidak memiliki key tunggal di generatedJson
     if (docType === "modul_ajar") {
-      const umum = generatedJson['modul_ajar_umum'];
+      const umum = generatedJson['modul_ajar_umum'] || jobs['modul_ajar_umum']?.data;
+      
+      // Jika belum ada data umum, tetapi statusnya sudah sukses, berarti ada masalah state
+      if (!umum && jobs['modul_ajar_umum']?.status === "success") {
+         return <div className="p-4 bg-red-100 text-red-700">Data Modul Ajar Umum gagal dimuat meskipun status sukses. Mohon muat ulang halaman.</div>;
+      }
+      
       if (!umum && !generatedDocs["modul_ajar"]) {
-         return <div dangerouslySetInnerHTML={{ __html: "" }} />;
+         return (
+           <div className="flex flex-col items-center justify-center py-10 text-slate-500">
+             <Layers className="w-12 h-12 mb-3 opacity-20" />
+             <p>Belum ada pratinjau Modul Ajar.</p>
+             <p className="text-sm">Silakan isi formulir dan klik "Generate Modul + LKPD + Rubrik" terlebih dahulu.</p>
+           </div>
+         );
       }
       
       const meetings: any[] = [];
       const jml = parseInt(state.module.jumlahPertemuan || "1", 10);
       for (let i = 1; i <= jml; i++) {
-        if (generatedJson[`modul_ajar_meeting_${i}`]) {
-          meetings.push(generatedJson[`modul_ajar_meeting_${i}`]);
+        const meetingData = generatedJson[`modul_ajar_meeting_${i}`] || jobs[`modul_ajar_meeting_${i}`]?.data;
+        if (meetingData) {
+          meetings.push(meetingData);
         }
       }
+      
       return <ModulAjarRenderer umum={umum} meetings={meetings} context={state} />;
     }
 
