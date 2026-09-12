@@ -229,7 +229,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
           <meta charset='utf-8'>
           <title>Modul Ajar Deep Learning</title>
           <style>
-            @page { size: A4 portrait; margin: 2cm 1.5cm 2cm 1.5cm; }
+            @page { size: 8.5in 13in; margin: 0.5in; }
             body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.25; color: #000000; }
             h1 { font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 14pt; text-transform: uppercase; color: #000000; }
             h2 { font-size: 12pt; font-weight: bold; border-bottom: 1.5pt solid #000000; padding-bottom: 3pt; margin-top: 16pt; margin-bottom: 8pt; color: #000000; text-transform: uppercase; }
@@ -281,7 +281,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
         <head>
           <title>Cetak Modul Ajar - ${form.topik}</title>
           <style>
-            @page { size: A4 portrait; margin: 1.5cm; }
+            @page { size: 8.5in 13in; margin: 0.5in; }
             body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.25; color: #000000; margin: 0; padding: 0; }
             h1 { font-size: 16pt; text-align: center; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; color: #000000; }
             h2 { font-size: 12pt; font-weight: bold; border-bottom: 1.5px solid #000000; padding-bottom: 4px; margin-top: 18px; margin-bottom: 8px; color: #000000; text-transform: uppercase; }
@@ -653,11 +653,34 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
           )}
 
           {generatedHtml && !loading && (
-            <div className="max-w-3xl mx-auto bg-white text-slate-900 p-8 sm:p-12 shadow-xl rounded-xl border border-slate-200 text-xs leading-relaxed space-y-4 font-serif">
-              <div
-                dangerouslySetInnerHTML={{ __html: generatedHtml }}
-                className="prose max-w-none prose-headings:font-sans prose-h1:text-xl prose-h1:font-black prose-h1:text-center prose-h1:text-blue-900 prose-h2:text-sm prose-h2:font-bold prose-h2:border-b-2 prose-h2:border-blue-900 prose-h2:pb-1 prose-h2:mt-6 prose-table:w-full prose-table:border-collapse prose-th:border prose-th:border-slate-700 prose-th:p-2.5 prose-th:bg-blue-900 prose-th:text-white prose-th:font-bold prose-th:text-center prose-td:border prose-td:border-slate-300 prose-td:p-2 prose-td:text-slate-800"
-              />
+            <div className="overflow-x-auto pb-8">
+              <div 
+                 className="mx-auto bg-white shadow-xl border border-slate-200 relative" 
+                 style={{ 
+                   width: '816px', 
+                   minHeight: '1248px', 
+                   padding: '48px',
+                   boxSizing: 'border-box'
+                 }}
+              >
+                <style>{`
+                  .preview-modul-ai { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.25; color: #000000; }
+                  .preview-modul-ai h1 { font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 14pt; text-transform: uppercase; color: #000000; border: none; font-family: 'Times New Roman', Times, serif; }
+                  .preview-modul-ai h2 { font-size: 12pt; font-weight: bold; border-bottom: 1.5pt solid #000000; padding-bottom: 3pt; margin-top: 16pt; margin-bottom: 8pt; color: #000000; text-transform: uppercase; }
+                  .preview-modul-ai h3 { font-size: 11pt; font-weight: bold; margin-top: 12pt; margin-bottom: 6pt; color: #000000; }
+                  .preview-modul-ai p { margin-bottom: 6pt; text-align: justify; color: #000000; }
+                  .preview-modul-ai table { width: 100%; border-collapse: collapse; margin-bottom: 12pt; }
+                  .preview-modul-ai th { border: 1px solid #000000; padding: 6pt 8pt; vertical-align: middle; text-align: center; font-size: 10pt; font-weight: bold; background-color: #1e3a8a !important; color: #ffffff !important; }
+                  .preview-modul-ai td { border: 1px solid #000000; padding: 6pt 8pt; vertical-align: top; text-align: left; font-size: 10pt; color: #000000 !important; background-color: #ffffff !important; }
+                  .preview-modul-ai ul, .preview-modul-ai ol { margin-bottom: 6pt; padding-left: 18pt; }
+                  .preview-modul-ai li { margin-bottom: 3pt; color: #000000; }
+                  .preview-modul-ai img { max-height: 75px; width: auto; object-fit: contain; float: left; margin-right: 15px; }
+                `}</style>
+                <div
+                  dangerouslySetInnerHTML={{ __html: generatedHtml }}
+                  className="preview-modul-ai"
+                />
+              </div>
             </div>
           )}
         </div>
