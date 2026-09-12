@@ -18,8 +18,36 @@ export interface AIJob {
 
 // In-memory queue state (can be hooked up to React state later)
 let jobQueue: string[] = [];
-let jobsRecord: Record<string, AIJob> = {};
 let isProcessingQueue = false;
+
+// Hydrate jobsRecord from localStorage on startup
+const loadInitialJobsRecord = (): Record<string, AIJob> => {
+  const initial: Record<string, AIJob> = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("kbc_cache_")) {
+        const jobId = key.replace("kbc_cache_", "");
+        const dataStr = localStorage.getItem(key);
+        if (dataStr) {
+          initial[jobId] = {
+            id: jobId,
+            docType: jobId,
+            status: "success",
+            progressMessage: "Dimuat dari riwayat lokal",
+            data: JSON.parse(dataStr),
+            lastUpdated: Date.now()
+          };
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Failed to load initial cache", e);
+  }
+  return initial;
+};
+
+let jobsRecord: Record<string, AIJob> = loadInitialJobsRecord();
 
 type QueueListener = (jobs: Record<string, AIJob>) => void;
 let listeners: QueueListener[] = [];
