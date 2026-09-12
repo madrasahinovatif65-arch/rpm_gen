@@ -219,6 +219,8 @@ export const AtpRenderer: React.FC<RendererProps> = ({ data, context }) => {
             <TableHeader>Tujuan Pembelajaran</TableHeader>
             <TableHeader>Materi Pokok</TableHeader>
             <TableHeader>Integrasi Nilai</TableHeader>
+            <TableHeader>Kelas</TableHeader>
+            <TableHeader>Rasionalisasi Kelas</TableHeader>
             <TableHeader>JP</TableHeader>
             <TableHeader>Semester</TableHeader>
           </tr>
@@ -232,6 +234,8 @@ export const AtpRenderer: React.FC<RendererProps> = ({ data, context }) => {
               <Td>{item.rumusanTp}</Td>
               <Td>{item.materiPokok}</Td>
               <Td>{item.integrasiNilai}</Td>
+              <Td align="center"><strong>{item.kelas}</strong></Td>
+              <Td><em style={{ fontSize: '0.85em', color: '#475569' }}>{item.rasionalisasiKelas || '-'}</em></Td>
               <Td align="center"><strong>{item.alokasiJp}</strong></Td>
               <Td align="center">{item.semester}</Td>
             </tr>

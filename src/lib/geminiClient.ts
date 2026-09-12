@@ -621,7 +621,8 @@ ${JSON.stringify(optimizedData, null, 2)}
 PENTING:
 - Fokus utama Anda adalah merumuskan (reasoning) materi pokok, kompetensi, dan memecah Capaian Pembelajaran.
 - ABAIKAN kalkulasi matematika presisi terkait "Alokasi JP" atau "kodeTp" karena sistem kami memiliki Data Normalizer yang akan menimpa angka JP dan kode TP tersebut. Anda cukup memberi estimasi nilai (misal 1 atau 2).
-- Pastikan setiap array terisi dengan struktur yang valid.`;
+- Pastikan setiap array terisi dengan struktur yang valid.
+- KHUSUS UNTUK ATP JIKA MELIBATKAN LEBIH DARI 1 KELAS (SATU FASE): Kamu WAJIB membaginya ke dalam kelas yang relevan (misal Kelas 1 dan Kelas 2). Kamu WAJIB mengisi properti "rasionalisasiKelas" dengan alasan logis pedagogik mengapa materi tersebut diletakkan di kelas tersebut, berdasarkan 4 tolok ukur: (1) Konkret ke Abstrak, (2) Hierarki/Prasyarat, (3) Cakupan Lingkungan (dekat ke jauh), atau (4) Gradasi Taksonomi Bloom (Kognitif C1-C6).`;
   }
 
   // Context Builder untuk Modul Ajar Umum

@@ -1,4 +1,4 @@
-﻿import { z } from 'zod';
+import { z } from 'zod';
 
 // 1. Analisis CP (ACP)
 export const AcpSchema = z.object({
@@ -46,6 +46,8 @@ export const AtpSchema = z.object({
     kompetensi: z.string(),
     integrasiNilai: z.string(),
     alokasiJp: z.number(),
+    kelas: z.string().describe("Kelas spesifik, misal 'Kelas 1' atau 'Kelas 2'"),
+    rasionalisasiKelas: z.string().describe("Alasan logis pedagogik mengapa TP ini diletakkan di kelas tersebut (berdasarkan Konkret-Abstrak, Prasyarat, Cakupan, atau Taksonomi Bloom)").optional(),
     semester: z.number()
   }))
 });
