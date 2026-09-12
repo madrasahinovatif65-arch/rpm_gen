@@ -469,11 +469,35 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     }
     const docMeta = docTypeList.find((d) => d.id === activeDoc);
     const title = docMeta?.fullTitle || "Dokumen_KBC";
+    
+    // Tentukan orientasi berdasarkan jenis dokumen
+    const isLandscape = activeDoc === "atp" || activeDoc === "prosem" || activeDoc === "kktp" || activeDoc === "rubrik";
+    // Ukuran F4: 8.5in x 13in. Margin Narrow: 0.5in
+    const size = isLandscape ? "13in 8.5in" : "8.5in 13in";
+    const margin = "0.5in 0.5in 0.5in 0.5in";
+
     const content = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>${title}</title></head><body>
-      ${htmlToPrint}
-      </body></html>
+      <head>
+        <meta charset='utf-8'>
+        <title>${title}</title>
+        <style>
+          @page WordSection1 {
+            size: ${size};
+            margin: ${margin};
+            mso-header-margin: 0.5in;
+            mso-footer-margin: 0.5in;
+            mso-paper-source: 0;
+          }
+          div.WordSection1 { page: WordSection1; }
+        </style>
+      </head>
+      <body>
+        <div class="WordSection1">
+          ${htmlToPrint}
+        </div>
+      </body>
+      </html>
     `;
     const blob = new Blob([content], { type: "application/msword" });
     const url = URL.createObjectURL(blob);

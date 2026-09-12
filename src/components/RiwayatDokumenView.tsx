@@ -107,12 +107,27 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
   const handleDownloadWord = (doc: PerangkatDoc) => {
     const htmlToPrint = renderToString(renderPreviewDocument(doc));
     
+    // Tentukan orientasi berdasarkan jenis dokumen
+    const isLandscape = doc.docType === "atp" || doc.docType === "prosem" || doc.docType === "kktp" || doc.docType === "rubrik";
+    
+    // Ukuran F4: 8.5in x 13in. Margin Narrow: 0.5in
+    const size = isLandscape ? "13in 8.5in" : "8.5in 13in";
+    const margin = "0.5in 0.5in 0.5in 0.5in";
+
     const content = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head>
         <meta charset='utf-8'>
         <title>${doc.docTitle}</title>
         <style>
+          @page WordSection1 {
+            size: ${size};
+            margin: ${margin};
+            mso-header-margin: 0.5in;
+            mso-footer-margin: 0.5in;
+            mso-paper-source: 0;
+          }
+          div.WordSection1 { page: WordSection1; }
           body { font-family: Arial, sans-serif; color: #000; }
           table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
           th, td { border: 1px solid #333; padding: 6px; font-size: 10pt; }
@@ -120,7 +135,9 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
         </style>
       </head>
       <body>
-      ${htmlToPrint}
+        <div class="WordSection1">
+          ${htmlToPrint}
+        </div>
       </body>
       </html>
     `;
