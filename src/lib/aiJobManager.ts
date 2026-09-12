@@ -1,5 +1,6 @@
 import { generatePerangkatAjarKBCAPI } from "./geminiClient";
 import { normalizeTpData, normalizeAtpData } from "./dataNormalizers";
+import { notifySimpanError, notifySimpanSuccess } from "./swal";
 
 export type JobStatus = "idle" | "running" | "success" | "failed";
 
@@ -180,6 +181,7 @@ const processQueue = async (formData: any) => {
       error: error.message,
       lastUpdated: Date.now()
     };
+    notifySimpanError(`Gagal memproses ${job.docType}: ${error.message}`);
   }
 
   notifyListeners();

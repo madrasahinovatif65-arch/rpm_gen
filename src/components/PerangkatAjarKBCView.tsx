@@ -1354,6 +1354,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   {isFinished && (
                     <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white"></span>
                   )}
+                  {jobStatus === "failed" && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white"></span>
+                  )}
                 </div>
                 <span className="text-[10px] font-medium text-center leading-tight mt-1">{doc.label}</span>
               </button>
