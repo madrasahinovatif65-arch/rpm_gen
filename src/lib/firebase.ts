@@ -81,7 +81,8 @@ export const firestore = firestoreInstance;
 export const COLLECTIONS = {
   PENGATURAN: "pengaturan",
   KBC_STATE: "kbc_state",
-  PERANGKAT_KBC: "perangkat_kbc"
+  PERANGKAT_KBC: "perangkat_kbc",
+  KALDIK: "kaldik"
 };
 
 // ============================================================
@@ -125,6 +126,29 @@ function getPengaturanDocRef() {
   }
   // Fallback ke global jika userId belum ada
   return doc(firestore, COLLECTIONS.PENGATURAN, 'config');
+}
+
+/**
+ * Path Firestore untuk Kaldik (Selalu Global/Admin)
+ * Menyimpan kalender akademik madrasah
+ */
+export function getKaldikDocRef(tahunAjaran: string) {
+  const safeTahun = tahunAjaran.replace(/\//g, '-'); // e.g. "2024-2025"
+  return doc(firestore, COLLECTIONS.KALDIK, safeTahun);
+}
+
+export async function getKaldik(tahunAjaran: string): Promise<any> {
+  const { getDoc } = await import("firebase/firestore");
+  const docSnap = await getDoc(getKaldikDocRef(tahunAjaran));
+  if (docSnap.exists()) {
+    return docSnap.data();
+  }
+  return null;
+}
+
+export async function saveKaldik(tahunAjaran: string, data: any): Promise<void> {
+  const { setDoc } = await import("firebase/firestore");
+  await setDoc(getKaldikDocRef(tahunAjaran), data, { merge: true });
 }
 
 /**

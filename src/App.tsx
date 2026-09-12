@@ -29,6 +29,7 @@ import { PengaturanView } from "./components/PengaturanView";
 import { ResetDatabaseView } from "./components/ResetDatabaseView";
 import { LoginView } from "./components/LoginView";
 import { SSOCallbackView } from "./components/SSOCallbackView";
+import { KaldikAdminView } from "./components/KaldikAdminView";
 
 import {
   subscribePengaturan,
@@ -308,6 +309,7 @@ export default function App() {
           {activeTab === "riwayat_dokumen" && <RiwayatDokumenView />}
           {activeTab === "cp_database" && <CPDatabaseView config={config} />}
           {activeTab === "modulai" && <ModulAjarAIView config={config} />}
+          {activeTab === "kaldik" && <KaldikAdminView />}
           {activeTab === "asistenai" && <AsistenGuruAIView config={config} />}
           {activeTab === "lkpdai" && <GeneratorLkpdAIView config={config} />}
           {activeTab === "ailainnya" && <GeneratorAILainnyaView />}

@@ -6,6 +6,7 @@ import {
   generateChatAssistantFallback
 } from "./aiGenerators";
 import { KbcSchemas } from "./kbcSchemas";
+import { getKaldik } from "./firebase";
 
 // Initialize Gemini AI Client safely
 export const getAiClient = () => {
@@ -487,6 +488,29 @@ Gunakan format HTML murni tanpa markdown, lengkapi kop sekolah dan tanda tangan 
 export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any) => {
   const ai = getAiClient();
   
+  let kaldikInfo = "";
+  if (docType === "prota" || docType === "prosem") {
+    try {
+      const savedKaldik = await getKaldik(formData.tahunAjaran || "2024/2025");
+      if (savedKaldik) {
+        const isKelas6 = formData.kelas === "VI" || formData.kelas === "6";
+        const sem1 = isKelas6 && savedKaldik.semester1_kls6 ? savedKaldik.semester1_kls6 : savedKaldik.semester1;
+        const sem2 = isKelas6 && savedKaldik.semester2_kls6 ? savedKaldik.semester2_kls6 : savedKaldik.semester2;
+        
+        kaldikInfo = `\nMATRIKS KALENDER AKADEMIK MADRASAH (Tahun Ajaran ${savedKaldik.tahunAjaran}):
+- Semester Ganjil (Kelas ${formData.kelas || "Umum"}):
+${sem1 ? sem1.map((m: any) => `  * ${m.namaBulan}: ${m.totalMinggu} mgg (Efektif: ${m.mingguEfektif}, Tidak Efektif: ${m.mingguTidakEfektif} - ${m.keterangan || "-"})`).join('\n') : "Tidak ada data."}
+- Semester Genap (Kelas ${formData.kelas || "Umum"}):
+${sem2 ? sem2.map((m: any) => `  * ${m.namaBulan}: ${m.totalMinggu} mgg (Efektif: ${m.mingguEfektif}, Tidak Efektif: ${m.mingguTidakEfektif} - ${m.keterangan || "-"})`).join('\n') : "Tidak ada data."}
+
+INSTRUKSI PENTING UNTUK PROTA / PROSEM:
+Sistem telah menyediakan Matriks Kalender Akademik aktual di atas. Kamu WAJIB menyusun Distribusi Alokasi Waktu (Prota/Prosem) berdasarkan jumlah "Minggu Efektif" pada matriks di atas. JANGAN lagi menggunakan asumsi generik (seperti 36 minggu per tahun) apabila Kaldik di atas menunjukkan angka yang berbeda!\n`;
+      }
+    } catch (e) {
+      console.warn("Gagal fetch kaldik", e);
+    }
+  }
+  
   let schemaKey = docType;
   let meetingNumber = 0;
   
@@ -589,7 +613,9 @@ Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model 
 
   // Context Builder untuk Dokumen Administratif (TP, ATP, Prota, Prosem)
   if (["tp", "atp", "prota", "prosem"].includes(schemaKey)) {
-    userPrompt = `Buatkan konten JSON untuk dokumen ${docType} berdasarkan data pendukung berikut:
+    userPrompt = `Tugasmu adalah menghasilkan data JSON sesuai dengan skema JSON yang diminta untuk dokumen: ${docType}.
+${kaldikInfo}
+Ini adalah data mentah (form data) yang diinputkan oleh guru:
 ${JSON.stringify(optimizedData, null, 2)}
 
 PENTING:

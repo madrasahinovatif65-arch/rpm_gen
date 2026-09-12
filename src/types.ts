@@ -39,11 +39,37 @@ export interface Pengaturan {
   siakadRole?: string;          // Role guru di SIAKAD (Guru Mapel, Wali Kelas, dll)
   siakadMapel?: string;         // Mata pelajaran yang diampu (dari SIAKAD)
   siakadRombel?: string;        // Kelas / Rombel yang diampu (dari SIAKAD)
+  siakadKelas?: string;         // Menyimpan data kelas spesifik (misal: 1A, 2B, dst)
   siakadKarakteristik?: string; // Rekap asesmen diagnostik untuk kelas (dari SIAKAD)
   siakadSyncedAt?: number;      // Timestamp terakhir sync dengan SIAKAD
   authProvider?: 'local' | 'siakad';  // Metode autentikasi yang digunakan
 }
 
+// -------------------------------------------------------------
+// TIPE DATA KALENDER AKADEMIK (KALDIK)
+// -------------------------------------------------------------
+export interface KaldikMonth {
+  namaBulan: string;
+  totalMinggu: number;
+  mingguTidakEfektif: number;
+  mingguEfektif: number;
+  keterangan: string;
+}
+
+export interface KaldikData {
+  tahunAjaran: string; // e.g., "2024/2025"
+  
+  // Kaldik Standar (Kelas 1 - 5)
+  semester1: KaldikMonth[]; // Juli - Desember
+  semester2: KaldikMonth[]; // Januari - Juni
+  
+  // Kaldik Khusus (Kelas 6) - karena beda waktu ujian
+  semester1_kls6: KaldikMonth[]; // Juli - Desember
+  semester2_kls6: KaldikMonth[]; // Januari - Juni
+  
+  updatedAt?: number;
+  updatedBy?: string;
+}
 
 export interface ModulFormState {
   namaGuru: string;

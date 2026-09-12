@@ -10,7 +10,8 @@ import {
   X,
   Download,
   Globe,
-  History
+  History,
+  Calendar
 } from "lucide-react";
 import { Badge } from "./ui/Badge";
 
@@ -52,6 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       group: "PENGATURAN",
       items: [
         { id: "pengaturan", label: "Pengaturan & Kop", icon: Settings },
+        { id: "kaldik", label: "Kalender Akademik", icon: Calendar },
         { id: "resetdb", label: "Hapus Database", icon: Trash2, dangerous: true },
       ]
     }
