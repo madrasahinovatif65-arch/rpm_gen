@@ -419,9 +419,6 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                     <option value="Fase A (Kelas 1-2)">Fase A (Kelas 1-2)</option>
                     <option value="Fase B (Kelas 3-4)">Fase B (Kelas 3-4)</option>
                     <option value="Fase C (Kelas 5-6)">Fase C (Kelas 5-6)</option>
-                    <option value="Fase D (Kelas 7-9)">Fase D (Kelas 7-9)</option>
-                    <option value="Fase E (Kelas 10)">Fase E (Kelas 10)</option>
-                    <option value="Fase F (Kelas 11-12)">Fase F (Kelas 11-12)</option>
                   </select>
                 </div>
                 <div>
