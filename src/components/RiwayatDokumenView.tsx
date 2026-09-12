@@ -10,7 +10,9 @@ import {
   BookOpen,
   Check,
   Filter,
-  Package
+  Package,
+  X,
+  Printer
 } from "lucide-react";
 import { PerangkatDoc } from "../types";
 import { subscribePerangkatDocs, deletePerangkatDoc } from "../lib/perangkatKbcStorage";
@@ -19,6 +21,8 @@ import { exportAll9Documents } from "../lib/exportBatchZip";
 import { Button } from "./ui/Button";
 import { Badge } from "./ui/Badge";
 import { Card } from "./ui/Card";
+import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
+import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 
 interface RiwayatDokumenViewProps {
   onViewDocument?: (doc: PerangkatDoc) => void;
@@ -29,6 +33,7 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
   const [filterType, setFilterType] = useState<string>("all");
   const [filterSubject, setFilterSubject] = useState<string>("all");
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<PerangkatDoc | null>(null);
 
   useEffect(() => {
     const unsubscribe = subscribePerangkatDocs((updatedDocs) => {
@@ -36,6 +41,36 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
     });
     return () => unsubscribe();
   }, []);
+
+  const renderPreviewDocument = (doc: PerangkatDoc) => {
+    const context = doc.formData || {};
+    // Mapel and other things might need to be destructured if not fully structured in formData
+    const normalizedContext = {
+      curriculum: { ...context },
+      school: { ...context },
+      module: { ...context },
+      cp: { ...context }
+    };
+    
+    switch (doc.docType) {
+      case 'analisis_cp': return <AcpRenderer data={doc.data} context={normalizedContext} />;
+      case 'tp': return <TpRenderer data={doc.data} context={normalizedContext} />;
+      case 'atp': return <AtpRenderer data={doc.data} context={normalizedContext} />;
+      case 'prota': return <ProtaRenderer data={doc.data} context={normalizedContext} />;
+      case 'prosem': return <ProsemRenderer data={doc.data} context={normalizedContext} />;
+      case 'kktp': return <KktpRenderer data={doc.data} context={normalizedContext} />;
+      case 'modul_ajar': 
+      case 'modul_ajar_umum':
+        return <ModulAjarRenderer umum={doc.data} meetings={[]} context={normalizedContext} />;
+      case 'lkpd': return <LkpdRenderer data={doc.data} context={normalizedContext} />;
+      case 'rubrik': return <RubrikRenderer data={doc.data} context={normalizedContext} />;
+      default:
+        if (doc.docType.startsWith('modul_ajar_meeting_')) {
+           return <ModulAjarRenderer umum={{} as any} meetings={[doc.data]} context={normalizedContext} />;
+        }
+        return <pre className="text-xs bg-slate-100 p-4 rounded">{JSON.stringify(doc.data, null, 2)}</pre>;
+    }
+  };
 
   const filteredDocs = docs.filter(doc => {
     if (filterType !== "all" && !doc.docType.includes(filterType)) return false;
@@ -215,17 +250,21 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  {onViewDocument && (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      icon={Eye}
-                      onClick={() => onViewDocument(doc)}
-                      title="Lihat Dokumen"
-                    >
-                      <span className="hidden sm:inline">Lihat</span>
-                    </Button>
-                  )}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    icon={Eye}
+                    onClick={() => {
+                      if (onViewDocument) {
+                        onViewDocument(doc);
+                      } else {
+                        setPreviewDoc(doc);
+                      }
+                    }}
+                    title="Lihat Dokumen"
+                  >
+                    <span className="hidden sm:inline">Lihat</span>
+                  </Button>
                   
                   <Button
                     variant="primary"
@@ -254,7 +293,7 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
                     size="sm"
                     icon={Trash2}
                     onClick={() => handleDelete(doc.id)}
-                    title="Hapus Dokumen"
+                    title="Hapus"
                   >
                     <span className="hidden sm:inline">Hapus</span>
                   </Button>
@@ -264,7 +303,52 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
           ))
         )}
       </div>
+
+      {/* Preview Modal */}
+      {previewDoc && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+              <div className="flex items-center gap-3">
+                <div className="bg-emerald-100 dark:bg-emerald-900/50 p-2 rounded-lg text-emerald-700 dark:text-emerald-400">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">
+                    {previewDoc.docTitle}
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Pratinjau Dokumen KBC
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon={Download}
+                  onClick={() => handleDownloadWord(previewDoc)}
+                >
+                  Word
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={X}
+                  onClick={() => setPreviewDoc(null)}
+                >
+                  Tutup
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-100 dark:bg-slate-900">
+              <div className="bg-white dark:bg-white text-black p-6 md:p-10 rounded-xl shadow-sm border border-slate-200 mx-auto max-w-4xl print-area">
+                {renderPreviewDocument(previewDoc)}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
