@@ -488,6 +488,23 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   };
 
   const renderDocument = (docType: string) => {
+    // Penanganan khusus untuk Modul Ajar karena ia tidak memiliki key tunggal di generatedJson
+    if (docType === "modul_ajar") {
+      const umum = generatedJson['modul_ajar_umum'];
+      if (!umum && !generatedDocs["modul_ajar"]) {
+         return <div dangerouslySetInnerHTML={{ __html: "" }} />;
+      }
+      
+      const meetings: any[] = [];
+      const jml = parseInt(state.module.jumlahPertemuan || "1", 10);
+      for (let i = 1; i <= jml; i++) {
+        if (generatedJson[`modul_ajar_meeting_${i}`]) {
+          meetings.push(generatedJson[`modul_ajar_meeting_${i}`]);
+        }
+      }
+      return <ModulAjarRenderer umum={umum} meetings={meetings} context={state} />;
+    }
+
     const data = generatedJson[docType];
     if (!data) {
       return <div dangerouslySetInnerHTML={{ __html: generatedDocs[docType] || "" }} />;
@@ -499,17 +516,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       case 'prota': return <ProtaRenderer data={data} context={state} />;
       case 'prosem': return <ProsemRenderer data={data} context={state} />;
       case 'kktp': return <KktpRenderer data={data} context={state} />;
-      case 'modul_ajar': {
-        const umum = generatedJson['modul_ajar_umum'];
-        const meetings: any[] = [];
-        const jml = parseInt(state.module.jumlahPertemuan || "1", 10);
-        for (let i = 1; i <= jml; i++) {
-          if (generatedJson[`modul_ajar_meeting_${i}`]) {
-            meetings.push(generatedJson[`modul_ajar_meeting_${i}`]);
-          }
-        }
-        return <ModulAjarRenderer umum={umum} meetings={meetings} context={state} />;
-      }
       case 'lkpd': return <LkpdRenderer data={data} context={state} />;
       case 'rubrik': return <RubrikRenderer data={data} context={state} />;
       default: return <div dangerouslySetInnerHTML={{ __html: generatedDocs[docType] || "" }} />;
