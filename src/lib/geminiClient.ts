@@ -501,7 +501,7 @@ export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any
     return { status: "error", message: `Schema untuk dokumen ${docType} tidak ditemukan.` };
   }
 
-  const generalKbcRules = `Kamu adalah Ahli Kurikulum & Pengembang Perangkat Ajar Kemenag RI, menguasai "Kurikulum Berbasis Cinta (KBC)".
+  const baseKbcRules = `Kamu adalah Ahli Kurikulum & Pengembang Perangkat Ajar Kemenag RI, menguasai "Kurikulum Berbasis Cinta (KBC)".
 Dalam setiap analisis, penyusunan tujuan, dan modul ajar, kamu WAJIB berpedoman mutlak pada definisi berikut sebagai GROUND TRUTH (kebenaran dasar) tanpa merujuk sumber eksternal mana pun:
 
 === PEDOMAN KURIKULUM BERBASIS CINTA (KBC) ===
@@ -535,6 +535,9 @@ Dalam setiap analisis, penyusunan tujuan, dan modul ajar, kamu WAJIB berpedoman 
 7. Kesehatan — menjalankan pola hidup bersih & sehat, menjaga kebugaran fisik & mental.
 8. Komunikasi — mampu menyimak, membaca, berbicara, dan menulis dengan baik, benar, dan etis.
 
+INSTRUKSI PENTING: Setiap kali menyusun dokumen, WAJIB mengaitkan materi dengan minimal 3 dari 5 Panca Cinta, minimal 3 dari 10 Nilai PPRA, dan minimal 3 dari 8 DPL secara eksplisit dan relevan.`;
+
+  const modulKbcRules = `
 [D] PEDOMAN MODEL DAN METODE PEMBELAJARAN (OTOMATISASI AI):
 Sebagai AI profesional, kamu WAJIB menerjemahkan "Model Pembelajaran" yang dipilih guru menjadi Sintak (Langkah-langkah) baku dan memilihkan "Metode Pembelajaran" (seperti diskusi, ceramah interaktif, tanya jawab, penugasan) yang paling relevan secara OTOMATIS.
 Gunakan pedoman baku berikut jika guru memilih model di bawah ini:
@@ -562,17 +565,32 @@ Gunakan pedoman baku berikut jika guru memilih model di bawah ini:
 8. Teaching at the Right Level (TaRL):
    - Sintak: (1) Asesmen diagnostik penempatan, (2) Pengelompokan siswa berdasarkan tingkat kemampuan, (3) Pembelajaran terarah & bimbingan sesuai level, (4) Evaluasi formatif, (5) Perpindahan level (re-grouping) & Pengayaan.
    - Metode cocok: Pendampingan intensif, scaffolding, tutor sebaya, latihan berjenjang.
-*PENTING: Jika data input memiliki "learningMethod" yang diisi secara spesifik oleh guru, maka kamu WAJIB menggunakan metode tersebut alih-alih metode otomatismu.
-*Jika model yang dipilih di luar daftar di atas, gunakan pengetahuan AI terbaikmu untuk menentukan sintak baku dan metode yang paling relevan.
+*PENTING: Jika data input memiliki "learningMethod" yang diisi spesifik oleh guru, kamu WAJIB menggunakan metode tersebut alih-alih metode otomatismu.
 
-INSTRUKSI PENTING: Setiap kali menyusun Analisis CP, TP, ATP, atau Modul Ajar, WAJIB mengaitkan materi dengan minimal 3 dari 5 Panca Cinta, minimal 3 dari 10 Nilai PPRA, dan minimal 3 dari 8 DPL secara eksplisit dan relevan. Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model Pembelajarannya.`;
+Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model Pembelajarannya.`;
 
-  let userPrompt = `Buatkan konten JSON untuk dokumen ${docType} berdasarkan data berikut:\n${JSON.stringify(formData, null, 2)}\n\nPastikan data terisi lengkap, akurat, dan kaya akan nilai PPRA & Panca Cinta Kemenag.`;
+  const isModulType = schemaKey.startsWith("modul_ajar") || schemaKey === "lkpd" || schemaKey === "rubrik";
+  const generalKbcRules = isModulType ? baseKbcRules + modulKbcRules : baseKbcRules;
+
+  // Filter out irrelevant data to save tokens
+  let optimizedData = { ...formData };
+  if (!isModulType) {
+    delete optimizedData.principal;
+    delete optimizedData.nipPrincipal;
+    delete optimizedData.teacher;
+    delete optimizedData.nipTeacher;
+    delete optimizedData.schoolAddress;
+    delete optimizedData.schoolLogo;
+    delete optimizedData.kemenagOffice;
+    delete optimizedData.cityDate;
+  }
+
+  let userPrompt = `Buatkan konten JSON untuk dokumen ${docType} berdasarkan data berikut:\n${JSON.stringify(optimizedData, null, 2)}\n\nPastikan data terisi lengkap, akurat, dan kaya akan nilai PPRA & Panca Cinta Kemenag.`;
 
   // Context Builder untuk Dokumen Administratif (TP, ATP, Prota, Prosem)
   if (["tp", "atp", "prota", "prosem"].includes(schemaKey)) {
     userPrompt = `Buatkan konten JSON untuk dokumen ${docType} berdasarkan data pendukung berikut:
-${JSON.stringify(formData, null, 2)}
+${JSON.stringify(optimizedData, null, 2)}
 
 PENTING:
 - Fokus utama Anda adalah merumuskan (reasoning) materi pokok, kompetensi, dan memecah Capaian Pembelajaran.
@@ -582,20 +600,20 @@ PENTING:
 
   // Context Builder untuk Modul Ajar Umum
   if (schemaKey === "modul_ajar_umum") {
-    userPrompt = `Buatkan struktur MODUL AJAR UMUM (Informasi Umum, Komponen Inti dasar, Asesmen, dan Lampiran) untuk topik: ${formData.topik}. \nData pendukung:\n${JSON.stringify(formData, null, 2)}\n\n(Jangan masukkan detail kegiatan skenario per pertemuan, karena itu akan digenerate terpisah).`;
+    userPrompt = `Buatkan struktur MODUL AJAR UMUM (Informasi Umum, Komponen Inti dasar, Asesmen, dan Lampiran) untuk topik: ${optimizedData.topik}. \nData pendukung:\n${JSON.stringify(optimizedData, null, 2)}\n\n(Jangan masukkan detail kegiatan skenario per pertemuan, karena itu akan digenerate terpisah).`;
   }
   
   // Context Builder khusus untuk Pertemuan
   if (schemaKey === "modul_ajar_meeting" && meetingNumber > 0) {
-    userPrompt = `Buatkan Skenario Kegiatan Belajar Mengajar (KBM) KHUSUS HANYA UNTUK PERTEMUAN KE-${meetingNumber} (dari total ${formData.jumlahPertemuan || 1} pertemuan).
-Topik Utama: ${formData.topik}
+    userPrompt = `Buatkan Skenario Kegiatan Belajar Mengajar (KBM) KHUSUS HANYA UNTUK PERTEMUAN KE-${meetingNumber} (dari total ${optimizedData.jumlahPertemuan || 1} pertemuan).
+Topik Utama: ${optimizedData.topik}
 Sub Topik/Fokus Pertemuan ini: Bebas tentukan oleh AI berdasarkan silabus logis untuk pertemuan ke-${meetingNumber}.
-Model Pembelajaran: ${formData.model || 'Problem Based Learning (PBL)'}
-Metode: ${formData.metode || 'Diskusi, Ceramah Interaktif'}
+Model Pembelajaran: ${optimizedData.model || 'Problem Based Learning (PBL)'}
+Metode: ${optimizedData.metode || 'Diskusi, Ceramah Interaktif'}
 
 Penting:
 - Berikan judul pertemuan yang relevan.
-- Fokus sintak harus berisi nama fase model ${formData.model} yang akan dijalankan pada pertemuan ini.
+- Fokus sintak harus berisi nama fase model ${optimizedData.model} yang akan dijalankan pada pertemuan ini.
 - Untuk kegiatan Pendahuluan, Inti, dan Penutup: berikan skenario rinci (ucapan/aktivitas guru & siswa) yang mencerminkan nilai PPRA Kemenag.
 - "pertemuanKe" WAJIB diisi dengan angka ${meetingNumber}.`;
   }
