@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { ZodSchema } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import {
   generateModulAjarFallback,
   generateChatAssistantFallback
@@ -83,7 +84,10 @@ const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any) =
 export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPrompt: string, userPrompt: string, schema: ZodSchema<any>, maxRetries = 2) => {
   if (!ai) throw new Error("GEMINI_API_KEY tidak dikonfigurasi.");
   
-  let currentPrompt = `${systemPrompt}\n\nIMPORTANT: You must return a valid JSON object that strictly follows this schema. Do not include markdown blocks like \`\`\`json. Return ONLY the raw JSON string.\n\n${userPrompt}`;
+  const jsonSchema = zodToJsonSchema(schema, "OutputSchema");
+  const schemaStr = JSON.stringify(jsonSchema, null, 2);
+  
+  let currentPrompt = `${systemPrompt}\n\nIMPORTANT: You must return a valid JSON object that strictly follows this JSON Schema:\n${schemaStr}\n\nDo not include markdown blocks like \`\`\`json. Return ONLY the raw JSON string.\n\n${userPrompt}`;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
