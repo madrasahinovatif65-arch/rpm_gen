@@ -146,11 +146,21 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     const { subject, level } = state.curriculum;
     if (!subject || !level) return;
     
-    // Cari template yang persis sama Mapel dan Fasenya
-    const matchingTemplate = config.cpTemplates.find(t => 
-      t.mataPelajaran === subject && 
-      t.faseKelas === level
-    );
+    // Fungsi pintar untuk mengekstrak kata "Fase X" (misal: "Fase A", "Fase B")
+    const extractFase = (str: string) => {
+      const match = str.match(/Fase\s+[A-F]/i);
+      return match ? match[0].toUpperCase() : str.trim().toLowerCase();
+    };
+
+    const targetFase = extractFase(level);
+    const targetSubject = subject.trim().toLowerCase();
+
+    // Cari template dengan Mapel sama dan Fase yang setara
+    const matchingTemplate = config.cpTemplates.find(t => {
+      const tSubj = (t.mataPelajaran || "").trim().toLowerCase();
+      const tFase = extractFase(t.faseKelas || "");
+      return tSubj === targetSubject && tFase === targetFase;
+    });
     
     if (matchingTemplate) {
       // Cegah infinite loop jika data sudah sama
