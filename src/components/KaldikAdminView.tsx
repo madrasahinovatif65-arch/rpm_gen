@@ -6,6 +6,7 @@ import { KaldikData, KaldikMonth } from '../types';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
+import { useKbcState } from '../store/kbcState';
 
 const DEFAULT_SEMESTER1 = [
   { namaBulan: 'Juli', totalMinggu: 4, mingguTidakEfektif: 2, mingguEfektif: 2, keterangan: 'Libur akhir tahun ajaran, MPLS' },
@@ -26,7 +27,10 @@ const DEFAULT_SEMESTER2 = [
 ];
 
 export const KaldikAdminView: React.FC = () => {
-  const [tahunAjaran, setTahunAjaran] = useState("2024/2025");
+  const [state] = useKbcState();
+  const defaultYear = state.curriculum?.year || "2024/2025";
+  
+  const [tahunAjaran, setTahunAjaran] = useState(defaultYear);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -204,15 +208,20 @@ export const KaldikAdminView: React.FC = () => {
           
           <div className="flex items-center gap-3 bg-emerald-900/50 p-3 rounded-lg border border-emerald-600/30">
             <label className="text-sm font-semibold whitespace-nowrap">Tahun Ajaran:</label>
-            <select 
+            <input 
+              type="text"
+              list="tahun-ajaran-list"
               value={tahunAjaran}
               onChange={(e) => setTahunAjaran(e.target.value)}
-              className="px-3 py-1.5 rounded-md bg-white text-emerald-900 font-bold border-0 outline-none"
-            >
-              <option value="2023/2024">2023/2024</option>
-              <option value="2024/2025">2024/2025</option>
-              <option value="2025/2026">2025/2026</option>
-            </select>
+              className="px-3 py-1.5 rounded-md bg-white text-emerald-900 font-bold border-0 outline-none w-32"
+              placeholder="Contoh: 2024/2025"
+            />
+            <datalist id="tahun-ajaran-list">
+              <option value={`${new Date().getFullYear() - 1}/${new Date().getFullYear()}`} />
+              <option value={`${new Date().getFullYear()}/${new Date().getFullYear() + 1}`} />
+              <option value={`${new Date().getFullYear() + 1}/${new Date().getFullYear() + 2}`} />
+              {state.curriculum?.year && <option value={state.curriculum.year} />}
+            </datalist>
           </div>
         </div>
       </Card>
