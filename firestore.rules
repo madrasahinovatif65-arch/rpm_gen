@@ -22,6 +22,11 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // Kaldik global Admin
+    match /kaldik/{docId} {
+      allow read, write: if true;
+    }
+
     // ============================================================
     // Path Per-User (Guru SIAKAD)
     // Isolation dilakukan via path naming di sisi aplikasi.
