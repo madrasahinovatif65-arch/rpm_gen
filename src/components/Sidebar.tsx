@@ -71,8 +71,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )
       };
     }
+    
+    if (group.group === "PENGATURAN" && !isAdmin) {
+      return {
+        ...group,
+        items: group.items.filter(item => item.id === "pengaturan")
+      };
+    }
+    
     return group;
-  }).filter(group => isAdmin || group.group !== "PENGATURAN");
+  });
 
   return (
     <>

@@ -188,22 +188,16 @@ Secara garis besar, alur kerja dibagi menjadi 3 fase utama: **Input**, **Generat
 
 ---
 
-## 🟢 FASE 1: INPUT (Persiapan Data & Regulasi)
-Pada fase ini, guru melakukan pendefinisian ruang lingkup mengajar. Data yang diinput di fase ini akan menjadi "otak" bagi AI dalam menyusun seluruh dokumen.
+## 🟢 FASE 1: INPUT (Persiapan Profil)
+Pada fase ini, guru melakukan pendefinisian identitas mengajar. Data Induk seperti Capaian Pembelajaran (CP) dan Kalender Akademik (Kaldik) **sudah otomatis diatur dan dipusatkan oleh Admin Madrasah**, sehingga Anda tidak perlu lagi mengurus hal teknis tersebut.
 
 ### 1. Pengaturan Profil & Tahun Ajaran
-- **Navigasi:** Buka menu **Pengaturan** (ikon gerigi).
+- **Navigasi:** Buka menu **Pengaturan & Profil** (ikon gerigi).
 - **Aksi:** Lengkapi data *Nama Yayasan, Nama Madrasah, Nama Guru, NIP, Kepala Madrasah*, dll.
-- **Penting:** Pastikan **Tahun Ajaran** di-set dengan benar (misal: 2026/2027) karena ini akan mengunci database seluruh dokumen Anda agar tidak tercampur dengan tahun lain.
+- **Penting:** Pastikan **Tahun Ajaran** di-set dengan benar (misal: 2026/2027) karena ini akan mengunci profil arsip dokumen Anda agar terstruktur rapi.
 
-### 2. Pengecekan Kalender Akademik (Kaldik)
-- **Navigasi:** Buka menu **Kalender Akademik**.
-- **Aksi:** Cek apakah admin sekolah sudah mengatur *Total Minggu* dan *Minggu Tidak Efektif* per bulannya. Jika sudah, Anda bisa melewati langkah ini.
-- **Koreksi Pribadi:** Jika jadwal mengajar Anda di hari tertentu banyak yang gugur karena libur (meski Kaldik sekolah efektif), Anda akan menyesuaikan JP Total Anda di langkah berikutnya.
-
-### 3. Mengatur Database Capaian Pembelajaran (CP)
-- **Navigasi:** Buka menu **Kelola Database CP Elemen**.
-- **Aksi:** Masukkan teks resmi CP dari Keputusan Dirjen Pendis / Kemdikbud berdasarkan Elemen yang Anda ajar.
+### 2. Penyesuaian Hari Efektif Pribadi (Opsional)
+- **Koreksi Pribadi:** Karena Kalender Akademik resmi sudah dikunci oleh Admin, jika jadwal riil Anda di hari tertentu banyak yang gugur karena libur lokal/cuti, Anda **cukup menyesuaikan total JP secara manual** saat proses pengisian di *Fase Generate* pada langkah selanjutnya. Tidak perlu mengubah menu Kaldik.
 
 ---
 
