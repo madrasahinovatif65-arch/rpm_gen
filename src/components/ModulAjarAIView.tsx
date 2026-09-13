@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Wand2, Printer, Download, Sparkles, FileText, Loader2, AlertTriangle, BookOpen, HelpCircle } from "lucide-react";
+import { Wand2, Printer, Download, Sparkles, FileText, Loader2, AlertTriangle, BookOpen, HelpCircle, Trash2 } from "lucide-react";
 import { ModulFormState, Pengaturan } from "../types";
 import { generateModulAjarAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyCetakSuccess, notifyUnduhSuccess, notifyUnduhError } from "../lib/swal";

@@ -3,8 +3,7 @@ import { Download, ExternalLink, ArrowRight, BookOpenCheck } from "lucide-react"
 import { Button } from "./ui";
 
 export const DownloadPerangkatAjarView: React.FC = () => {
-
-
+  const targetUrl = "https://www.yefriharyanto.id/2025/10/perangkat-ajar-deep-learning-.html";
   const handleOpenLink = () => {
     window.open(targetUrl, "_blank", "noopener,noreferrer");
   };
