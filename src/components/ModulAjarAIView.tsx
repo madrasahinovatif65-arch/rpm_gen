@@ -625,6 +625,19 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
 
           <div className="flex items-center space-x-2 w-full sm:w-auto">
             <Button
+              onClick={() => {
+                if (window.confirm("Yakin ingin membersihkan layar preview?")) {
+                  setGeneratedHtml("");
+                }
+              }}
+              variant="outline"
+              size="sm"
+              icon={Trash2}
+              className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/30 border-red-200 dark:border-red-900/50"
+            >
+              Bersihkan Preview
+            </Button>
+            <Button
               onClick={handlePrint}
               disabled={!generatedHtml}
               variant="primary"

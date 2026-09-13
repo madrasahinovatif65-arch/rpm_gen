@@ -135,6 +135,20 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (filteredDocs.length === 0) return;
+    if (!confirm(`Yakin ingin menghapus ${filteredDocs.length} dokumen yang sedang ditampilkan ini? TINDAKAN INI TIDAK DAPAT DIBATALKAN.`)) return;
+    
+    try {
+      const deletePromises = filteredDocs.map(doc => deletePerangkatDoc(doc.id));
+      await Promise.all(deletePromises);
+      notifySimpanSuccess(`${filteredDocs.length} dokumen berhasil dihapus secara masal`);
+    } catch (err) {
+      console.error(err);
+      notifySimpanError("Beberapa dokumen gagal dihapus");
+    }
+  };
+
   const handleDownloadWord = (doc: PerangkatDoc) => {
     const htmlToPrint = renderToString(renderPreviewDocument(doc));
     
@@ -310,16 +324,28 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
             </p>
           </div>
 
-          <Button
-            variant="accent"
-            size="md"
-            icon={Package}
-            onClick={handleExportAll}
-            disabled={docs.length === 0}
-            className="shrink-0"
-          >
-            Unduh Semua (ZIP)
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Button
+              variant="outline"
+              size="md"
+              icon={Trash2}
+              onClick={handleDeleteAll}
+              disabled={filteredDocs.length === 0}
+              className="shrink-0 bg-white/10 hover:bg-red-500/80 border-0 text-white"
+            >
+              Hapus Masal
+            </Button>
+            <Button
+              variant="accent"
+              size="md"
+              icon={Package}
+              onClick={handleExportAll}
+              disabled={docs.length === 0}
+              className="shrink-0"
+            >
+              Export ZIP
+            </Button>
+          </div>
         </div>
       </Card>
 

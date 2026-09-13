@@ -1459,6 +1459,22 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             </Button>
             <Button
               type="button"
+              variant="outline"
+              size="sm"
+              icon={Trash2}
+              onClick={() => {
+                if (window.confirm("Yakin ingin membersihkan layar preview?")) {
+                  setGeneratedDocs({});
+                  setGeneratedJson({});
+                  setJobs({});
+                }
+              }}
+              className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/30 border-red-200 dark:border-red-900/50"
+            >
+              Bersihkan Preview
+            </Button>
+            <Button
+              type="button"
               variant="primary"
               size="sm"
               icon={Download}
