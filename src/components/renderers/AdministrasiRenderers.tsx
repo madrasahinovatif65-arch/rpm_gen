@@ -22,9 +22,10 @@ export const Td: React.FC<{ children: React.ReactNode; align?: 'left'|'center'|'
 
 export const DocumentHeader: React.FC<{ context: any, title: string, subtitle?: string }> = ({ context, title, subtitle }) => (
   <div style={{ textAlign: 'center', marginBottom: '20px', fontFamily: 'Arial, sans-serif' }}>
-    <h3 style={{ margin: 0 }}>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h3>
     <h3 style={{ margin: 0 }}>{context.school?.kemenagOffice?.toUpperCase()}</h3>
     <h2 style={{ margin: 0 }}>{context.school?.schoolName?.toUpperCase()}</h2>
+    <h3 style={{ margin: 0 }}>PURWOSARI - PASURUAN - JAWA TIMUR</h3>
+    <p style={{ margin: 0, fontSize: '0.85em' }}>{context.school?.schoolAddress}</p>
     <hr style={{ border: '1px solid black', margin: '10px 0' }} />
     <h3 style={{ margin: 0, marginTop: '20px' }}>{title}</h3>
     {subtitle && <h4 style={{ margin: 0 }}>{subtitle}</h4>}

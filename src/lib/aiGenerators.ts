@@ -36,10 +36,10 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
 
   const kopHtml = `
     <div style="text-align: center; border-bottom: 3px double #1a3a5c; padding-bottom: 12px; margin-bottom: 20px; font-family: 'Segoe UI', Arial, sans-serif;">
-      <h4 style="margin: 0; font-size: 13pt; text-transform: uppercase; color: #334155; letter-spacing: 0.5px;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4>
-      <h4 style="margin: 3px 0; font-size: 13pt; text-transform: uppercase; color: #334155; letter-spacing: 0.5px;">${kemenagOffice}</h4>
+      <h4 style="margin: 0; font-size: 13pt; text-transform: uppercase; color: #334155; letter-spacing: 0.5px;">${kemenagOffice}</h4>
       <h2 style="margin: 4px 0; font-size: 16pt; font-weight: bold; text-transform: uppercase; color: #1a3a5c;">${schoolName}</h2>
-      <p style="margin: 2px 0 0 0; font-size: 9pt; color: #64748b;">${schoolAddress}</p>
+      <h4 style="margin: 3px 0; font-size: 13pt; text-transform: uppercase; color: #334155; letter-spacing: 0.5px;">PURWOSARI - PASURUAN - JAWA TIMUR</h4>
+      <p style="margin: 2px 0 0 0; font-size: 8.5pt; color: #64748b;">${schoolAddress}</p>
     </div>
   `;
 
