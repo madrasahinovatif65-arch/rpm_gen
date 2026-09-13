@@ -10,6 +10,7 @@ import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 
 interface CPDatabaseViewProps {
   config: Pengaturan;
+  isAdmin?: boolean;
 }
 
 interface ImportRow {
@@ -31,7 +32,7 @@ interface ImportRow {
   error?: string;
 }
 
-export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
+export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config, isAdmin = false }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<CpTemplate>({ id: "", name: "", rasional: "", elemen: "" });
@@ -254,24 +255,28 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
               Ekspor Data
             </Button>
 
-            <label
-              className="inline-flex h-8 items-center gap-2 rounded-lg bg-emerald-600 px-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 cursor-pointer"
-              title="Import banyak CP sekaligus dari file Excel"
-            >
-              <FileSpreadsheet className="w-4 h-4" />
-              <span>Import Excel</span>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".xlsx,.xls"
-                className="sr-only"
-                onChange={handleFileUpload}
-              />
-            </label>
+            {isAdmin && (
+              <>
+                <label
+                  className="inline-flex h-8 items-center gap-2 rounded-lg bg-emerald-600 px-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 cursor-pointer"
+                  title="Import banyak CP sekaligus dari file Excel"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>Import Excel</span>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx,.xls"
+                    className="sr-only"
+                    onChange={handleFileUpload}
+                  />
+                </label>
 
-            <Button onClick={handleAddNew} variant="primary" size="sm" icon={Plus}>
-              Tambah CP Baru
-            </Button>
+                <Button onClick={handleAddNew} variant="primary" size="sm" icon={Plus}>
+                  Tambah CP Baru
+                </Button>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -519,10 +524,12 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config }) => {
                   <div key={template.id} className="group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-md transition-all flex flex-col">
                     <div className="flex justify-between items-start mb-3">
                       <h3 className="font-bold text-slate-800 dark:text-slate-100 pr-8 line-clamp-2">{template.name}</h3>
-                      <div className="flex items-center space-x-1 absolute top-4 right-4 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-white dark:bg-slate-800 p-1 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
-                        <button type="button" onClick={() => handleEdit(template)} className="w-9 h-9 inline-flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" title="Edit" aria-label={`Edit template ${template.name}`}><Edit className="w-4 h-4" /></button>
-                        <button type="button" onClick={() => handleDelete(template.id, template.name)} className="w-9 h-9 inline-flex items-center justify-center text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500" title="Hapus" aria-label={`Hapus template ${template.name}`}><Trash2 className="w-4 h-4" /></button>
-                      </div>
+                      {isAdmin && (
+                        <div className="flex items-center space-x-1 absolute top-4 right-4 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-white dark:bg-slate-800 p-1 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                          <button type="button" onClick={() => handleEdit(template)} className="w-9 h-9 inline-flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" title="Edit" aria-label={`Edit template ${template.name}`}><Edit className="w-4 h-4" /></button>
+                          <button type="button" onClick={() => handleDelete(template.id, template.name)} className="w-9 h-9 inline-flex items-center justify-center text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500" title="Hapus" aria-label={`Hapus template ${template.name}`}><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 space-y-3">
                       <div>

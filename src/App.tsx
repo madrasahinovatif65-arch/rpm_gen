@@ -307,7 +307,7 @@ export default function App() {
           {activeTab === "downloadperangkat" && <DownloadPerangkatAjarView />}
           {activeTab === "perangkat_kbc" && <PerangkatAjarKBCView config={config} onNavigateToCP={() => setActiveTab("cp_database")} />}
           {activeTab === "riwayat_dokumen" && <RiwayatDokumenView />}
-          {activeTab === "cp_database" && <CPDatabaseView config={config} />}
+          {activeTab === "cp_database" && <CPDatabaseView config={config} isAdmin={isAdmin} />}
           {activeTab === "modulai" && <ModulAjarAIView config={config} />}
           {activeTab === "kaldik" && <KaldikAdminView />}
           {activeTab === "asistenai" && <AsistenGuruAIView config={config} />}
