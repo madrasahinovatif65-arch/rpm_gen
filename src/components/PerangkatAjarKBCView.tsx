@@ -31,7 +31,7 @@ import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-
 import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { useKbcState, defaultKbcState } from "../store/kbcState";
-import { subscribeToJobs, enqueueJob, clearAllJobs, AIJob } from "../lib/aiJobManager";
+import { subscribeToJobs, enqueueJob, clearAllJobs, clearJobByPrefix, AIJob } from "../lib/aiJobManager";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
 import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
@@ -1395,7 +1395,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 onClick={() => handleSelectDoc(doc.id)}
                 className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${
                   activeDoc === doc.id
-                    ? "bg-emerald-50 dark:bg-emerald-900/50 border-emerald-500 dark:border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                    ? isModulType 
+                      ? "bg-amber-50 dark:bg-amber-900/50 border-amber-500 dark:border-amber-500 text-amber-700 dark:text-amber-300 shadow-sm"
+                      : "bg-emerald-50 dark:bg-emerald-900/50 border-emerald-500 dark:border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-sm"
                     : isModulType 
                       ? "bg-white dark:bg-slate-800 border-amber-300 dark:border-amber-500/50 text-slate-600 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                       : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 hover:border-emerald-300"
@@ -1403,7 +1405,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 title={doc.fullTitle}
               >
                 <div className="relative">
-                  <Icon className={`w-5 h-5 mb-1 ${activeDoc === doc.id ? "text-emerald-600" : "text-slate-400"}`} />
+                  <Icon className={`w-5 h-5 mb-1 ${activeDoc === doc.id ? (isModulType ? "text-amber-600" : "text-emerald-600") : "text-slate-400"}`} />
                   {jobStatus === "running" && (
                     <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-yellow-400 rounded-full animate-ping"></span>
                   )}
@@ -1463,11 +1465,33 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               size="sm"
               icon={Trash2}
               onClick={() => {
-                if (window.confirm("Yakin ingin membersihkan layar preview?")) {
-                  clearAllJobs();
-                  setGeneratedDocs({});
-                  setGeneratedJson({});
-                  setJobs({});
+                if (window.confirm(`Yakin ingin membersihkan layar preview untuk dokumen ini?`)) {
+                  clearJobByPrefix(activeDoc);
+                  
+                  // Filter out activeDoc from states
+                  setGeneratedDocs(prev => {
+                    const next = { ...prev };
+                    Object.keys(next).forEach(k => {
+                      if (k.startsWith(activeDoc)) delete next[k];
+                    });
+                    return next;
+                  });
+                  
+                  setGeneratedJson(prev => {
+                    const next = { ...prev };
+                    Object.keys(next).forEach(k => {
+                      if (k.startsWith(activeDoc)) delete next[k];
+                    });
+                    return next;
+                  });
+                  
+                  setJobs(prev => {
+                    const next = { ...prev };
+                    Object.keys(next).forEach(k => {
+                      if (k.startsWith(activeDoc)) delete next[k];
+                    });
+                    return next;
+                  });
                 }
               }}
               className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/30 border-red-200 dark:border-red-900/50"

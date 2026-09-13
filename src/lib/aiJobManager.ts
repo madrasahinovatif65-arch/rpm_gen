@@ -113,6 +113,27 @@ export const clearAllJobs = () => {
   notifyListeners();
 };
 
+export const clearJobByPrefix = (prefix: string) => {
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(`kbc_cache_${prefix}`)) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+  
+  // Remove from jobsRecord
+  Object.keys(jobsRecord).forEach(key => {
+    if (key.startsWith(prefix)) {
+      delete jobsRecord[key];
+    }
+  });
+  
+  notifyListeners();
+};
+
+
 export const enqueueJob = (id: string, docType: string, formData: any) => {
   if (jobsRecord[id]?.status === "running") return; // Already running
 
