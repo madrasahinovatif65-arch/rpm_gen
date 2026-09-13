@@ -754,13 +754,16 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             </div>
 
             <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Alokasi Waktu Total</label>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Alokasi Waktu Total (JP 1 Tahun)</label>
               <input
                 type="number"
                 value={formData.totalJp}
                 onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, totalJp: Number(e.target.value) || 0 } }))}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold mb-2"
               />
+              <p className="text-[10px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-200 dark:border-amber-800 leading-tight">
+                <strong>💡 Info:</strong> Jika jadwal mengajar Anda di hari tertentu banyak terpotong libur nasional, silakan <strong>kurangi</strong> angka JP Total di atas sesuai jumlah JP yang riil hilang agar Prota/Prosem tetap presisi.
+              </p>
             </div>
 
             <div>
