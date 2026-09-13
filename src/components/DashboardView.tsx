@@ -9,19 +9,25 @@ import {
   LayoutGrid,
   Download,
   Globe,
-  History
+  History,
+  BookOpen
 } from "lucide-react";
 import { Button } from "./ui/Button";
 import { Badge } from "./ui/Badge";
 import { Card } from "./ui/Card";
+import { MarkdownModal } from "./MarkdownModal";
+import { PROMPT_ADMIN_MD, ALUR_GURU_MD } from "../lib/docsContent";
 
 interface DashboardViewProps {
   onNavigate: (tab: string) => void;
+  isAdmin: boolean;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
-  onNavigate
+  onNavigate,
+  isAdmin
 }) => {
+  const [isDocsModalOpen, setIsDocsModalOpen] = React.useState(false);
   // Simplified color mapping: primary (emerald), accent (amber), secondary (slate)
   const menuCards = [
     {
@@ -37,8 +43,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       title: "Perangkat Ajar KBC",
       desc: "ACP, TP, ATP, Prota, Prosem, KKTP, Modul, LKPD & Rubrik KBC.",
       icon: HeartHandshake,
-      badge: "KBC",
-      variant: "primary" as const,
+      badge: "Unggulan",
+      variant: "accent" as const,
     },
     {
       id: "riwayat_dokumen",
@@ -53,8 +59,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       title: "Modul Ajar Deep Learning AI",
       desc: "Generator RPP Deep Learning Kurikulum Merdeka hingga 5 pertemuan.",
       icon: Wand2,
-      badge: "Unggulan",
-      variant: "accent" as const,
+      badge: "Modul AI",
+      variant: "primary" as const,
     },
     {
       id: "asistenai",
@@ -97,31 +103,40 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Badge variant="accent" size="md" className="uppercase tracking-wider">
-              Fitur Unggulan
+              {isAdmin ? "PANDUAN ADMIN" : "PANDUAN GURU"}
             </Badge>
             <Sparkles className="w-4 h-4 text-amber-300" />
           </div>
           
           <div className="space-y-2">
             <h2 className="text-2xl font-bold leading-tight">
-              Modul Ajar Deep Learning Otomatis
+              {isAdmin ? "Buku Pedoman Ekstraksi CP & Prompt" : "Alur Kerja Otomasi Perangkat KBC"}
             </h2>
             <p className="text-sm text-emerald-100 leading-relaxed">
-              Susun modul pembelajaran Kurikulum Merdeka lengkap dengan skenario kegiatan per pertemuan, tabel diagnostik, rubrik asesmen, dan LKPD interaktif.
+              {isAdmin 
+                ? "Pelajari cara menyalin, menyesuaikan, dan menyusun prompt ke ChatGPT/Gemini untuk menghasilkan Database CP Elemen yang bebas halusinasi."
+                : "Pelajari prosedur 3 fase (Input, Generate, Koreksi) agar dokumen yang Anda hasilkan konsisten, akurat, dan sesuai dengan kalender akademik."}
             </p>
           </div>
           
           <Button
             variant="accent"
             size="md"
-            icon={Wand2}
-            onClick={() => onNavigate("modulai")}
+            icon={BookOpen}
+            onClick={() => setIsDocsModalOpen(true)}
             className="w-full sm:w-auto"
           >
-            Buka Modul Ajar AI
+            Baca {isAdmin ? "Pedoman" : "Alur Kerja"}
           </Button>
         </div>
       </Card>
+
+      <MarkdownModal 
+        isOpen={isDocsModalOpen}
+        onClose={() => setIsDocsModalOpen(false)}
+        title={isAdmin ? "Panduan Ekstraksi CP (Admin)" : "Alur Kerja Guru (Workflow)"}
+        markdownContent={isAdmin ? PROMPT_ADMIN_MD : ALUR_GURU_MD}
+      />
 
       {/* Menu Grid */}
       <div className="space-y-4">
