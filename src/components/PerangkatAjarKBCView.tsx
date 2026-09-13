@@ -31,7 +31,7 @@ import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-
 import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { useKbcState, defaultKbcState } from "../store/kbcState";
-import { subscribeToJobs, enqueueJob, AIJob } from "../lib/aiJobManager";
+import { subscribeToJobs, enqueueJob, clearAllJobs, AIJob } from "../lib/aiJobManager";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
 import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
@@ -1464,6 +1464,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               icon={Trash2}
               onClick={() => {
                 if (window.confirm("Yakin ingin membersihkan layar preview?")) {
+                  clearAllJobs();
                   setGeneratedDocs({});
                   setGeneratedJson({});
                   setJobs({});

@@ -628,6 +628,7 @@ export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
               onClick={() => {
                 if (window.confirm("Yakin ingin membersihkan layar preview?")) {
                   setGeneratedHtml("");
+                  localStorage.removeItem("modul_ajar_ai_html_cache");
                 }
               }}
               variant="outline"

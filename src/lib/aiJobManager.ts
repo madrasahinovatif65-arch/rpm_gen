@@ -100,6 +100,19 @@ export const loadFromLocalStorage = (key: string) => {
   }
 };
 
+export const clearAllJobs = () => {
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith("kbc_cache_")) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+  jobsRecord = {};
+  notifyListeners();
+};
+
 export const enqueueJob = (id: string, docType: string, formData: any) => {
   if (jobsRecord[id]?.status === "running") return; // Already running
 
