@@ -277,7 +277,10 @@ export default function App() {
               <span>AI Tools:</span>
               <SlidersHorizontal className="w-3 h-3 text-emerald-400 ml-0.5" />
             </button>
-            {AI_TOOLS_ITEMS.map((item) => {
+            {AI_TOOLS_ITEMS.filter(item => 
+              isAdmin || 
+              (item.id !== "downloadperangkat" && item.id !== "lkpdai" && item.id !== "ailainnya")
+            ).map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (

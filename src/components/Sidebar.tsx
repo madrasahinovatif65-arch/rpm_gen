@@ -59,10 +59,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  // Sembunyikan grup pengaturan jika bukan admin
-  const visibleNavItems = isAdmin 
-    ? navItems 
-    : navItems.filter(group => group.group !== "PENGATURAN");
+  // Sembunyikan grup pengaturan dan menu tertentu jika bukan admin
+  const visibleNavItems = navItems.map(group => {
+    if (group.group === "GENERATOR AI" && !isAdmin) {
+      return {
+        ...group,
+        items: group.items.filter(item => 
+          item.id !== "downloadperangkat" && 
+          item.id !== "lkpdai" && 
+          item.id !== "ailainnya"
+        )
+      };
+    }
+    return group;
+  }).filter(group => isAdmin || group.group !== "PENGATURAN");
 
   return (
     <>
