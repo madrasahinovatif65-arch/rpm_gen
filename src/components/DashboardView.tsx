@@ -96,6 +96,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     }
   ];
 
+  const visibleMenuCards = menuCards.filter(card => {
+    if (!isAdmin && (card.id === "downloadperangkat" || card.id === "lkpdai" || card.id === "ailainnya")) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <div className="space-y-6 max-w-2xl mx-auto w-full">
       {/* Hero CTA Card */}
@@ -148,12 +155,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </h3>
           </div>
           <span className="text-xs font-semibold text-slate-500">
-            {menuCards.length} Menu
+            {visibleMenuCards.length} Menu
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {menuCards.map((item) => {
+          {visibleMenuCards.map((item) => {
             const Icon = item.icon;
             return (
               <Card

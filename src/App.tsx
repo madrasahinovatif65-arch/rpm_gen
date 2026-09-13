@@ -304,6 +304,7 @@ export default function App() {
           {activeTab === "dashboard" && (
             <DashboardView
               onNavigate={(tab) => setActiveTab(tab)}
+              isAdmin={isAdmin}
             />
           )}
 
