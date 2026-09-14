@@ -591,7 +591,24 @@ Gunakan pedoman baku berikut jika guru memilih model di bawah ini:
    - Metode cocok: Pendampingan intensif, scaffolding, tutor sebaya, latihan berjenjang.
 *PENTING: Jika data input memiliki "learningMethod" yang diisi spesifik oleh guru, kamu WAJIB menggunakan metode tersebut alih-alih metode otomatismu.
 
-Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model Pembelajarannya.`;
+Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model Pembelajarannya.
+
+[E] PEDOMAN ASESMEN BERDASARKAN FASE DAN METODE (OTOMATISASI AI):
+Jika guru meminta Asesmen "Otomatis dari AI", kamu WAJIB menyusun instrumen berdasarkan Fase (Kelas) dan Metode Pembelajaran yang dipilih, dengan panduan 10 teknik berikut:
+1. ASESMEN DIAGNOSTIK / KOGNITIF TP (Pemetaan awal / Kuis CBT):
+   - Wawancara/Lisan: (Metode: Diskusi/Pre-teaching). Fase A sangat ideal (tanya jawab konsep dasar), Fase B&C untuk menggali miskonsepsi.
+   - Tes Tertulis/Kuis Prasyarat: (Metode: Direct Instruction). Fase A (menjodohkan gambar), Fase B&C (2-3 soal hitungan/logika dasar).
+   - Angket/Survei Non-Kognitif: (Metode: Student-Centered). Fase A (emotikon), Fase B&C (ceklis kesiapan).
+2. ASESMEN FORMATIF (Mendapat umpan balik saat proses belajar):
+   - Observasi: (Metode: Cooperative Learning, Praktikum, Roleplay). Berlaku Fase A, B, C (lembar ceklis perilaku).
+   - Kuis Singkat/Exit Ticket: (Metode: Refleksi Harian). Fase A (pertanyaan lisan), Fase B&C (1-3 soal pendek tertulis).
+   - Penilaian Diri (Self-Assessment): (Metode: Deep Learning, Refleksi). Fase A (centang sederhana), Fase B&C (pertanyaan metakognitif).
+   - Penilaian Antarteman (Peer Assessment): (Metode: Diskusi Kelompok, Tutor Sebaya). Tunda untuk Fase A. Berlaku Fase B&C dengan rubrik ketat.
+3. ASESMEN SUMATIF (Mengukur hasil akhir untuk rapor):
+   - Proyek: (Metode: PjBL). Fase A (skala kecil/1-2 hari), Fase B&C (investigasi/pembuatan produk).
+   - Unjuk Kerja (Performance): (Metode: Demonstrasi, Praktik). Fase A, B, C didemonstrasikan langsung (rubrik keterampilan).
+   - Portofolio: (Metode: Penugasan Jangka Panjang). Fase A (kumpulan lembar/gambar), Fase B&C (kumpulan karya dengan refleksi).
+   - Tes Tertulis: (Metode: Konvensional, Evaluasi Unit). Fase A (PG bergambar), Fase B&C (Soal HOTS/analisis kasus).`;
 
   const isModulType = schemaKey.startsWith("modul_ajar") || schemaKey.startsWith("asesmen_") || schemaKey === "rubrik";
   const generalKbcRules = isModulType ? baseKbcRules + modulKbcRules : baseKbcRules;
@@ -652,26 +669,28 @@ Penting:
 
   // Context Builder khusus untuk Asesmen
   if (schemaKey === "asesmen_kognitif") {
-    userPrompt = `Buatkan dokumen Asesmen Kognitif TP yang berfokus pada tes pemahaman kognitif/teori untuk Tujuan Pembelajaran terpilih. Instrumen ini murni untuk evaluasi kognitif (Pilihan Ganda, Benar/Salah, atau Isian Singkat) yang ideal untuk diujikan via UI SIAKAD (CBT).
-Input Detail Guru: ${optimizedData.asesmenKognitifDetail || 'Kuis interaktif singkat'}.
-Model Pembelajaran: ${optimizedData.model}. Metode: ${optimizedData.metode}.
+    userPrompt = `Buatkan dokumen Asesmen Kognitif TP / Diagnostik.
+Input Detail Guru: ${optimizedData.asesmenKognitifDetail || 'Kuis interaktif singkat (atau diagnostik otomatis)'}.
+Fase/Kelas: ${optimizedData.fase} - ${optimizedData.kelas}. Model: ${optimizedData.model}. Metode: ${optimizedData.metode}.
+PASTIKAN jika detail guru mengindikasikan "otomatis", rujuk pedoman [E] poin 1 (Asesmen Diagnostik) berdasarkan Fase & Metode. Jika spesifik kognitif, buat soal teori/CBT.
 Data Modul: ${JSON.stringify(optimizedData, null, 2)}`;
   }
   
   if (schemaKey === "asesmen_formatif") {
-    userPrompt = `Buatkan dokumen Asesmen Formatif yang mendampingi proses belajar (misal: Lembar Kerja Peserta Didik / LKPD, Panduan Proyek, atau Lembar Observasi Praktik). 
-Target Instrumen Utama: ${optimizedData.asesmenFormatifTarget || 'Otomatis dari AI (Sesuai Metode Mengajar)'}.
+    userPrompt = `Buatkan dokumen Asesmen Formatif yang mendampingi proses belajar. 
+Target Instrumen Utama: ${optimizedData.asesmenFormatifTarget || 'Otomatis dari AI (Sesuai Metode Mengajar & Fase)'}.
 Detail Instruksi Guru: ${optimizedData.asesmenFormatifDetail || 'Susun instrumen proses yang relevan'}.
-Model Pembelajaran: ${optimizedData.model}. Metode: ${optimizedData.metode}.
-PASTIKAN instrumen ini sangat relevan dengan metode yang digunakan (misal jika metode praktik, buat lembar kerja praktik).
+Fase/Kelas: ${optimizedData.fase} - ${optimizedData.kelas}. Model: ${optimizedData.model}. Metode: ${optimizedData.metode}.
+PASTIKAN merujuk kuat pada pedoman [E] poin 2 jika instrumen "Otomatis".
 Data Modul: ${JSON.stringify(optimizedData, null, 2)}`;
   }
 
   if (schemaKey === "asesmen_sumatif") {
-    userPrompt = `Buatkan dokumen Asesmen Sumatif sebagai tes tertulis akhir untuk mengukur Capaian Pembelajaran dan TP secara utuh.
-Target Instrumen Utama: ${optimizedData.asesmenSumatifTarget || 'Ujian Tertulis (Pilihan Ganda & Uraian)'}.
-Detail Instruksi Guru: ${optimizedData.asesmenSumatifDetail || 'Buatkan 10 Soal Pilihan Ganda dan 5 Uraian HOTS'}.
-PASTIKAN menyertakan kunci jawaban untuk setiap soal.
+    userPrompt = `Buatkan dokumen Asesmen Sumatif sebagai tes/evaluasi akhir.
+Target Instrumen Utama: ${optimizedData.asesmenSumatifTarget || 'Otomatis dari AI (Sesuai Metode Mengajar & Fase)'}.
+Detail Instruksi Guru: ${optimizedData.asesmenSumatifDetail || 'Susun evaluasi akhir yang relevan'}.
+Fase/Kelas: ${optimizedData.fase} - ${optimizedData.kelas}. Model: ${optimizedData.model}. Metode: ${optimizedData.metode}.
+PASTIKAN merujuk kuat pada pedoman [E] poin 3 jika instrumen "Otomatis" dan selalu sertakan kunci jawaban/rubrik penilaian.
 Data Modul: ${JSON.stringify(optimizedData, null, 2)}`;
   }
 

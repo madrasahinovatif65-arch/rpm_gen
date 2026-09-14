@@ -1270,6 +1270,9 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                       className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-medium"
                     />
                     <datalist id="asesmen-kognitif-list">
+                      <option value="Wawancara / Tanya Jawab Lisan (Diagnostik)" />
+                      <option value="Tes Tertulis / Kuis Prasyarat (Diagnostik)" />
+                      <option value="Angket / Survei Non-Kognitif (Diagnostik)" />
                       <option value="Kuis interaktif singkat (Pilihan Ganda)" />
                       <option value="Soal Benar/Salah" />
                       <option value="Isian Singkat" />
@@ -1292,10 +1295,10 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                       className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-medium"
                     >
                       <option value="">Otomatis dari AI</option>
-                      <option value="Lembar Kerja Peserta Didik (LKPD Aktivitas)">Lembar Kerja Peserta Didik (LKPD)</option>
-                      <option value="Jurnal Refleksi Siswa">Jurnal Refleksi Siswa</option>
-                      <option value="Penilaian Proyek / Kinerja">Penilaian Proyek / Kinerja</option>
-                      <option value="Lembar Observasi Praktik">Lembar Observasi Praktik</option>
+                      <option value="Observasi">Observasi</option>
+                      <option value="Kuis Singkat / Exit Ticket">Kuis Singkat / Exit Ticket</option>
+                      <option value="Penilaian Diri (Self-Assessment)">Penilaian Diri (Self-Assessment)</option>
+                      <option value="Penilaian Antarteman (Peer Assessment)">Penilaian Antarteman (Peer Assessment)</option>
                     </select>
                     <input
                       type="text"
@@ -1322,8 +1325,10 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                       className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-medium"
                     >
                       <option value="">Otomatis dari AI</option>
-                      <option value="Ujian Tertulis PG & Uraian">Ujian Tertulis PG & Uraian</option>
-                      <option value="Penugasan Sumatif Akhir">Penugasan Sumatif Akhir</option>
+                      <option value="Proyek">Proyek</option>
+                      <option value="Unjuk Kerja (Performance Assessment)">Unjuk Kerja (Performance Assessment)</option>
+                      <option value="Portofolio">Portofolio</option>
+                      <option value="Tes Tertulis">Tes Tertulis</option>
                     </select>
                     <input
                       type="text"

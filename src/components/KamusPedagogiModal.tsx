@@ -196,34 +196,50 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
             <section id="kamus-panel-asesmen" role="tabpanel" aria-labelledby="kamus-tab-asesmen" className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="mb-4">
                 <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                  <span className="text-blue-500">Bentuk Asesmen</span>
+                  <span className="text-blue-500">Pedoman 10 Teknik Asesmen (Berdasarkan Fase & Metode)</span>
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  Panduan memilih jenis instrumen penilaian pembelajaran:
+                  Jika Anda memilih <b>Otomatis dari AI</b>, sistem akan menggunakan matriks riset ini untuk meracik instrumen yang paling akurat secara pedagogis untuk Fase (Kelas) Anda:
                 </p>
               </div>
               
-              <div className="space-y-3">
-                <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/40 text-blue-600 rounded-lg shrink-0">1</div>
-                  <div>
-                    <h5 className="font-bold text-sm text-slate-700 dark:text-slate-300">Asesmen Kognitif TP (UI / CBT)</h5>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Digunakan untuk menghasilkan kuis interaktif (Pilihan Ganda, Benar/Salah, Isian) yang difokuskan pada uji teori dan dirancang untuk dikerjakan langsung melalui aplikasi (SIAKAD).</p>
-                  </div>
+              <div className="space-y-4">
+                {/* Diagnostik */}
+                <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                  <h4 className="font-bold text-sm text-blue-700 dark:text-blue-400 flex items-center gap-2 mb-2">
+                    <div className="p-1 bg-blue-100 dark:bg-blue-900/40 rounded-md">1</div> Asesmen Diagnostik / Kognitif TP
+                  </h4>
+                  <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-2 ml-6 list-disc">
+                    <li><b>Wawancara / Lisan:</b> Fase A (tanya jawab konsep dasar, tanpa kendala calistung). Fase B&C (menggali miskonsepsi). <i>Metode: Diskusi/Pre-teaching.</i></li>
+                    <li><b>Tes Tertulis / Kuis Prasyarat:</b> Fase A (menjodohkan gambar). Fase B&C (2-3 soal logika dasar). <i>Metode: Direct Instruction.</i></li>
+                    <li><b>Angket / Survei Non-Kognitif:</b> Fase A (angket bergambar/emotikon). Fase B&C (survei/ceklis kesiapan). <i>Metode: Student-Centered.</i></li>
+                  </ul>
                 </div>
-                <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 rounded-lg shrink-0">2</div>
-                  <div>
-                    <h5 className="font-bold text-sm text-slate-700 dark:text-slate-300">Asesmen Formatif (Aktivitas / LKPD)</h5>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Dokumen cetak (Word) untuk mendampingi proses belajar. Cocok untuk Lembar Kerja Peserta Didik (LKPD), Lembar Observasi Praktik, dan Jurnal Refleksi.</p>
-                  </div>
+
+                {/* Formatif */}
+                <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                  <h4 className="font-bold text-sm text-emerald-700 dark:text-emerald-400 flex items-center gap-2 mb-2">
+                    <div className="p-1 bg-emerald-100 dark:bg-emerald-900/40 rounded-md">2</div> Asesmen Formatif (Mendapat Umpan Balik)
+                  </h4>
+                  <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-2 ml-6 list-disc">
+                    <li><b>Observasi:</b> Berlaku semua fase (A, B, C). Guru menggunakan lembar ceklis untuk mengamati perilaku. <i>Metode: Cooperative Learning, Praktikum.</i></li>
+                    <li><b>Kuis Singkat / Exit Ticket:</b> Fase A (pertanyaan lisan saat pulang). Fase B&C (1-3 soal pendek tertulis di akhir kelas). <i>Metode: Refleksi Harian.</i></li>
+                    <li><b>Penilaian Diri (Self-Assessment):</b> Fase A (format sangat sederhana/centang). Fase B&C (metakognitif/refleksi tulis). <i>Metode: Deep Learning.</i></li>
+                    <li><b>Penilaian Antarteman (Peer Assessment):</b> Belum disarankan untuk Fase A. Berlaku Fase B&C dengan dibekali rubrik ketat. <i>Metode: Tutor Sebaya.</i></li>
+                  </ul>
                 </div>
-                <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                  <div className="p-2 bg-amber-100 dark:bg-amber-900/40 text-amber-600 rounded-lg shrink-0">3</div>
-                  <div>
-                    <h5 className="font-bold text-sm text-slate-700 dark:text-slate-300">Asesmen Sumatif (Ujian Akhir Tertulis)</h5>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Instrumen evaluasi utuh di akhir unit/bab (Cetak Word). Biasanya memuat Soal Pilihan Ganda Kompleks dan Uraian HOTS secara menyeluruh beserta kunci jawabannya.</p>
-                  </div>
+
+                {/* Sumatif */}
+                <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                  <h4 className="font-bold text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2 mb-2">
+                    <div className="p-1 bg-amber-100 dark:bg-amber-900/40 rounded-md">3</div> Asesmen Sumatif (Mengukur Hasil Akhir)
+                  </h4>
+                  <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-2 ml-6 list-disc">
+                    <li><b>Proyek:</b> Fase A (skala kecil 1-2 hari). Fase B&C (investigasi, perancangan, dan pembuatan solusi/produk). <i>Metode: PjBL.</i></li>
+                    <li><b>Unjuk Kerja (Performance):</b> Berlaku semua fase (A, B, C). Demonstrasi kemampuan (seperti praktik wudu/presentasi). <i>Metode: Praktik.</i></li>
+                    <li><b>Portofolio:</b> Fase A (kumpulan lembar mewarnai/tulisan). Fase B&C (karya terpilih beserta refleksi). <i>Metode: Penugasan Jangka Panjang.</i></li>
+                    <li><b>Tes Tertulis:</b> Fase A (PG bergambar). Fase B&C (Soal HOTS / studi kasus / bukan hafalan). <i>Metode: Evaluasi Akhir Unit.</i></li>
+                  </ul>
                 </div>
               </div>
             </section>
