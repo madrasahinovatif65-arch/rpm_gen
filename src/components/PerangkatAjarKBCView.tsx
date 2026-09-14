@@ -20,6 +20,7 @@ import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { useKbcState, defaultKbcState } from "../store/kbcState";
 import { subscribeToJobs, enqueueJob, clearAllJobs, clearJobByPrefix, AIJob } from "../lib/aiJobManager";
+import { saveGeneratedDoc } from "../lib/perangkatKbcStorage";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
 import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
@@ -1579,9 +1580,17 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   <div className="a4-preview-container bg-slate-900 p-0 rounded-lg shadow-inner min-h-[800px] h-full flex">
                     <InlineJsonEditor
                       initialJson={generatedJson[activeDoc]}
-                      onSave={(newJson) => {
+                      onSave={async (newJson) => {
                         setGeneratedJson(prev => ({ ...prev, [activeDoc]: newJson }));
                         localStorage.setItem(`kbc_cache_${activeDoc}`, JSON.stringify(newJson));
+                        
+                        try {
+                          // Auto-save edited draft to cloud
+                          await saveGeneratedDoc(activeDoc, newJson, { ...baseFormData, ...formDataModul });
+                        } catch (e) {
+                          console.error("Gagal sinkronisasi draft ke cloud", e);
+                        }
+                        
                         setIsEditingDraft(false);
                       }}
                       onCancel={() => setIsEditingDraft(false)}
