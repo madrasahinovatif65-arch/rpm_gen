@@ -11,8 +11,9 @@ import {
   AlertTriangle,
   Layers, 
   Calendar, 
-  Award,
-import { BookMarked, Printer, AlertTriangle, ArrowRight, Save, Trash2, Calendar, FileText, CheckCircle, RefreshCcw, Loader2, PlayCircle, Settings, Download, X, HelpCircle, FileSpreadsheet, LayoutList, Layers, FileCheck, BrainCircuit, HeartHandshake, Sparkles } from "lucide-react";
+  Award
+} from "lucide-react";
+import { BookMarked, Printer, AlertTriangle, ArrowRight, Save, Trash2, FileText, CheckCircle, RefreshCcw, PlayCircle, Settings, X, HelpCircle, FileSpreadsheet, LayoutList, BrainCircuit } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-supabase";
@@ -22,7 +23,7 @@ import { useKbcState, defaultKbcState } from "../store/kbcState";
 import { subscribeToJobs, enqueueJob, clearAllJobs, clearJobByPrefix, AIJob } from "../lib/aiJobManager";
 import { saveGeneratedDoc } from "../lib/perangkatKbcStorage";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
-import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
+import { ModulAjarRenderer, AsesmenRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
 import { InlineJsonEditor } from "./InlineJsonEditor";
@@ -36,7 +37,7 @@ interface PerangkatAjarKBCViewProps {
 
 export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ config, onNavigateToCP }) => {
   const [activeDoc, setActiveDoc] = useState<
-    "analisis_cp" | "tp" | "atp" | "prota" | "prosem" | "kktp" | "modul_ajar" | "lkpd" | "rubrik"
+    "analisis_cp" | "tp" | "atp" | "prota" | "prosem" | "kktp" | "modul_ajar" | "asesmen_kognitif" | "asesmen_formatif" | "asesmen_sumatif" | "rubrik"
   >("analisis_cp");
 
   const [inputTab, setInputTab] = useState<"admin" | "modul">("admin");
@@ -205,13 +206,15 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     { id: "prosem", label: "5. Program Semester", fullTitle: "Program Semester (Prosem) KBC", icon: FileSpreadsheet },
     { id: "kktp", label: "6. KKTP KBC", fullTitle: "Kriteria Ketercapaian Tujuan Pembelajaran (KKTP) KBC", icon: Award },
     { id: "modul_ajar", label: "7. Modul Ajar KBC", fullTitle: "Modul Ajar Deep Learning KBC", icon: HeartHandshake },
-    { id: "lkpd", label: "8. LKPD KBC", fullTitle: "Lembar Kerja Peserta Didik (LKPD) KBC", icon: FileText },
-    { id: "rubrik", label: "9. Rubrik Formatif & Sumatif", fullTitle: "Rubrik Penilaian Formatif & Sumatif KBC", icon: CheckSquare }
+    { id: "asesmen_kognitif", label: "8. Asesmen Kognitif", fullTitle: "Asesmen Kognitif TP (UI SIAKAD)", icon: HelpCircle },
+    { id: "asesmen_formatif", label: "9. Asesmen Formatif", fullTitle: "Asesmen Formatif (Aktivitas & LKPD)", icon: FileText },
+    { id: "asesmen_sumatif", label: "10. Asesmen Sumatif", fullTitle: "Asesmen Sumatif (Tes Tertulis Akhir)", icon: CheckCircle },
+    { id: "rubrik", label: "11. Rubrik Penilaian", fullTitle: "Rubrik Penilaian Formatif & Sumatif KBC", icon: CheckSquare }
   ];
 
   const handleSelectDoc = (docId: any) => {
     setActiveDoc(docId);
-    if (docId === "modul_ajar" || docId === "lkpd" || docId === "rubrik") {
+    if (docId === "modul_ajar" || docId.startsWith("asesmen_") || docId === "rubrik") {
       setInputTab("modul");
     } else {
       setInputTab("admin");
@@ -548,7 +551,10 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       case 'prota': return <ProtaRenderer data={data} context={state} />;
       case 'prosem': return <ProsemRenderer data={data} context={state} />;
       case 'kktp': return <KktpRenderer data={data} context={state} />;
-      case 'lkpd': return <LkpdRenderer data={data} context={state} />;
+      case 'asesmen_kognitif':
+      case 'asesmen_formatif':
+      case 'asesmen_sumatif':
+        return <AsesmenRenderer data={data} context={state} />;
       case 'rubrik': return <RubrikRenderer data={data} context={state} />;
       default: return <div dangerouslySetInnerHTML={{ __html: generatedDocs[docType] || "" }} />;
     }
@@ -583,7 +589,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 disabled={isGenerating}
                 className="w-full lg:w-auto"
               >
-                Generate Modul + LKPD + Rubrik
+                Generate Modul + 3 Asesmen + Rubrik
               </Button>
             ) : (
               <Button
@@ -627,7 +633,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
           aria-pressed={inputTab === "modul"}
         >
           <BookMarked className="w-4 h-4" />
-          <span>Modul, LKPD & Rubrik</span>
+          <span>Modul, Asesmen & Rubrik</span>
         </button>
       </div>
 
@@ -1226,6 +1232,95 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               </div>
             </div>
 
+            <div className="pt-4 mt-6 border-t border-slate-200 dark:border-slate-700">
+              <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-base md:text-lg mb-4 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-600" />
+                Konfigurasi 3 Asesmen Pembelajaran
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Asesmen Kognitif */}
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="font-bold text-slate-800 dark:text-slate-200 text-sm">Asesmen Kognitif TP (UI)</label>
+                  </div>
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      list="asesmen-kognitif-list"
+                      value={formDataModul.asesmenKognitifDetail || ""}
+                      onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, asesmenKognitifDetail: e.target.value } }))}
+                      placeholder="Kuis interaktif singkat (PG & Isian)"
+                      className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-medium"
+                    />
+                    <datalist id="asesmen-kognitif-list">
+                      <option value="Kuis interaktif singkat (Pilihan Ganda)" />
+                      <option value="Soal Benar/Salah" />
+                      <option value="Isian Singkat" />
+                    </datalist>
+                  </div>
+                </div>
+
+                {/* Asesmen Formatif */}
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="font-bold text-slate-800 dark:text-slate-200 text-sm">Asesmen Formatif (Proses)</label>
+                    <button onClick={() => setShowKamusModal("asesmen")} title="Kamus Asesmen" className="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full hover:bg-emerald-200 transition-colors">
+                      ? Kamus
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <select
+                      value={formDataModul.asesmenFormatifTarget || ""}
+                      onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, asesmenFormatifTarget: e.target.value } }))}
+                      className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-medium"
+                    >
+                      <option value="">Otomatis dari AI</option>
+                      <option value="Lembar Kerja Peserta Didik (LKPD Aktivitas)">Lembar Kerja Peserta Didik (LKPD)</option>
+                      <option value="Jurnal Refleksi Siswa">Jurnal Refleksi Siswa</option>
+                      <option value="Penilaian Proyek / Kinerja">Penilaian Proyek / Kinerja</option>
+                      <option value="Lembar Observasi Praktik">Lembar Observasi Praktik</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={formDataModul.asesmenFormatifDetail || ""}
+                      onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, asesmenFormatifDetail: e.target.value } }))}
+                      placeholder="Detail... (Opsional)"
+                      className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Asesmen Sumatif */}
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="font-bold text-slate-800 dark:text-slate-200 text-sm">Asesmen Sumatif (Akhir)</label>
+                    <button onClick={() => setShowKamusModal("asesmen")} title="Kamus Asesmen" className="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full hover:bg-emerald-200 transition-colors">
+                      ? Kamus
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <select
+                      value={formDataModul.asesmenSumatifTarget || ""}
+                      onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, asesmenSumatifTarget: e.target.value } }))}
+                      className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-medium"
+                    >
+                      <option value="">Otomatis dari AI</option>
+                      <option value="Ujian Tertulis PG & Uraian">Ujian Tertulis PG & Uraian</option>
+                      <option value="Penugasan Sumatif Akhir">Penugasan Sumatif Akhir</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={formDataModul.asesmenSumatifDetail || ""}
+                      onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, asesmenSumatifDetail: e.target.value } }))}
+                      placeholder="misal: 10 PG, 5 Uraian HOTS"
+                      className="w-full px-3 py-2 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900">
               <div>
                 <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Kantor Kemenag Kabupaten/Kota</label>
@@ -1405,7 +1500,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               else if (umumStatus === "success") isFinished = true;
             }
             
-            const isModulType = doc.id === "modul_ajar" || doc.id === "lkpd" || doc.id === "rubrik";
+            const isModulType = doc.id === "modul_ajar" || doc.id.startsWith("asesmen_") || doc.id === "rubrik";
             
             return (
               <button

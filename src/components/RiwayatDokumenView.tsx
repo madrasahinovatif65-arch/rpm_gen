@@ -22,7 +22,7 @@ import { Button } from "./ui/Button";
 import { Badge } from "./ui/Badge";
 import { Card } from "./ui/Card";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
-import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
+import { ModulAjarRenderer, AsesmenRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 
 interface RiwayatDokumenViewProps {
   onViewDocument?: (doc: PerangkatDoc) => void;
@@ -62,7 +62,10 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
       case 'modul_ajar': 
       case 'modul_ajar_umum':
         return <ModulAjarRenderer umum={doc.data} meetings={[]} context={normalizedContext} />;
-      case 'lkpd': return <LkpdRenderer data={doc.data} context={normalizedContext} />;
+      case 'asesmen_kognitif':
+      case 'asesmen_formatif':
+      case 'asesmen_sumatif':
+        return <AsesmenRenderer data={doc.data} context={normalizedContext} />;
       case 'rubrik': return <RubrikRenderer data={doc.data} context={normalizedContext} />;
       case 'modul_ajar_ai_html':
         return (
@@ -120,7 +123,9 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
     prosem: "Program Semester",
     kktp: "KKTP",
     modul_ajar: "Modul Ajar",
-    lkpd: "LKPD",
+    asesmen_kognitif: "Asesmen Kognitif",
+    asesmen_formatif: "Asesmen Formatif",
+    asesmen_sumatif: "Asesmen Sumatif",
     rubrik: "Rubrik"
   };
 
@@ -213,7 +218,7 @@ export const RiwayatDokumenView: React.FC<RiwayatDokumenViewProps> = ({ onViewDo
       
       const mainTypes = [
         "analisis_cp", "tp", "atp", "prota", "prosem", "kktp", 
-        "modul_ajar_umum", "lkpd", "rubrik", "modul_ajar_ai_html"
+        "modul_ajar_umum", "asesmen_kognitif", "asesmen_formatif", "asesmen_sumatif", "rubrik", "modul_ajar_ai_html"
       ];
 
       const docsToExport: PerangkatDoc[] = [];

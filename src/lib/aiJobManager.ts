@@ -26,7 +26,7 @@ const loadInitialJobsRecord = (): Record<string, AIJob> => {
   const initial: Record<string, AIJob> = {};
   const mainTypes = [
     "analisis_cp", "tp", "atp", "prota", "prosem", "kktp", 
-    "modul_ajar_umum", "lkpd", "rubrik"
+    "modul_ajar_umum", "asesmen_kognitif", "asesmen_formatif", "asesmen_sumatif", "rubrik"
   ];
 
   try {

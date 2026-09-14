@@ -147,18 +147,22 @@ export const ModulAjarMeetingSchema = z.object({
 });
 export type ModulAjarMeetingType = z.infer<typeof ModulAjarMeetingSchema>;
 
-// 8. LKPD
-export const LkpdSchema = z.object({
-  judul: z.string(),
-  tujuanLkpd: z.array(z.string()).optional().describe("Tujuan kegiatan LKPD"),
-  tujuanKegiatan: z.string(),
-  alatDanBahan: z.array(z.string()),
-  langkahKerja: z.array(z.string()),
-  pertanyaanDiskusi: z.array(z.string()),
-  tugas: z.array(z.object({ pertanyaan: z.string() })).optional().describe("Daftar tugas terstruktur"),
-  tabelPengamatan: z.array(z.object({ kolom1: z.string(), kolom2: z.string(), kolom3: z.string() })).optional()
+// 8. Asesmen (Kognitif, Formatif, Sumatif)
+export const AsesmenSchema = z.object({
+  judul: z.string().describe("Judul dokumen asesmen"),
+  jenisAsesmen: z.string().describe("Jenis asesmen utama"),
+  daftarInstrumen: z.array(z.object({
+    namaInstrumen: z.string().describe("Nama instrumen (misal: Soal Pilihan Ganda, Lembar Kerja, Proyek)"),
+    petunjuk: z.string().describe("Petunjuk pengerjaan atau pelaksanaan"),
+    kontenInstrumen: z.array(z.object({
+      nomor: z.number().optional(),
+      pertanyaanAtauLangkah: z.string().describe("Pertanyaan soal atau deskripsi langkah aktivitas"),
+      opsiJawaban: z.array(z.string()).optional().describe("Isi khusus jika soal berupa pilihan ganda"),
+      kunciJawabanAtauKriteria: z.string().optional().describe("Kunci jawaban atau ekspektasi penilaian")
+    }))
+  }))
 });
-export type LkpdType = z.infer<typeof LkpdSchema>;
+export type AsesmenType = z.infer<typeof AsesmenSchema>;
 
 // Shared kriteria object
 const KriteriaSchema = z.object({
@@ -206,6 +210,8 @@ export const KbcSchemas: Record<string, z.ZodSchema<any>> = {
   "kktp": KktpSchema,
   "modul_ajar_umum": ModulAjarUmumSchema,
   "modul_ajar_meeting": ModulAjarMeetingSchema,
-  "lkpd": LkpdSchema,
+  "asesmen_kognitif": AsesmenSchema,
+  "asesmen_formatif": AsesmenSchema,
+  "asesmen_sumatif": AsesmenSchema,
   "rubrik": RubrikSchema
 };

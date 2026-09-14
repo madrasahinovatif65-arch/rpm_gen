@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  ModulAjarUmumType, ModulAjarMeetingType, LkpdType, RubrikType 
+  ModulAjarUmumType, ModulAjarMeetingType, AsesmenType, RubrikType 
 } from '../../lib/kbcSchemas';
 import { TableHeader, Td, DocumentHeader, DocumentFooter } from './AdministrasiRenderers';
 
@@ -159,37 +159,49 @@ export const ModulAjarRenderer: React.FC<RendererProps> = ({ umum, meetings, con
   );
 };
 
-export const LkpdRenderer: React.FC<RendererProps> = ({ data, context }) => {
-  const lkpd = data as LkpdType;
+export const AsesmenRenderer: React.FC<RendererProps> = ({ data, context }) => {
+  const asesmen = data as AsesmenType;
+  if (!asesmen) return <div>Menunggu data asesmen...</div>;
+  
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', color: '#000', lineHeight: 1.5 }}>
-      <DocumentHeader context={context} title="LEMBAR KERJA PESERTA DIDIK (LKPD)" subtitle={`Mata Pelajaran: ${context.curriculum?.subject} | Kelas: ${context.curriculum?.level}`} />
+      <DocumentHeader context={context} title={(asesmen.judul || "ASESMEN PEMBELAJARAN").toUpperCase()} subtitle={`Jenis: ${asesmen.jenisAsesmen || "Asesmen"} | Mapel: ${context.curriculum?.subject} | Kelas: ${context.curriculum?.level}`} />
       
-      <div style={{ border: '1px solid black', padding: '15px', marginBottom: '20px' }}>
-        <strong>Nama Siswa / Kelompok:</strong> ..............................................................<br/><br/>
-        <strong>Kelas:</strong> {context.curriculum?.level}<br/><br/>
-        <strong>Materi:</strong> {context.module?.topikLokal}
-      </div>
-
-      <h4>A. Tujuan LKPD</h4>
-      <ul>
-        {lkpd.tujuanLkpd?.map((t, i) => <li key={i}>{t}</li>)}
-      </ul>
-
-      <h4>B. Langkah Kerja / Petunjuk</h4>
-      <ol>
-        {lkpd.langkahKerja?.map((l, i) => <li key={i}>{l}</li>)}
-      </ol>
-
-      <h4>C. Tugas / Pertanyaan</h4>
-      <ol>
-        {lkpd.tugas?.map((t, i) => (
-          <li key={i} style={{ marginBottom: '20px' }}>
-            <strong>{t.pertanyaan}</strong>
-            <div style={{ border: '1px dashed #ccc', height: '100px', marginTop: '10px' }}></div>
-          </li>
-        ))}
-      </ol>
+      {asesmen.daftarInstrumen?.map((instr, idx) => (
+        <div key={idx} style={{ marginBottom: '40px' }}>
+          <h4 style={{ backgroundColor: '#f0fdf4', borderLeft: '4px solid #16a34a', padding: '10px' }}>
+            Instrumen {idx + 1}: {instr.namaInstrumen}
+          </h4>
+          <p><strong>Petunjuk:</strong> {instr.petunjuk}</p>
+          
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px' }}>
+            <tbody>
+              {instr.kontenInstrumen?.map((konten, kIdx) => (
+                <tr key={kIdx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ width: '30px', verticalAlign: 'top', padding: '10px 0' }}>
+                    <strong>{konten.nomor || kIdx + 1}.</strong>
+                  </td>
+                  <td style={{ padding: '10px 0' }}>
+                    <div style={{ marginBottom: '8px' }}>{konten.pertanyaanAtauLangkah}</div>
+                    {konten.opsiJawaban && konten.opsiJawaban.length > 0 && (
+                      <ol type="A" style={{ margin: '10px 0', paddingLeft: '20px' }}>
+                        {konten.opsiJawaban.map((opt, oIdx) => (
+                          <li key={oIdx}>{opt}</li>
+                        ))}
+                      </ol>
+                    )}
+                    {konten.kunciJawabanAtauKriteria && (
+                      <div style={{ marginTop: '10px', fontSize: '12px', color: '#475569', fontStyle: 'italic', backgroundColor: '#f8fafc', padding: '5px' }}>
+                        * Kunci / Kriteria: {konten.kunciJawabanAtauKriteria}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
 
       <DocumentFooter context={context} />
     </div>

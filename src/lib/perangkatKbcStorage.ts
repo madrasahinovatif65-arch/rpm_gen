@@ -21,7 +21,9 @@ function getDocTitle(docType: string, formData: any): string {
     prosem: "Program Semester",
     kktp: "KKTP",
     modul_ajar_umum: "Modul Ajar",
-    lkpd: "LKPD",
+    asesmen_kognitif: "Asesmen Kognitif",
+    asesmen_formatif: "Asesmen Formatif",
+    asesmen_sumatif: "Asesmen Sumatif",
     rubrik: "Rubrik Penilaian",
     modul_ajar_ai_html: "Modul Ajar AI (Full HTML)"
   };

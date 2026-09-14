@@ -593,7 +593,7 @@ Gunakan pedoman baku berikut jika guru memilih model di bawah ini:
 
 Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model Pembelajarannya.`;
 
-  const isModulType = schemaKey.startsWith("modul_ajar") || schemaKey === "lkpd" || schemaKey === "rubrik";
+  const isModulType = schemaKey.startsWith("modul_ajar") || schemaKey.startsWith("asesmen_") || schemaKey === "rubrik";
   const generalKbcRules = isModulType ? baseKbcRules + modulKbcRules : baseKbcRules;
 
   // Filter out irrelevant data to save tokens
@@ -639,21 +639,40 @@ ${schemaKey === "prosem" && Array.isArray(optimizedData.blockedWeeks) && optimiz
   // Context Builder khusus untuk Pertemuan
   if (schemaKey === "modul_ajar_meeting" && meetingNumber > 0) {
     const isMultiTp = Array.isArray(optimizedData.kodeTp) && optimizedData.kodeTp.length > 1;
-    const tpText = isMultiTp 
-      ? `Gabungan TP: ${optimizedData.kodeTp.join(", ")}` 
-      : optimizedData.topik;
-      
-    userPrompt = `Buatkan Skenario Kegiatan Belajar Mengajar (KBM) KHUSUS HANYA UNTUK PERTEMUAN KE-${meetingNumber} (dari total ${optimizedData.jumlahPertemuan || 1} pertemuan).
-Topik Utama: ${tpText}
-Sub Topik/Fokus Pertemuan ini: Bebas tentukan oleh AI berdasarkan silabus logis untuk pertemuan ke-${meetingNumber}.
-Model Pembelajaran: ${optimizedData.model || 'Problem Based Learning (PBL)'}
-Metode: ${optimizedData.metode || 'Diskusi, Ceramah Interaktif'}
+    userPrompt = `Buatkan detail skenario pembelajaran untuk PERTEMUAN KE-${meetingNumber} (Fokus Topik: ${optimizedData.topikLokal || optimizedData.topik}).
+Data pendukung (Model/Sintak):
+${JSON.stringify(optimizedData, null, 2)}
 
 Penting:
 - Berikan judul pertemuan yang relevan.
 - Fokus sintak harus berisi nama fase model ${optimizedData.model} yang akan dijalankan pada pertemuan ini.
 - Untuk kegiatan Pendahuluan, Inti, dan Penutup: berikan skenario rinci (ucapan/aktivitas guru & siswa) yang mencerminkan nilai PPRA Kemenag.
 - "pertemuanKe" WAJIB diisi dengan angka ${meetingNumber}.${isMultiTp ? "\n- Pastikan skenario memfasilitasi pencapaian berbagai Tujuan Pembelajaran yang dipilih secara logis bertahap." : ""}`;
+  }
+
+  // Context Builder khusus untuk Asesmen
+  if (schemaKey === "asesmen_kognitif") {
+    userPrompt = `Buatkan dokumen Asesmen Kognitif TP yang berfokus pada tes pemahaman kognitif/teori untuk Tujuan Pembelajaran terpilih. Instrumen ini murni untuk evaluasi kognitif (Pilihan Ganda, Benar/Salah, atau Isian Singkat) yang ideal untuk diujikan via UI SIAKAD (CBT).
+Input Detail Guru: ${optimizedData.asesmenKognitifDetail || 'Kuis interaktif singkat'}.
+Model Pembelajaran: ${optimizedData.model}. Metode: ${optimizedData.metode}.
+Data Modul: ${JSON.stringify(optimizedData, null, 2)}`;
+  }
+  
+  if (schemaKey === "asesmen_formatif") {
+    userPrompt = `Buatkan dokumen Asesmen Formatif yang mendampingi proses belajar (misal: Lembar Kerja Peserta Didik / LKPD, Panduan Proyek, atau Lembar Observasi Praktik). 
+Target Instrumen Utama: ${optimizedData.asesmenFormatifTarget || 'Otomatis dari AI (Sesuai Metode Mengajar)'}.
+Detail Instruksi Guru: ${optimizedData.asesmenFormatifDetail || 'Susun instrumen proses yang relevan'}.
+Model Pembelajaran: ${optimizedData.model}. Metode: ${optimizedData.metode}.
+PASTIKAN instrumen ini sangat relevan dengan metode yang digunakan (misal jika metode praktik, buat lembar kerja praktik).
+Data Modul: ${JSON.stringify(optimizedData, null, 2)}`;
+  }
+
+  if (schemaKey === "asesmen_sumatif") {
+    userPrompt = `Buatkan dokumen Asesmen Sumatif sebagai tes tertulis akhir untuk mengukur Capaian Pembelajaran dan TP secara utuh.
+Target Instrumen Utama: ${optimizedData.asesmenSumatifTarget || 'Ujian Tertulis (Pilihan Ganda & Uraian)'}.
+Detail Instruksi Guru: ${optimizedData.asesmenSumatifDetail || 'Buatkan 10 Soal Pilihan Ganda dan 5 Uraian HOTS'}.
+PASTIKAN menyertakan kunci jawaban untuk setiap soal.
+Data Modul: ${JSON.stringify(optimizedData, null, 2)}`;
   }
 
   try {

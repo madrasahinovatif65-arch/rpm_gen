@@ -41,6 +41,11 @@ export interface KbcState {
     minutesPerJp: number;
     topikLokal: string;
     karakteristik?: string;
+    asesmenKognitifDetail?: string;
+    asesmenFormatifTarget?: string;
+    asesmenFormatifDetail?: string;
+    asesmenSumatifTarget?: string;
+    asesmenSumatifDetail?: string;
   };
 }
 
