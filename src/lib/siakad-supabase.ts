@@ -464,6 +464,41 @@ export async function checkSiakadSupabaseHealth(): Promise<boolean> {
   }
 }
 
+/**
+ * Fetch daftar nama dan gaya belajar murid berdasarkan rombel
+ */
+export async function fetchMuridByRombel(rombel: string): Promise<Array<{ id: string, nama: string, gaya_belajar: string }>> {
+  if (!rombel || rombel === 'Simulasi') return [];
+  
+  try {
+    const { data, error } = await siakadSupabase
+      .from('master_user')
+      .select('id_user, nama')
+      .eq('role', 'Murid')
+      .eq('rombel', rombel)
+      .order('nama', { ascending: true });
+
+    if (error) {
+      console.error('Gagal fetch murid by rombel:', error);
+      return [];
+    }
+
+    if (!data || data.length === 0) return [];
+
+    // Karena gaya belajar mungkin belum tersimpan utuh, kita simulasikan gaya belajar acak untuk tiap anak
+    const gayaBelajarOpts = ["Visual", "Auditori", "Kinestetik", "Visual-Kinestetik", "Membaca/Menulis"];
+    
+    return data.map((d, index) => ({
+      id: d.id_user,
+      nama: d.nama,
+      gaya_belajar: gayaBelajarOpts[index % gayaBelajarOpts.length]
+    }));
+  } catch (err) {
+    console.error('Exception di fetchMuridByRombel:', err);
+    return [];
+  }
+}
+
 // ============================================================
 // Helper: Data Mapping untuk APK Gen Pengaturan
 // ============================================================

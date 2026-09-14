@@ -32,14 +32,14 @@ import {
 } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
-import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-supabase";
+import { fetchDistinctRombels, fetchKarakteristikByRombel, fetchMuridByRombel } from "../lib/siakad-supabase";
 import { generatePerangkatAjarKBCAPI } from "../lib/geminiClient";
 import { notifySimpanSuccess, notifySimpanError, notifyUnduhSuccess } from "../lib/swal";
 import { useKbcState, defaultKbcState } from "../store/kbcState";
 import { subscribeToJobs, enqueueJob, clearAllJobs, clearJobByPrefix, AIJob } from "../lib/aiJobManager";
 import { saveGeneratedDoc } from "../lib/perangkatKbcStorage";
 import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, KktpRenderer } from './renderers/AdministrasiRenderers';
-import { ModulAjarRenderer, AsesmenRenderer, RubrikRenderer } from './renderers/ModulRenderers';
+import { ModulAjarRenderer, AsesmenRenderer, RubrikRenderer, AnalisisRenderer } from './renderers/ModulRenderers';
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
 import { InlineJsonEditor } from "./InlineJsonEditor";
@@ -53,11 +53,15 @@ interface PerangkatAjarKBCViewProps {
 
 export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ config, onNavigateToCP }) => {
   const [activeDoc, setActiveDoc] = useState<
-    "analisis_cp" | "tp" | "atp" | "prota" | "prosem" | "kktp" | "modul_ajar" | "asesmen_kognitif" | "asesmen_formatif" | "asesmen_sumatif" | "rubrik"
+    "analisis_cp" | "tp" | "atp" | "prota" | "prosem" | "kktp" | "modul_ajar" | "asesmen_kognitif" | "asesmen_formatif" | "asesmen_sumatif" | "rubrik" | "analisis_penilaian"
   >("analisis_cp");
 
-  const [inputTab, setInputTab] = useState<"admin" | "modul">("admin");
+  const [inputTab, setInputTab] = useState<"admin" | "modul" | "analisis">("admin");
   const [showKamusModal, setShowKamusModal] = useState<"model" | "metode" | "asesmen" | null>(null);
+
+  const [availableStudents, setAvailableStudents] = useState<Array<{ id: string, nama: string, gaya_belajar: string }>>([]);
+  const [analisisTargetAsesmen, setAnalisisTargetAsesmen] = useState<string>("asesmen_sumatif");
+  const [analisisSelectedStudentId, setAnalisisSelectedStudentId] = useState<string>("");
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingProgress, setGeneratingProgress] = useState("");
@@ -116,6 +120,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         }));
       }
       setIsFetchingRombel(false);
+      
+      const muridData = await fetchMuridByRombel(state.curriculum.level);
+      setAvailableStudents(muridData);
+      if (muridData.length > 0) {
+        setAnalisisSelectedStudentId(muridData[0].id);
+      }
     }
     syncKarakteristik();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -225,13 +235,16 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     { id: "asesmen_kognitif", label: "8. Asesmen Kognitif", fullTitle: "Asesmen Kognitif TP (UI SIAKAD)", icon: HelpCircle },
     { id: "asesmen_formatif", label: "9. Asesmen Formatif", fullTitle: "Asesmen Formatif (Aktivitas & LKPD)", icon: FileText },
     { id: "asesmen_sumatif", label: "10. Asesmen Sumatif", fullTitle: "Asesmen Sumatif (Tes Tertulis Akhir)", icon: CheckCircle },
-    { id: "rubrik", label: "11. Rubrik Penilaian", fullTitle: "Rubrik Penilaian Formatif & Sumatif KBC", icon: CheckSquare }
+    { id: "rubrik", label: "11. Rubrik Penilaian", fullTitle: "Rubrik Penilaian Formatif & Sumatif KBC", icon: CheckSquare },
+    { id: "analisis_penilaian", label: "12. Analisis Penilaian", fullTitle: "Laporan Analisis Penilaian & Tindak Lanjut", icon: Award }
   ];
 
   const handleSelectDoc = (docId: any) => {
     setActiveDoc(docId);
     if (docId === "modul_ajar" || docId.startsWith("asesmen_") || docId === "rubrik") {
       setInputTab("modul");
+    } else if (docId === "analisis_penilaian") {
+      setInputTab("analisis");
     } else {
       setInputTab("admin");
     }
@@ -388,12 +401,29 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     const docMeta = docTypeList.find((d) => d.id === targetType);
     setGeneratingProgress(`Antre menyusun ${docMeta?.fullTitle || targetType}...`);
 
-    const isModulType = targetType === "modul_ajar" || targetType === "lkpd" || targetType === "rubrik";
-    const payloadData = isModulType ? formDataModul : formData;
+    const isModulType = targetType === "modul_ajar" || targetType === "lkpd" || targetType === "rubrik" || targetType.startsWith("asesmen_");
+    let payloadData: any = isModulType ? formDataModul : formData;
+    
+    if (targetType === "analisis_penilaian") {
+      let selectedMurid = availableStudents.find(s => s.id === analisisSelectedStudentId);
+      if (!selectedMurid && analisisSelectedStudentId.startsWith('simulasi_')) {
+        selectedMurid = {
+          id: analisisSelectedStudentId,
+          nama: analisisSelectedStudentId === 'simulasi_fajar' ? 'Fajar' : 'Siti',
+          gaya_belajar: analisisSelectedStudentId === 'simulasi_fajar' ? 'Kinestetik-Visual' : 'Auditori'
+        };
+      }
+      
+      payloadData = {
+        ...formDataModul, // Tetap bawa konteks TP & Modul untuk rubrik
+        analisis_siswa: selectedMurid || { nama: "Siswa Simulasi", gaya_belajar: "Campuran" },
+        analisis_target: analisisTargetAsesmen
+      };
+    }
 
     if (targetType === "modul_ajar") {
       enqueueJob("modul_ajar_umum", "modul_ajar_umum", payloadData);
-      const jmlPertemuan = parseInt(payloadData.jumlahPertemuan || "1", 10);
+      const jmlPertemuan = parseInt((payloadData.jumlahPertemuan || "1") as any, 10);
       for (let i = 1; i <= jmlPertemuan; i++) {
         enqueueJob(`modul_ajar_meeting_${i}`, `modul_ajar_meeting_${i}`, payloadData);
       }
@@ -405,7 +435,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
   const handleGenerate3ModulDocs = async () => {
     enqueueJob("modul_ajar_umum", "modul_ajar_umum", formDataModul);
-    const jmlPertemuan = parseInt(formDataModul.jumlahPertemuan || "1", 10);
+    const jmlPertemuan = parseInt((formDataModul.jumlahPertemuan || "1") as any, 10);
     for (let i = 1; i <= jmlPertemuan; i++) {
       enqueueJob(`modul_ajar_meeting_${i}`, `modul_ajar_meeting_${i}`, formDataModul);
     }
@@ -423,7 +453,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       
       if (t === "modul_ajar") {
         enqueueJob("modul_ajar_umum", "modul_ajar_umum", payloadData);
-        const jmlPertemuan = parseInt(payloadData.jumlahPertemuan || "1", 10);
+        const jmlPertemuan = parseInt((payloadData.jumlahPertemuan || "1") as any, 10);
         for (let i = 1; i <= jmlPertemuan; i++) {
           enqueueJob(`modul_ajar_meeting_${i}`, `modul_ajar_meeting_${i}`, payloadData);
         }
@@ -545,7 +575,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       }
       
       const meetings: any[] = [];
-      const jml = parseInt(state.module.jumlahPertemuan || "1", 10);
+      const jml = parseInt((state.module.jumlahPertemuan || "1") as any, 10);
       for (let i = 1; i <= jml; i++) {
         const meetingData = generatedJson[`modul_ajar_meeting_${i}`] || jobs[`modul_ajar_meeting_${i}`]?.data;
         if (meetingData) {
@@ -567,11 +597,18 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       case 'prota': return <ProtaRenderer data={data} context={state} />;
       case 'prosem': return <ProsemRenderer data={data} context={state} />;
       case 'kktp': return <KktpRenderer data={data} context={state} />;
-      case 'asesmen_kognitif':
-      case 'asesmen_formatif':
-      case 'asesmen_sumatif':
-        return <AsesmenRenderer data={data} context={state} />;
+      case 'asesmen_kognitif': return <AsesmenRenderer data={data} context={state} docType="KOGNITIF" />;
+      case 'asesmen_formatif': return <AsesmenRenderer data={data} context={state} docType="FORMATIF" />;
+      case 'asesmen_sumatif': return <AsesmenRenderer data={data} context={state} docType="SUMATIF" />;
       case 'rubrik': return <RubrikRenderer data={data} context={state} />;
+      case 'analisis_penilaian': return <AnalisisRenderer data={data} context={{
+        ...state,
+        analisis_siswa: availableStudents.find(s => s.id === analisisSelectedStudentId) || {
+          nama: analisisSelectedStudentId === 'simulasi_fajar' ? 'Fajar' : 'Siti',
+          gaya_belajar: analisisSelectedStudentId === 'simulasi_fajar' ? 'Kinestetik-Visual' : 'Auditori'
+        },
+        analisis_target: analisisTargetAsesmen
+      } as any} />;
       default: return <div dangerouslySetInnerHTML={{ __html: generatedDocs[docType] || "" }} />;
     }
   };
@@ -650,6 +687,20 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         >
           <BookMarked className="w-4 h-4" />
           <span>Modul, Asesmen & Rubrik</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setInputTab("analisis")}
+          className={`min-h-[44px] px-4 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+            inputTab === "analisis"
+              ? "bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 shadow-sm"
+              : "text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-800/60"
+          }`}
+          aria-pressed={inputTab === "analisis"}
+        >
+          <Award className="w-4 h-4" />
+          <span>Analisis Asesmen</span>
         </button>
       </div>
 
@@ -1087,8 +1138,8 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                               const selectedAtps = atpList.filter((a: any) => newKodes.includes(a.kodeTp));
                               
                               // Use Set to remove duplicate elemenCp
-                              const newElemenCp = Array.from(new Set(selectedTps.map((t: any) => t.elemen)));
-                              const newRumusanTp = selectedTps.map((t: any) => t.rumusanTp);
+                              const newElemenCp = Array.from(new Set(selectedTps.map((t: any) => t.elemen))) as string[];
+                              const newRumusanTp = selectedTps.map((t: any) => t.rumusanTp) as string[];
                               
                               const autofillKonteks = selectedAtps.length > 0
                                 ? selectedAtps.map((a: any) => `${a.materiPokok} (${a.integrasiNilai})`).join(" | ")
@@ -1236,13 +1287,19 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
               <div className="md:col-span-3">
                 <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
-                  Topik / Konteks Lokal Relevan (Kearifan Lokal Kerinci / Isu Lingkungan / Budaya)
+                  Topik / Konteks Lokal (Formulir Pemetaan Profil Lingkungan Otomatis / FP-PLO)
                 </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <button type="button" onClick={() => updateState(s => ({ ...s, module: { ...s.module, topikLokal: s.module.topikLokal + (s.module.topikLokal ? " | " : "") + "Konteks Mikro (Rumah): Menganalisis/mengaitkan konsep dengan lingkungan rumah tangga dan rutinitas/interaksi keluarga." } }))} className="text-[10px] px-2 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 rounded-md hover:bg-blue-200 dark:hover:bg-blue-800 transition">🏠 Skala Mikro (Rumah)</button>
+                  <button type="button" onClick={() => updateState(s => ({ ...s, module: { ...s.module, topikLokal: s.module.topikLokal + (s.module.topikLokal ? " | " : "") + "Konteks Meso (Sekolah): Mengidentifikasi/mengamati fasilitas madrasah, sudut ruangan kelas, atau interaksi teman sebaya." } }))} className="text-[10px] px-2 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 rounded-md hover:bg-emerald-200 dark:hover:bg-emerald-800 transition">🏫 Skala Meso (Sekolah)</button>
+                  <button type="button" onClick={() => updateState(s => ({ ...s, module: { ...s.module, topikLokal: s.module.topikLokal + (s.module.topikLokal ? " | " : "") + "Konteks Makro (Masyarakat): Meneliti isu sosial, profesi, tradisi daerah, atau kondisi lingkungan di desa/kecamatan setempat." } }))} className="text-[10px] px-2 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 rounded-md hover:bg-amber-200 dark:hover:bg-amber-800 transition">🏘️ Skala Makro (Daerah)</button>
+                  <button type="button" onClick={() => updateState(s => ({ ...s, module: { ...s.module, topikLokal: s.module.topikLokal + (s.module.topikLokal ? " | " : "") + "Konteks Nasional: Membandingkan isu skala luas (Indonesia) dengan kondisi/representasi langsung di wilayah ini." } }))} className="text-[10px] px-2 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200 rounded-md hover:bg-purple-200 dark:hover:bg-purple-800 transition">🇮🇩 Skala Nasional</button>
+                </div>
                 <textarea
                   rows={2}
                   value={formDataModul.topikLokal}
                   onChange={(e) => updateState(s => ({ ...s, module: { ...s.module, topikLokal: e.target.value } }))}
-                  placeholder="misal: Isu lingkungan Hutan TNKS Kerinci, Budaya Gotong Royong Adat Kerinci, Tradisi Mudik Kerinci..."
+                  placeholder="misal: Isu lingkungan Hutan TNKS Kerinci, Budaya Gotong Royong Adat Kerinci, Tradisi Mudik Kerinci... (Bisa ketik manual atau klik skala di atas)"
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold leading-relaxed"
                 />
               </div>
@@ -1478,6 +1535,72 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {inputTab === "analisis" && (
+        <div className="bg-blue-50/50 dark:bg-blue-950/20 rounded-2xl p-6 border-2 border-blue-300 dark:border-blue-800 shadow-lg space-y-6">
+          <div className="flex items-center justify-between border-b border-blue-200 dark:border-blue-800 pb-3 flex-wrap gap-2">
+            <div className="flex items-center space-x-2">
+              <Award className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div>
+                <h3 className="text-base md:text-lg font-black text-blue-950 dark:text-blue-200">
+                  Laporan Analisis Penilaian (Tindak Lanjut)
+                </h3>
+                <p className="text-xs text-blue-800 dark:text-blue-400 font-medium">
+                  Pengolahan data asesmen secara komprehensif mengaitkan KKTP, Level Kognitif, dan Profil Siswa.
+                </p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              icon={Sparkles}
+              loading={jobs["analisis_penilaian"]?.status === "running"}
+              onClick={() => handleGenerateDoc("analisis_penilaian")}
+              disabled={jobs["analisis_penilaian"]?.status === "running"}
+              className="bg-blue-600 hover:bg-blue-700 text-white border-none shadow-md"
+            >
+              Generate Laporan Analisis
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Pilih Siswa Sampel</label>
+              <select
+                value={analisisSelectedStudentId}
+                onChange={(e) => setAnalisisSelectedStudentId(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+              >
+                {availableStudents.length > 0 ? (
+                  availableStudents.map(murid => (
+                    <option key={murid.id} value={murid.id}>
+                      {murid.nama} ({murid.gaya_belajar})
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="simulasi_fajar">Fajar (Gaya Belajar: Kinestetik-Visual)</option>
+                    <option value="simulasi_siti">Siti (Gaya Belajar: Auditori)</option>
+                  </>
+                )}
+              </select>
+            </div>
+            <div>
+              <label className="font-bold text-slate-800 dark:text-slate-200 block mb-1">Target Asesmen yang Dianalisis</label>
+              <select
+                value={analisisTargetAsesmen}
+                onChange={(e) => setAnalisisTargetAsesmen(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+              >
+                <option value="asesmen_kognitif">Asesmen Kognitif / Diagnostik</option>
+                <option value="asesmen_formatif">Asesmen Formatif (Aktivitas/Proses)</option>
+                <option value="asesmen_sumatif">Asesmen Sumatif (Akhir)</option>
+              </select>
             </div>
           </div>
         </div>

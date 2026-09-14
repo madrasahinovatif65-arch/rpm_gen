@@ -596,19 +596,25 @@ Khusus untuk Modul Ajar, jabarkan skenario kegiatan selaras dengan Sintak Model 
 [E] PEDOMAN ASESMEN BERDASARKAN FASE DAN METODE (OTOMATISASI AI):
 Jika guru meminta Asesmen "Otomatis dari AI", kamu WAJIB menyusun instrumen berdasarkan Fase (Kelas) dan Metode Pembelajaran yang dipilih, dengan panduan 10 teknik berikut:
 1. ASESMEN DIAGNOSTIK / KOGNITIF TP (Pemetaan awal / Kuis CBT):
-   - Wawancara/Lisan: (Metode: Diskusi/Pre-teaching). Fase A sangat ideal (tanya jawab konsep dasar), Fase B&C untuk menggali miskonsepsi.
-   - Tes Tertulis/Kuis Prasyarat: (Metode: Direct Instruction). Fase A (menjodohkan gambar), Fase B&C (2-3 soal hitungan/logika dasar).
-   - Angket/Survei Non-Kognitif: (Metode: Student-Centered). Fase A (emotikon), Fase B&C (ceklis kesiapan).
+   - Wawancara/Lisan: (Metode: Diskusi/Pre-teaching). Fase A sangat ideal (tanya jawab konsep dasar), Fase B&C untuk menggali miskonsepsi. (Cara Analisis: Diagnostik langsung untuk mendeteksi miskonsepsi tersembunyi via respons lisan).
+   - Tes Tertulis/Kuis Prasyarat: (Metode: Direct Instruction). Fase A (menjodohkan gambar), Fase B&C (2-3 soal hitungan/logika dasar). (Cara Analisis: Kuantitatif berbasis persentase/interval nilai).
+   - Angket/Survei Non-Kognitif: (Metode: Student-Centered). Fase A (emotikon), Fase B&C (ceklis kesiapan). (Cara Analisis: Profil non-kognitif membaca pola kecenderungan kelas untuk diferensiasi).
 2. ASESMEN FORMATIF (Mendapat umpan balik saat proses belajar):
-   - Observasi: (Metode: Cooperative Learning, Praktikum, Roleplay). Berlaku Fase A, B, C (lembar ceklis perilaku).
-   - Kuis Singkat/Exit Ticket: (Metode: Refleksi Harian). Fase A (pertanyaan lisan), Fase B&C (1-3 soal pendek tertulis).
-   - Penilaian Diri (Self-Assessment): (Metode: Deep Learning, Refleksi). Fase A (centang sederhana), Fase B&C (pertanyaan metakognitif).
-   - Penilaian Antarteman (Peer Assessment): (Metode: Diskusi Kelompok, Tutor Sebaya). Tunda untuk Fase A. Berlaku Fase B&C dengan rubrik ketat.
+   - Observasi: (Metode: Cooperative Learning, Praktikum, Roleplay). Berlaku Fase A, B, C (lembar ceklis perilaku). (Cara Analisis: Kualitatif dengan anekdotal untuk memantau kemunculan indikator partisipasi).
+   - Kuis Singkat/Exit Ticket: (Metode: Refleksi Harian). Fase A (pertanyaan lisan), Fase B&C (1-3 soal pendek tertulis). (Cara Analisis: Analisis kilat memetakan siapa yang sudah paham dan keliru untuk strategi besok).
+   - Penilaian Diri (Self-Assessment): (Metode: Deep Learning, Refleksi). Fase A (centang sederhana), Fase B&C (pertanyaan metakognitif). (Cara Analisis: Reflektif kualitatif untuk mengukur tingkat kesadaran metakognitif).
+   - Penilaian Antarteman (Peer Assessment): (Metode: Diskusi Kelompok, Tutor Sebaya). Tunda untuk Fase A. Berlaku Fase B&C dengan rubrik ketat. (Cara Analisis: Formatif kualitatif melihat objektivitas dan empati umpan balik).
 3. ASESMEN SUMATIF (Mengukur hasil akhir untuk rapor):
-   - Proyek: (Metode: PjBL). Fase A (skala kecil/1-2 hari), Fase B&C (investigasi/pembuatan produk).
-   - Unjuk Kerja (Performance): (Metode: Demonstrasi, Praktik). Fase A, B, C didemonstrasikan langsung (rubrik keterampilan).
-   - Portofolio: (Metode: Penugasan Jangka Panjang). Fase A (kumpulan lembar/gambar), Fase B&C (kumpulan karya dengan refleksi).
-   - Tes Tertulis: (Metode: Konvensional, Evaluasi Unit). Fase A (PG bergambar), Fase B&C (Soal HOTS/analisis kasus).`;
+   - Proyek: (Metode: PjBL). Fase A (skala kecil/1-2 hari), Fase B&C (investigasi/pembuatan produk). (Cara Analisis: Holistik berbasis rubrik multi-komponen menilai proses kerja dan kualitas produk akhir).
+   - Unjuk Kerja (Performance): (Metode: Demonstrasi, Praktik). Fase A, B, C didemonstrasikan langsung (rubrik keterampilan). (Cara Analisis: Rubrik skala bertingkat mencocokkan performa langsung dengan kriteria tingkatan skor).
+   - Portofolio: (Metode: Penugasan Jangka Panjang). Fase A (kumpulan lembar/gambar), Fase B&C (kumpulan karya dengan refleksi). (Cara Analisis: Analisis tren perkembangan/growth fokus membaca refleksi diri siswa).
+   - Tes Tertulis: (Metode: Konvensional, Evaluasi Unit). Fase A (PG bergambar), Fase B&C (Soal HOTS/analisis kasus). (Cara Analisis: Kuantitatif berbasis persentase, menguji nalar kritis evaluasi bukan hafalan).
+
+[F] PARAMETER KEADILAN ASESMEN BERDIFERENSIASI:
+Jika merancang Asesmen Berdiferensiasi (terutama Formatif/Sumatif/Proyek) yang memberikan kebebasan bentuk karya pada siswa, patuhi 3 prinsip ini:
+1. TP dan Indikator Sama: Apapun bentuk akhirnya (visual, teks, audio), wajib mengukur titik kompetensi yang persis sama. Jangan turunkan standarnya.
+2. Rubrik Fokus Substansi: Rubrik harus menilai esensi pemahaman konsep materi (misal ketepatan konten), BUKAN keindahan estetika visual atau kemampuan teknis luar yang tidak berkaitan dengan TP.
+3. Profil Kesiapan/Minat: Opsi unjuk kerja harus selaras dengan profil diagnostik/gaya belajar siswa agar tidak ada hambatan akses fisik/psikologis.`;
 
   const isModulType = schemaKey.startsWith("modul_ajar") || schemaKey.startsWith("asesmen_") || schemaKey === "rubrik";
   const generalKbcRules = isModulType ? baseKbcRules + modulKbcRules : baseKbcRules;
@@ -638,6 +644,7 @@ ${JSON.stringify(optimizedData, null, 2)}
 PENTING:
 - Fokus utama Anda adalah merumuskan (reasoning) materi pokok, kompetensi, dan memecah Capaian Pembelajaran.
 - ABAIKAN kalkulasi matematika presisi terkait "Alokasi JP" atau "kodeTp" karena sistem kami memiliki Data Normalizer yang akan menimpa angka JP dan kode TP tersebut. Anda cukup memberi estimasi nilai (misal 1 atau 2).
+- KONTEKS LOKAL (FP-PLO): Jika field "topikLokal" (Konteks Mikro/Meso/Makro/Nasional) terisi, pastikan TP/ATP atau instrumen asesmen memiliki *Indikator Kontekstualisasi Lokal* (mampu memberi contoh fenomena dari lingkungan yang dipilih) dan *Indikator Penarikan Kesimpulan* (mampu memberi solusi lokal).
 - Pastikan setiap array terisi dengan struktur yang valid.
 ${schemaKey === "prosem" && Array.isArray(optimizedData.blockedWeeks) && optimizedData.blockedWeeks.length > 0 ? `- PERHATIAN KHUSUS UNTUK PROSEM: Guru telah memblokir/mengecualikan minggu-minggu berikut: ${optimizedData.blockedWeeks.join(", ")}. JANGAN mendistribusikan alokasi waktu/materi (Kosongkan/Tandai X) pada minggu-minggu tersebut karena libur personal/kegiatan lain.` : ""}
 - KHUSUS UNTUK ATP JIKA MELIBATKAN LEBIH DARI 1 KELAS (SATU FASE): Kamu WAJIB membaginya ke dalam kelas yang relevan (misal Kelas 1 dan Kelas 2). Kamu WAJIB mengisi properti "rasionalisasiKelas" dengan alasan logis pedagogik mengapa materi tersebut diletakkan di kelas tersebut, berdasarkan 4 tolok ukur: (1) Konkret ke Abstrak, (2) Hierarki/Prasyarat, (3) Cakupan Lingkungan (dekat ke jauh), atau (4) Gradasi Taksonomi Bloom (Kognitif C1-C6).`;
@@ -692,6 +699,30 @@ Detail Instruksi Guru: ${optimizedData.asesmenSumatifDetail || 'Susun evaluasi a
 Fase/Kelas: ${optimizedData.fase} - ${optimizedData.kelas}. Model: ${optimizedData.model}. Metode: ${optimizedData.metode}.
 PASTIKAN merujuk kuat pada pedoman [E] poin 3 jika instrumen "Otomatis" dan selalu sertakan kunci jawaban/rubrik penilaian.
 Data Modul: ${JSON.stringify(optimizedData, null, 2)}`;
+  }
+
+  if (schemaKey === "rubrik") {
+    userPrompt = `Susun Dokumen Rubrik Penilaian dengan panduan khusus berikut:
+1. Menentukan Tujuan Pembelajaran (TP) dan KKTP sebagai Titik Awal. Pecah KKTP menjadi indikator-indikator perilaku/kualitas karya terukur.
+2. Menggunakan Skala Tingkat Penguasaan yang Konsisten: (Level 1: Belum Berkembang, Level 2: Mulai Berkembang, Level 3: Berkembang, Level 4: Sangat Berkembang).
+3. Merumuskan Deskriptor Kualitatif yang Jelas dan spesifik pada tiap level, bukan sekadar nilai kuantitatif (Misal: "Mampu menjelaskan konsep dan contoh nyata", bukan cuma "Baik Sekali").
+4. Menyelaraskan Bobot Penilaian dengan Aspek Kritis. Fokuskan penilaian esensi kompetensi/substansi materi, bukan bias pada estetika/kerapian visual semata.
+
+Data Form/Modul Referensi: ${JSON.stringify(optimizedData, null, 2)}`;
+  }
+
+  if (schemaKey === "analisis_penilaian") {
+    userPrompt = `Buatkan Laporan Analisis Penilaian dan Tindak Lanjut secara komprehensif berdasarkan 4 komponen (Analisis Rubrik, KKTP, Kognitif, dan Profil Belajar Siswa).
+Siswa Sampel: ${optimizedData.analisis_siswa?.nama || "Siswa Simulasi"} (Gaya Belajar: ${optimizedData.analisis_siswa?.gaya_belajar || "Campuran"})
+Target Asesmen: ${optimizedData.analisis_target || "asesmen_sumatif"}
+
+Data Modul Referensi: ${JSON.stringify(optimizedData, null, 2)}
+
+Instruksi Khusus:
+- Analisis Rubrik: Tentukan skor mentah imajiner yang realistis diperoleh siswa ini, jabarkan kekuatan dan kelemahannya berdasarkan rubrik.
+- Analisis KKTP: Tentukan apakah siswa ini tuntas atau belum, dan deskripsikan ketercapaiannya.
+- Analisis Kognitif: Sebutkan level kognitif (C1-C6) yang berhasil dicapai siswa ini dan rekomendasikan level selanjutnya.
+- Profil Belajar & Tindak Lanjut: Hubungkan gaya belajar siswa (${optimizedData.analisis_siswa?.gaya_belajar}) dengan jenis tindak lanjut (Remedial/Pengayaan). Berikan strategi diferensiasi spesifik yang relevan dengan gaya belajar tersebut.`;
   }
 
   try {

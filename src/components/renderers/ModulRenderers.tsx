@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  ModulAjarUmumType, ModulAjarMeetingType, AsesmenType, RubrikType 
+  ModulAjarUmumType, ModulAjarMeetingType, AsesmenType, RubrikType, AnalisisPenilaianType 
 } from '../../lib/kbcSchemas';
 import { TableHeader, Td, DocumentHeader, DocumentFooter } from './AdministrasiRenderers';
 
@@ -9,6 +9,7 @@ interface RendererProps {
   umum?: ModulAjarUmumType;
   meetings?: ModulAjarMeetingType[];
   context: any;
+  docType?: string;
 }
 
 export const ModulAjarRenderer: React.FC<RendererProps> = ({ umum, meetings, context }) => {
@@ -285,6 +286,67 @@ export const RubrikRenderer: React.FC<RendererProps> = ({ data, context }) => {
           ))}
         </tbody>
       </table>
+
+      <DocumentFooter context={context} />
+    </div>
+  );
+};
+
+export const AnalisisRenderer: React.FC<RendererProps> = ({ data, context }) => {
+  const analisis = data as AnalisisPenilaianType;
+  return (
+    <div style={{ fontFamily: 'Arial, sans-serif', color: '#000', lineHeight: 1.5 }}>
+      <DocumentHeader context={context} title="LAPORAN ANALISIS PENILAIAN" subtitle={`Tindak Lanjut Pembelajaran | Mapel: ${context.curriculum?.subject}`} />
+      
+      <h4>A. IDENTITAS MURID & ASESMEN</h4>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+        <tbody>
+          <tr><Td>Nama Siswa</Td><Td><strong>{analisis.identitas?.namaSiswa}</strong></Td></tr>
+          <tr><Td>Gaya Belajar</Td><Td><strong>{analisis.identitas?.gayaBelajar}</strong></Td></tr>
+          <tr><Td>Target Asesmen</Td><Td><strong>{analisis.identitas?.targetAsesmen}</strong></Td></tr>
+        </tbody>
+      </table>
+
+      <h4>B. HASIL ANALISIS</h4>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+        <thead>
+          <tr>
+            <TableHeader>Komponen Penilaian</TableHeader>
+            <TableHeader>Hasil & Deskripsi</TableHeader>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <Td><strong>1. Analisis Rubrik</strong></Td>
+            <Td>
+              <strong>Skor Diperoleh:</strong> {analisis.analisisRubrik?.skorDiperoleh}<br/>
+              <strong>Kekuatan:</strong> {analisis.analisisRubrik?.kekuatanSiswa}<br/>
+              <strong>Kelemahan:</strong> {analisis.analisisRubrik?.kelemahanSiswa}
+            </Td>
+          </tr>
+          <tr>
+            <Td><strong>2. Analisis KKTP (Ketuntasan)</strong></Td>
+            <Td>
+              <strong>Status:</strong> {analisis.analisisKktp?.statusKetuntasan}<br/>
+              <strong>Deskripsi:</strong> {analisis.analisisKktp?.deskripsiKetercapaian}
+            </Td>
+          </tr>
+          <tr>
+            <Td><strong>3. Analisis Level Kognitif</strong></Td>
+            <Td>
+              <strong>Level Tercapai:</strong> {analisis.analisisKognitif?.levelKognitifTercapai}<br/>
+              <strong>Rekomendasi:</strong> {analisis.analisisKognitif?.rekomendasiLevelSelanjutnya}
+            </Td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>C. TINDAK LANJUT & DIFERENSIASI</h4>
+      <div style={{ backgroundColor: '#eff6ff', padding: '15px', borderLeft: '4px solid #3b82f6', marginBottom: '20px' }}>
+        <strong>Tindak Lanjut:</strong> {analisis.tindakLanjut?.jenisTindakLanjut}<br/><br/>
+        <strong>Strategi Diferensiasi (Berdasarkan Profil {analisis.identitas?.gayaBelajar}):</strong><br/>
+        {analisis.tindakLanjut?.strategiDiferensiasi}
+      </div>
 
       <DocumentFooter context={context} />
     </div>

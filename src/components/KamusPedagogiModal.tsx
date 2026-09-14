@@ -210,9 +210,9 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
                     <div className="p-1 bg-blue-100 dark:bg-blue-900/40 rounded-md">1</div> Asesmen Diagnostik / Kognitif TP
                   </h4>
                   <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-2 ml-6 list-disc">
-                    <li><b>Wawancara / Lisan:</b> Fase A (tanya jawab konsep dasar, tanpa kendala calistung). Fase B&C (menggali miskonsepsi). <i>Metode: Diskusi/Pre-teaching.</i></li>
-                    <li><b>Tes Tertulis / Kuis Prasyarat:</b> Fase A (menjodohkan gambar). Fase B&C (2-3 soal logika dasar). <i>Metode: Direct Instruction.</i></li>
-                    <li><b>Angket / Survei Non-Kognitif:</b> Fase A (angket bergambar/emotikon). Fase B&C (survei/ceklis kesiapan). <i>Metode: Student-Centered.</i></li>
+                    <li><b>Wawancara / Lisan:</b> Fase A (tanya jawab konsep dasar). Fase B&C (menggali miskonsepsi). <i>Metode: Diskusi.</i><br/><span className="text-[10px] text-blue-600/80 dark:text-blue-400/80"><b>Cara Analisis:</b> Diagnostik kualitatif. Mendengarkan respons lisan untuk mendeteksi miskonsepsi tersembunyi.</span></li>
+                    <li><b>Tes Tertulis / Kuis Prasyarat:</b> Fase A (menjodohkan gambar). Fase B&C (2-3 soal logika dasar). <i>Metode: Direct Instruction.</i><br/><span className="text-[10px] text-blue-600/80 dark:text-blue-400/80"><b>Cara Analisis:</b> Kuantitatif. Mengukur persentase kebenaran materi prasyarat.</span></li>
+                    <li><b>Angket / Survei Non-Kognitif:</b> Fase A (emotikon). Fase B&C (ceklis kesiapan). <i>Metode: Student-Centered.</i><br/><span className="text-[10px] text-blue-600/80 dark:text-blue-400/80"><b>Cara Analisis:</b> Kualitatif non-kognitif. Membaca pola kecenderungan kelas untuk penyesuaian pendekatan.</span></li>
                   </ul>
                 </div>
 
@@ -222,10 +222,10 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
                     <div className="p-1 bg-emerald-100 dark:bg-emerald-900/40 rounded-md">2</div> Asesmen Formatif (Mendapat Umpan Balik)
                   </h4>
                   <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-2 ml-6 list-disc">
-                    <li><b>Observasi:</b> Berlaku semua fase (A, B, C). Guru menggunakan lembar ceklis untuk mengamati perilaku. <i>Metode: Cooperative Learning, Praktikum.</i></li>
-                    <li><b>Kuis Singkat / Exit Ticket:</b> Fase A (pertanyaan lisan saat pulang). Fase B&C (1-3 soal pendek tertulis di akhir kelas). <i>Metode: Refleksi Harian.</i></li>
-                    <li><b>Penilaian Diri (Self-Assessment):</b> Fase A (format sangat sederhana/centang). Fase B&C (metakognitif/refleksi tulis). <i>Metode: Deep Learning.</i></li>
-                    <li><b>Penilaian Antarteman (Peer Assessment):</b> Belum disarankan untuk Fase A. Berlaku Fase B&C dengan dibekali rubrik ketat. <i>Metode: Tutor Sebaya.</i></li>
+                    <li><b>Observasi:</b> Berlaku semua fase. <i>Metode: Praktikum, Cooperative Learning.</i><br/><span className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80"><b>Cara Analisis:</b> Kualitatif dengan lembar ceklis/anekdotal. Menganalisis kemunculan indikator perilaku/partisipasi.</span></li>
+                    <li><b>Kuis Singkat / Exit Ticket:</b> Fase A (lisan). Fase B&C (1-3 soal pendek). <i>Metode: Refleksi Harian.</i><br/><span className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80"><b>Cara Analisis:</b> Kilat (real-time check). Memetakan siapa yang sudah paham dan keliru untuk strategi esok hari.</span></li>
+                    <li><b>Penilaian Diri (Self-Assessment):</b> Fase A (centang sederhana). Fase B&C (refleksi metakognitif). <i>Metode: Deep Learning.</i><br/><span className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80"><b>Cara Analisis:</b> Reflektif kualitatif. Mengukur tingkat kesadaran metakognitif (self-awareness) siswa terhadap belajarnya.</span></li>
+                    <li><b>Penilaian Antarteman (Peer Assessment):</b> Berlaku Fase B&C dengan rubrik. <i>Metode: Tutor Sebaya.</i><br/><span className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80"><b>Cara Analisis:</b> Formatif kualitatif. Menganalisis objektivitas dan empati siswa dalam memberi umpan balik (2 Bintang, 1 Harapan).</span></li>
                   </ul>
                 </div>
 
@@ -235,10 +235,10 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
                     <div className="p-1 bg-amber-100 dark:bg-amber-900/40 rounded-md">3</div> Asesmen Sumatif (Mengukur Hasil Akhir)
                   </h4>
                   <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-2 ml-6 list-disc">
-                    <li><b>Proyek:</b> Fase A (skala kecil 1-2 hari). Fase B&C (investigasi, perancangan, dan pembuatan solusi/produk). <i>Metode: PjBL.</i></li>
-                    <li><b>Unjuk Kerja (Performance):</b> Berlaku semua fase (A, B, C). Demonstrasi kemampuan (seperti praktik wudu/presentasi). <i>Metode: Praktik.</i></li>
-                    <li><b>Portofolio:</b> Fase A (kumpulan lembar mewarnai/tulisan). Fase B&C (karya terpilih beserta refleksi). <i>Metode: Penugasan Jangka Panjang.</i></li>
-                    <li><b>Tes Tertulis:</b> Fase A (PG bergambar). Fase B&C (Soal HOTS / studi kasus / bukan hafalan). <i>Metode: Evaluasi Akhir Unit.</i></li>
+                    <li><b>Proyek:</b> Fase A (skala kecil). Fase B&C (investigasi & pembuatan produk). <i>Metode: PjBL.</i><br/><span className="text-[10px] text-amber-600/80 dark:text-amber-400/80"><b>Cara Analisis:</b> Holistik. Mengevaluasi proses kerja (kolaborasi/kemanfaatan) sekaligus kualitas produk akhir menggunakan bobot penilaian.</span></li>
+                    <li><b>Unjuk Kerja (Performance):</b> Demonstrasi kemampuan praktis. <i>Metode: Praktik.</i><br/><span className="text-[10px] text-amber-600/80 dark:text-amber-400/80"><b>Cara Analisis:</b> Rubrik Skala Bertingkat. Mencocokkan performa langsung siswa dengan kriteria tingkatan skor.</span></li>
+                    <li><b>Portofolio:</b> Kumpulan karya terpilih beserta refleksi. <i>Metode: Penugasan Jangka Panjang.</i><br/><span className="text-[10px] text-amber-600/80 dark:text-amber-400/80"><b>Cara Analisis:</b> Tren perkembangan (growth). Fokus membaca lembar refleksi diri siswa di setiap karya.</span></li>
+                    <li><b>Tes Tertulis:</b> Fase A (PG bergambar). Fase B&C (Soal HOTS). <i>Metode: Evaluasi Akhir Unit.</i><br/><span className="text-[10px] text-amber-600/80 dark:text-amber-400/80"><b>Cara Analisis:</b> Kuantitatif. Persentase jawaban benar, melihat kemampuan analisis dan nalar kritis (bukan sekadar hafalan).</span></li>
                   </ul>
                 </div>
               </div>

@@ -201,6 +201,33 @@ export const RubrikSchema = z.object({
 });
 export type RubrikType = z.infer<typeof RubrikSchema>;
 
+// 10. Analisis Penilaian
+export const AnalisisPenilaianSchema = z.object({
+  identitas: z.object({
+    namaSiswa: z.string(),
+    gayaBelajar: z.string(),
+    targetAsesmen: z.string()
+  }),
+  analisisRubrik: z.object({
+    skorDiperoleh: z.string(),
+    kekuatanSiswa: z.string(),
+    kelemahanSiswa: z.string()
+  }),
+  analisisKktp: z.object({
+    statusKetuntasan: z.string(),
+    deskripsiKetercapaian: z.string()
+  }),
+  analisisKognitif: z.object({
+    levelKognitifTercapai: z.string(),
+    rekomendasiLevelSelanjutnya: z.string()
+  }),
+  tindakLanjut: z.object({
+    jenisTindakLanjut: z.string().describe("Remedial atau Pengayaan"),
+    strategiDiferensiasi: z.string().describe("Strategi spesifik berdasarkan gaya belajar siswa (Visual/Auditori/Kinestetik)")
+  })
+});
+export type AnalisisPenilaianType = z.infer<typeof AnalisisPenilaianSchema>;
+
 export const KbcSchemas: Record<string, z.ZodSchema<any>> = {
   "analisis_cp": AcpSchema,
   "tp": TpSchema,
@@ -213,5 +240,6 @@ export const KbcSchemas: Record<string, z.ZodSchema<any>> = {
   "asesmen_kognitif": AsesmenSchema,
   "asesmen_formatif": AsesmenSchema,
   "asesmen_sumatif": AsesmenSchema,
-  "rubrik": RubrikSchema
+  "rubrik": RubrikSchema,
+  "analisis_penilaian": AnalisisPenilaianSchema
 };
