@@ -12,19 +12,7 @@ import {
   Layers, 
   Calendar, 
   Award,
-  RefreshCw,
-  FileSpreadsheet,
-  Building2,
-  HeartHandshake,
-  FileText,
-  CheckSquare,
-  BookMarked,
-  LayoutList,
-  Trash2,
-  Save,
-  Settings,
-  HelpCircle
-} from "lucide-react";
+import { BookMarked, Printer, AlertTriangle, ArrowRight, Save, Trash2, Calendar, FileText, CheckCircle, RefreshCcw, Loader2, PlayCircle, Settings, Download, X, HelpCircle, FileSpreadsheet, LayoutList, Layers, FileCheck, BrainCircuit, HeartHandshake, Sparkles } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-supabase";
@@ -189,13 +177,16 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.curriculum.subject, state.curriculum.level, config?.cpTemplates]);
 
-  const formData = {
+  const baseFormData = {
     ...state.school,
     ...state.curriculum,
     ...state.cp,
+    ...state.module,
     cpRasional: state.cp.rasional,
     cpElemen: state.cp.elemen
   };
+
+  const formData = baseFormData;
 
   const formDataModul = {
     ...state.school,
@@ -1059,7 +1050,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                               const checked = e.target.checked;
                               const currentKodes = Array.isArray(formDataModul.kodeTp) ? [...formDataModul.kodeTp] : (formDataModul.kodeTp ? [formDataModul.kodeTp] : []);
                               
-                              let newKodes = [];
+                              let newKodes: string[] = [];
                               if (checked) {
                                 newKodes = [...currentKodes, tp.kodeTp];
                               } else {
