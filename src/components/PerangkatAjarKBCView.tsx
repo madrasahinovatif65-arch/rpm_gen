@@ -36,6 +36,7 @@ import { AcpRenderer, TpRenderer, AtpRenderer, ProtaRenderer, ProsemRenderer, Kk
 import { ModulAjarRenderer, LkpdRenderer, RubrikRenderer } from './renderers/ModulRenderers';
 import { DATA_MAPEL_KEMENAG } from "../lib/kemenagMapel";
 import { KamusPedagogiModal } from "./KamusPedagogiModal";
+import { InlineJsonEditor } from "./InlineJsonEditor";
 import { Button } from "./ui/Button";
 import { Badge } from "./ui/Badge";
 
@@ -61,6 +62,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
 
   const [availableRombels, setAvailableRombels] = useState<string[]>([]);
   const [isFetchingRombel, setIsFetchingRombel] = useState(false);
+  const [isEditingDraft, setIsEditingDraft] = useState(false);
 
   React.useEffect(() => {
     async function loadRombels() {
@@ -1038,50 +1040,74 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   )}
                 </div>
                 
-                <select
-                  value={formDataModul.kodeTp}
-                  disabled={!generatedJson["tp"]?.daftarTp}
-                  onChange={(e) => {
-                    const selectedKode = e.target.value;
-                    const tpList = generatedJson["tp"]?.daftarTp || [];
-                    const atpList = generatedJson["atp"]?.alur || [];
-                    const selectedTp = tpList.find((t: any) => t.kodeTp === selectedKode);
-                    
-                    if (selectedTp) {
-                      // Attempt to find matching ATP for context
-                      const matchingAtp = atpList.find((a: any) => a.kodeTp === selectedKode);
-                      const autofillKonteks = matchingAtp 
-                        ? `${matchingAtp.materiPokok} (${matchingAtp.integrasiNilai})` 
-                        : selectedTp.integrasiNilai;
+                <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
+                  {!generatedJson["tp"]?.daftarTp ? (
+                    <div className="text-slate-500 italic p-3 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300 font-bold">Generate TP di Tab 1 Terlebih Dahulu</div>
+                  ) : (
+                    (generatedJson["tp"]?.daftarTp || []).map((tp: any, i: number) => {
+                      const isChecked = Array.isArray(formDataModul.kodeTp) 
+                        ? formDataModul.kodeTp.includes(tp.kodeTp)
+                        : formDataModul.kodeTp === tp.kodeTp;
+                        
+                      return (
+                        <label key={i} className={`flex items-start space-x-3 p-3 rounded-xl border cursor-pointer transition-colors ${isChecked ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-500' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                          <input 
+                            type="checkbox" 
+                            className="mt-1 w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              const currentKodes = Array.isArray(formDataModul.kodeTp) ? [...formDataModul.kodeTp] : (formDataModul.kodeTp ? [formDataModul.kodeTp] : []);
+                              
+                              let newKodes = [];
+                              if (checked) {
+                                newKodes = [...currentKodes, tp.kodeTp];
+                              } else {
+                                newKodes = currentKodes.filter(k => k !== tp.kodeTp);
+                              }
+                              
+                              const tpList = generatedJson["tp"]?.daftarTp || [];
+                              const atpList = generatedJson["atp"]?.alur || [];
+                              
+                              const selectedTps = tpList.filter((t: any) => newKodes.includes(t.kodeTp));
+                              const selectedAtps = atpList.filter((a: any) => newKodes.includes(a.kodeTp));
+                              
+                              // Use Set to remove duplicate elemenCp
+                              const newElemenCp = Array.from(new Set(selectedTps.map((t: any) => t.elemen)));
+                              const newRumusanTp = selectedTps.map((t: any) => t.rumusanTp);
+                              
+                              const autofillKonteks = selectedAtps.length > 0
+                                ? selectedAtps.map((a: any) => `${a.materiPokok} (${a.integrasiNilai})`).join(" | ")
+                                : selectedTps.map((t: any) => t.integrasiNilai).join(" | ");
 
-                      updateState(s => ({ 
-                        ...s, 
-                        module: { 
-                          ...s.module, 
-                          kodeTp: selectedTp.kodeTp,
-                          elemenCp: selectedTp.elemen,
-                          rumusanTp: selectedTp.rumusanTp,
-                          konteksLokal: autofillKonteks
-                        } 
-                      }));
-                    }
-                  }}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-bold text-emerald-700 dark:text-emerald-400 cursor-pointer disabled:opacity-50"
-                >
-                  <option value="">-- {generatedJson["tp"]?.daftarTp ? "Silakan Pilih TP..." : "Generate TP di Tab 1 Terlebih Dahulu"} --</option>
-                  {(generatedJson["tp"]?.daftarTp || []).map((tp: any, i: number) => (
-                    <option key={i} value={tp.kodeTp}>
-                      [{tp.kodeTp}] - {tp.elemen} - {tp.rumusanTp.substring(0, 100)}...
-                    </option>
-                  ))}
-                </select>
+                              updateState(s => ({ 
+                                ...s, 
+                                module: { 
+                                  ...s.module, 
+                                  kodeTp: newKodes,
+                                  elemenCp: newElemenCp,
+                                  rumusanTp: newRumusanTp,
+                                  konteksLokal: autofillKonteks || ""
+                                } 
+                              }));
+                            }}
+                          />
+                          <div className="flex-1">
+                            <div className={`font-bold text-xs ${isChecked ? 'text-emerald-800 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'}`}>[{tp.kodeTp}] - {tp.elemen}</div>
+                            <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">{tp.rumusanTp}</div>
+                          </div>
+                        </label>
+                      );
+                    })
+                  )}
+                </div>
               </div>
 
               <div>
                 <label className="font-bold text-slate-500 dark:text-slate-400 block mb-1">Elemen CP (Read-Only)</label>
                 <input
                   type="text"
-                  value={formDataModul.elemenCp}
+                  value={Array.isArray(formDataModul.elemenCp) ? formDataModul.elemenCp.join(", ") : formDataModul.elemenCp}
                   readOnly
                   placeholder="Terisi otomatis dari TP..."
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 font-semibold text-slate-500"
@@ -1094,7 +1120,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 </label>
                 <textarea
                   rows={2}
-                  value={formDataModul.rumusanTp}
+                  value={Array.isArray(formDataModul.rumusanTp) ? formDataModul.rumusanTp.join("\n") : formDataModul.rumusanTp}
                   readOnly
                   placeholder="Terisi otomatis dari TP..."
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 font-semibold text-slate-500 leading-relaxed"
@@ -1423,6 +1449,29 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
         </div>
       </div>
 
+      {activeDoc === "prosem" && (
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-md p-4 space-y-3">
+          <div className="flex items-center space-x-2 border-b border-slate-200 dark:border-slate-700 pb-2">
+            <span className="text-xl">📅</span>
+            <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">Pengecualian Minggu Spesifik (Libur Personal)</h3>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Ketik minggu keberapa saja (format: YYYY-MM-W#) yang ingin diblokir agar materi tidak didistribusikan ke minggu tersebut. Pisahkan dengan koma. (Contoh: 2026-07-W3, 2026-08-W1)
+          </p>
+          <input
+            type="text"
+            placeholder="Contoh: 2026-07-W3, 2026-08-W1"
+            value={(state.curriculum.blockedWeeks || []).join(", ")}
+            onChange={(e) => {
+              const val = e.target.value;
+              const weeks = val.split(",").map(s => s.trim()).filter(s => s.length > 0 || val.endsWith(","));
+              updateState(s => ({ ...s, curriculum: { ...s.curriculum, blockedWeeks: val.split(",").map(s => s.trim()) } }));
+            }}
+            className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-mono text-sm text-amber-700 dark:text-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+          />
+        </div>
+      )}
+
       {isGenerating && (
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 rounded-xl flex items-center space-x-4">
           <Loader2 className="w-5 h-5 text-yellow-600 animate-spin" />
@@ -1459,6 +1508,18 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             >
               Cetak F4
             </Button>
+            {generatedJson[activeDoc] && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                icon={isEditingDraft ? X : BookMarked}
+                onClick={() => setIsEditingDraft(!isEditingDraft)}
+                className={isEditingDraft ? "bg-slate-100 text-slate-700 border-slate-300" : "text-emerald-600 border-emerald-200 hover:bg-emerald-50"}
+              >
+                {isEditingDraft ? "Tutup Editor" : "Edit Draft"}
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
@@ -1522,6 +1583,22 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               : (generatedJson[activeDoc] || generatedDocs[activeDoc] || jobs[activeDoc]?.data);
               
             if (hasContent) {
+              if (isEditingDraft && generatedJson[activeDoc]) {
+                return (
+                  <div className="a4-preview-container bg-slate-900 p-0 rounded-lg shadow-inner min-h-[800px] h-full flex">
+                    <InlineJsonEditor
+                      initialJson={generatedJson[activeDoc]}
+                      onSave={(newJson) => {
+                        setGeneratedJson(prev => ({ ...prev, [activeDoc]: newJson }));
+                        localStorage.setItem(`kbc_cache_${activeDoc}`, JSON.stringify(newJson));
+                        setIsEditingDraft(false);
+                      }}
+                      onCancel={() => setIsEditingDraft(false)}
+                    />
+                  </div>
+                );
+              }
+
               return (
                 <div id="kbc-document-render-area" className="a4-preview-container bg-white text-black p-8 rounded-lg shadow-inner min-h-[800px] relative">
                   {renderDocument(activeDoc)}

@@ -21,6 +21,7 @@ export interface KbcState {
     jpPerMinggu: number;
     learningModel: string;
     learningMethod: string;
+    blockedWeeks: string[];
   };
   cp: {
     rasional: string;
@@ -31,9 +32,9 @@ export interface KbcState {
   };
   module: {
     tpId: string | null;
-    kodeTp: string;
-    rumusanTp: string;
-    elemenCp: string;
+    kodeTp: string[];
+    rumusanTp: string[];
+    elemenCp: string[];
     sintakModel: string | string[];
     jumlahPertemuan: number;
     jpPerPertemuan: number;
@@ -63,6 +64,7 @@ export const defaultKbcState: KbcState = {
     jpPerMinggu: 2,
     learningModel: "",
     learningMethod: "",
+    blockedWeeks: [],
   },
   cp: {
     rasional: "",
@@ -73,9 +75,9 @@ export const defaultKbcState: KbcState = {
   },
   module: {
     tpId: null,
-    kodeTp: "TP.AA.ELE.10.01",
-    rumusanTp: "Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
-    elemenCp: "Akidah",
+    kodeTp: ["TP.AA.ELE.10.01"],
+    rumusanTp: ["Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci."],
+    elemenCp: ["Akidah"],
     sintakModel: "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
     jumlahPertemuan: 3,
     jpPerPertemuan: 2,

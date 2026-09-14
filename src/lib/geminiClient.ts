@@ -622,18 +622,29 @@ PENTING:
 - Fokus utama Anda adalah merumuskan (reasoning) materi pokok, kompetensi, dan memecah Capaian Pembelajaran.
 - ABAIKAN kalkulasi matematika presisi terkait "Alokasi JP" atau "kodeTp" karena sistem kami memiliki Data Normalizer yang akan menimpa angka JP dan kode TP tersebut. Anda cukup memberi estimasi nilai (misal 1 atau 2).
 - Pastikan setiap array terisi dengan struktur yang valid.
+${schemaKey === "prosem" && Array.isArray(optimizedData.blockedWeeks) && optimizedData.blockedWeeks.length > 0 ? `- PERHATIAN KHUSUS UNTUK PROSEM: Guru telah memblokir/mengecualikan minggu-minggu berikut: ${optimizedData.blockedWeeks.join(", ")}. JANGAN mendistribusikan alokasi waktu/materi (Kosongkan/Tandai X) pada minggu-minggu tersebut karena libur personal/kegiatan lain.` : ""}
 - KHUSUS UNTUK ATP JIKA MELIBATKAN LEBIH DARI 1 KELAS (SATU FASE): Kamu WAJIB membaginya ke dalam kelas yang relevan (misal Kelas 1 dan Kelas 2). Kamu WAJIB mengisi properti "rasionalisasiKelas" dengan alasan logis pedagogik mengapa materi tersebut diletakkan di kelas tersebut, berdasarkan 4 tolok ukur: (1) Konkret ke Abstrak, (2) Hierarki/Prasyarat, (3) Cakupan Lingkungan (dekat ke jauh), atau (4) Gradasi Taksonomi Bloom (Kognitif C1-C6).`;
   }
 
   // Context Builder untuk Modul Ajar Umum
   if (schemaKey === "modul_ajar_umum") {
-    userPrompt = `Buatkan struktur MODUL AJAR UMUM (Informasi Umum, Komponen Inti dasar, Asesmen, dan Lampiran) untuk topik: ${optimizedData.topik}. \nData pendukung:\n${JSON.stringify(optimizedData, null, 2)}\n\n(Jangan masukkan detail kegiatan skenario per pertemuan, karena itu akan digenerate terpisah).`;
+    const isMultiTp = Array.isArray(optimizedData.kodeTp) && optimizedData.kodeTp.length > 1;
+    const tpText = isMultiTp 
+      ? `Beberapa Tujuan Pembelajaran (Gabungan dari: ${optimizedData.kodeTp.join(", ")})` 
+      : optimizedData.topik;
+      
+    userPrompt = `Buatkan struktur MODUL AJAR UMUM (Informasi Umum, Komponen Inti dasar, Asesmen, dan Lampiran) untuk topik: ${tpText}. \nData pendukung:\n${JSON.stringify(optimizedData, null, 2)}\n\n(Jangan masukkan detail kegiatan skenario per pertemuan, karena itu akan digenerate terpisah).${isMultiTp ? " PASTIKAN Modul Ajar ini merangkum dan menghubungkan KESELURUHAN Tujuan Pembelajaran yang dipilih menjadi satu kesatuan skenario yang utuh." : ""}`;
   }
   
   // Context Builder khusus untuk Pertemuan
   if (schemaKey === "modul_ajar_meeting" && meetingNumber > 0) {
+    const isMultiTp = Array.isArray(optimizedData.kodeTp) && optimizedData.kodeTp.length > 1;
+    const tpText = isMultiTp 
+      ? `Gabungan TP: ${optimizedData.kodeTp.join(", ")}` 
+      : optimizedData.topik;
+      
     userPrompt = `Buatkan Skenario Kegiatan Belajar Mengajar (KBM) KHUSUS HANYA UNTUK PERTEMUAN KE-${meetingNumber} (dari total ${optimizedData.jumlahPertemuan || 1} pertemuan).
-Topik Utama: ${optimizedData.topik}
+Topik Utama: ${tpText}
 Sub Topik/Fokus Pertemuan ini: Bebas tentukan oleh AI berdasarkan silabus logis untuk pertemuan ke-${meetingNumber}.
 Model Pembelajaran: ${optimizedData.model || 'Problem Based Learning (PBL)'}
 Metode: ${optimizedData.metode || 'Diskusi, Ceramah Interaktif'}
@@ -642,7 +653,7 @@ Penting:
 - Berikan judul pertemuan yang relevan.
 - Fokus sintak harus berisi nama fase model ${optimizedData.model} yang akan dijalankan pada pertemuan ini.
 - Untuk kegiatan Pendahuluan, Inti, dan Penutup: berikan skenario rinci (ucapan/aktivitas guru & siswa) yang mencerminkan nilai PPRA Kemenag.
-- "pertemuanKe" WAJIB diisi dengan angka ${meetingNumber}.`;
+- "pertemuanKe" WAJIB diisi dengan angka ${meetingNumber}.${isMultiTp ? "\n- Pastikan skenario memfasilitasi pencapaian berbagai Tujuan Pembelajaran yang dipilih secara logis bertahap." : ""}`;
   }
 
   try {
