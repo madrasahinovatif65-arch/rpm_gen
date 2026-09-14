@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   FileCheck, 
   Sparkles, 
@@ -11,9 +11,25 @@ import {
   AlertTriangle,
   Layers, 
   Calendar, 
-  Award
+  Award,
+  BookMarked,
+  ArrowRight,
+  Save,
+  Trash2,
+  FileText,
+  RefreshCcw,
+  PlayCircle,
+  Settings,
+  X,
+  HelpCircle,
+  FileSpreadsheet,
+  LayoutList,
+  BrainCircuit,
+  HeartHandshake,
+  CheckSquare,
+  Building2,
+  RefreshCw
 } from "lucide-react";
-import { BookMarked, Printer, AlertTriangle, ArrowRight, Save, Trash2, FileText, CheckCircle, RefreshCcw, PlayCircle, Settings, X, HelpCircle, FileSpreadsheet, LayoutList, BrainCircuit } from "lucide-react";
 import { Pengaturan } from "../types";
 import { savePengaturan } from "../lib/firebase";
 import { fetchDistinctRombels, fetchKarakteristikByRombel } from "../lib/siakad-supabase";
@@ -41,7 +57,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   >("analisis_cp");
 
   const [inputTab, setInputTab] = useState<"admin" | "modul">("admin");
-  const [showKamusModal, setShowKamusModal] = useState<"model" | "metode" | null>(null);
+  const [showKamusModal, setShowKamusModal] = useState<"model" | "metode" | "asesmen" | null>(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingProgress, setGeneratingProgress] = useState("");

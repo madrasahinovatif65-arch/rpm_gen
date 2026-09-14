@@ -15,7 +15,7 @@ interface ModulAjarAIViewProps {
 }
 
 export const ModulAjarAIView: React.FC<ModulAjarAIViewProps> = ({ config }) => {
-  const [showKamusModal, setShowKamusModal] = useState<string | null>(null);
+  const [showKamusModal, setShowKamusModal] = useState<"model" | "metode" | "asesmen" | null>(null);
   const [kbcState] = useKbcState();
   const safeConfig = config || {} as Pengaturan;
   const [availableRombels, setAvailableRombels] = useState<string[]>([]);

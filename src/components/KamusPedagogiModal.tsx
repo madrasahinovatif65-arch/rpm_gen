@@ -4,11 +4,11 @@ import { X, BookOpen, Lightbulb, Users, ArrowRightCircle } from "lucide-react";
 interface KamusPedagogiModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: "model" | "metode";
+  initialTab?: "model" | "metode" | "asesmen";
 }
 
 export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, onClose, initialTab = "model" }) => {
-  const [activeTab, setActiveTab] = useState<"model" | "metode">(initialTab);
+  const [activeTab, setActiveTab] = useState<"model" | "metode" | "asesmen">(initialTab);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -96,6 +96,22 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
             <Users className="w-4 h-4" />
             Metode Pembelajaran
           </button>
+          <button
+            id="kamus-tab-asesmen"
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "asesmen"}
+            aria-controls="kamus-panel-asesmen"
+            onClick={() => setActiveTab("asesmen")}
+            className={`pb-3 font-bold text-sm flex items-center gap-2 border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+              activeTab === "asesmen" 
+                ? "border-blue-500 text-blue-600 dark:text-blue-400" 
+                : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            Bentuk Asesmen
+          </button>
         </div>
 
         {/* Content */}
@@ -172,6 +188,43 @@ export const KamusPedagogiModal: React.FC<KamusPedagogiModalProps> = ({ isOpen, 
                     </div>
                   </div>
                 ))}
+              </div>
+            </section>
+          )}
+
+          {activeTab === "asesmen" && (
+            <section id="kamus-panel-asesmen" role="tabpanel" aria-labelledby="kamus-tab-asesmen" className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="mb-4">
+                <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                  <span className="text-blue-500">Bentuk Asesmen</span>
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                  Panduan memilih jenis instrumen penilaian pembelajaran:
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/40 text-blue-600 rounded-lg shrink-0">1</div>
+                  <div>
+                    <h5 className="font-bold text-sm text-slate-700 dark:text-slate-300">Asesmen Kognitif TP (UI / CBT)</h5>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Digunakan untuk menghasilkan kuis interaktif (Pilihan Ganda, Benar/Salah, Isian) yang difokuskan pada uji teori dan dirancang untuk dikerjakan langsung melalui aplikasi (SIAKAD).</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 rounded-lg shrink-0">2</div>
+                  <div>
+                    <h5 className="font-bold text-sm text-slate-700 dark:text-slate-300">Asesmen Formatif (Aktivitas / LKPD)</h5>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Dokumen cetak (Word) untuk mendampingi proses belajar. Cocok untuk Lembar Kerja Peserta Didik (LKPD), Lembar Observasi Praktik, dan Jurnal Refleksi.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                  <div className="p-2 bg-amber-100 dark:bg-amber-900/40 text-amber-600 rounded-lg shrink-0">3</div>
+                  <div>
+                    <h5 className="font-bold text-sm text-slate-700 dark:text-slate-300">Asesmen Sumatif (Ujian Akhir Tertulis)</h5>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Instrumen evaluasi utuh di akhir unit/bab (Cetak Word). Biasanya memuat Soal Pilihan Ganda Kompleks dan Uraian HOTS secara menyeluruh beserta kunci jawabannya.</p>
+                  </div>
+                </div>
               </div>
             </section>
           )}
