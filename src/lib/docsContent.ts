@@ -217,9 +217,10 @@ Proses generasi **HARUS** dilakukan secara urut. Jangan melompat!
 
 1. **Tab 1 (ACP & TP):** Klik *Generate* untuk menyusun Analisis CP dan Tujuan Pembelajaran. Tunggu hingga AI selesai meracik rumusan TP berdasarkan elemen.
 2. **Tab 2 (ATP & Prota):** Klik *Generate*. AI akan mendistribusikan TP dari Tab 1 menjadi Alur (ATP) yang dilengkapi rasionalisasi pedagogik, serta membaginya ke dalam Program Tahunan.
-3. **Tab 3 (Prosem):** Klik *Generate*. AI akan "memanggil" data Kalender Akademik (Kaldik) dan membagi matriks ATP ke dalam minggu-minggu efektif per bulan secara akurat (baik Semester Ganjil maupun Genap).
+3. **Tab 3 (Prosem):** Klik *Generate*. AI akan "memanggil" data Kalender Akademik (Kaldik) dan membagi matriks ATP ke dalam minggu-minggu efektif per bulan secara akurat.
+   - *Tips Level Dewa:* Jika ada minggu spesifik yang digunakan untuk libur personal atau kemah, ketikkan minggu tersebut di form "Pengecualian Minggu Spesifik" agar AI mengosongkannya.
 4. **Tab 4 (Modul, LKPD, Rubrik):** 
-   - Pilih TP yang ingin diajarkan dari *dropdown*.
+   - Pilih satu atau **centang beberapa TP sekaligus** yang ingin diajarkan. AI akan merangkum gabungan TP tersebut menjadi satu modul utuh.
    - Kolom **Topik / Konteks Lokal Relevan** akan terisi otomatis (*autofill*) dari Materi Pokok ATP.
    - Klik *Generate* untuk menghasilkan RPP utuh.
 
@@ -239,13 +240,15 @@ AI bertindak sebagai *Co-Pilot*, bukan pengganti guru. Segala hasil dari Fase 2 
 ### 2. Generate Ulang Jika Kurang Sesuai (Opsi)
 - Jika hasilnya dirasa kurang tajam secara pedagogi, Anda dapat kembali ke atas, memodifikasi *prompt* di kolom "Topik/Konteks Lokal" (misalnya menambahkan perintah spesifik: *"Fokuskan materi pada budaya Kerinci"*), lalu klik *Generate* ulang pada dokumen yang bermasalah.
 
-### 3. Ekspor & Koreksi Manual di Microsoft Word
-> [!IMPORTANT]
-> Aplikasi ini tidak menyediakan *inline editor* tabel yang rumit di dalam browser demi kecepatan performa. Koreksi teks tingkat mikro disarankan dilakukan di Microsoft Word.
+### 3. Edit Draft Langsung (Inline JSON Editor)
+- Jika hasil AI kurang pas (misal: tebakan badge P8 otomatis meleset, atau ada kalimat yang ingin diganti), Anda tidak perlu selalu mengunduhnya ke Word.
+- Tekan tombol **"Edit Draft"**.
+- Anda akan masuk ke mode *Inline Editor* berisi teks struktur mentah. Cukup ubah teks di dalam tanda kutip (jangan merusak struktur kurung), lalu klik **Simpan & Render**. Tampilan akan langsung berubah dan pembaruan akan disematkan ke pembuatan dokumen berikutnya!
 
+### 4. Ekspor & Koreksi Lanjutan di Microsoft Word
 - **Aksi:** Klik tombol **"Ekspor Semua (Batch ZIP)"**.
 - **Hasil:** Aplikasi akan mengunduh 1 buah file ZIP yang di dalamnya terdapat 9 dokumen Microsoft Word (\`.docx\`) dengan format kertas F4 (Folio) yang sudah rapi dan siap cetak.
-- **Koreksi Final:** Buka dokumen Word tersebut. Di sini, Anda memiliki otonomi mutlak 100% untuk mengubah redaksi kata, menyesuaikan baris tabel, atau memodifikasi sintaks/langkah pembelajaran sesuka hati sebelum diserahkan ke Kepala Madrasah.
+- **Koreksi Final:** Buka dokumen Word tersebut. Di sini, Anda memiliki otonomi mutlak 100% untuk merombak struktur tabel atau menambahkan gambar sesuka hati sebelum diserahkan ke Kepala Madrasah.
 
 ---
 
