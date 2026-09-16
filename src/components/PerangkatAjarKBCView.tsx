@@ -831,6 +831,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               </p>
             </div>
 
+
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">JP per Minggu</label>
               <input
