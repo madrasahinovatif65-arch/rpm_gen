@@ -341,7 +341,9 @@ export const generatePerangkatAjarAPI = async (docType: string, formData: any) =
   const schoolName = formData?.school || "SMA Negeri 1 Jambi";
   const subject = formData?.subject || "Bahasa Indonesia";
   const singkatanMapel = formData?.singkatanMapel || "BI";
-  const level = formData?.level || "Fase E / Kelas X";
+  const level = formData?.level || formData?.fase || "Fase A";         // DEPRECATED backward compat
+  const fase = formData?.fase || formData?.level || "Fase A";           // Untuk dokumen makro (ACP, TP, ATP, Prota, Prosem)
+  const kelasRombel = formData?.kelasRombel || formData?.level || "Kelas 1"; // Untuk Modul Ajar & Asesmen
   const year = formData?.year || "2026/2027";
   const totalJp = formData?.totalJp || "108 JP / Tahun";
   const jpPerMinggu = formData?.jpPerMinggu || "3 JP/Minggu";
@@ -374,7 +376,7 @@ ${generalRules}
 [DATA INPUT GURU]:
 - Satuan Pendidikan: ${schoolName}
 - Mata Pelajaran: ${subject}
-- Fase / Kelas: ${level}
+- Fase Kurikulum: ${fase}
 - Tahun Pelajaran: ${year}
 - Nama Guru: ${teacher}
 - NIP / NUPTK: ${nipTeacher}
@@ -388,7 +390,7 @@ ${generalRules}
 - CP Per Elemen: ${cpElemen}
 
 STRUKTUR DOKUMEN HTML WAJIB (7 Bagian Wajib):
-1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-CP-${singkatanMapel}-${level.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
+1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-CP-${singkatanMapel}-${fase.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
 2. BAGIAN A — IDENTITAS (Tabel 2 Kolom)
 3. BAGIAN B — RASIONAL MATA PELAJARAN (Tabel 3 kolom: No | Uraian | Deskripsi) -> 1. Pentingnya Mapel, 2. Kaitan dengan 8 Dimensi Profil Lulusan, 3. Orientasi Pembelajaran.
 4. BAGIAN C — TUJUAN MATA PELAJARAN (Jika "Tujuan Mata Pelajaran" ada di Data Input Guru, WAJIB SALIN PERSIS teks tersebut. Jika kosong, rangkai 3 tujuan secara mandiri).
@@ -410,7 +412,7 @@ ${generalRules}
 - Satuan Pendidikan: ${schoolName}
 - Mata Pelajaran: ${subject}
 - Singkatan Mapel: ${singkatanMapel}
-- Fase / Kelas: ${level}
+- Fase Kurikulum: ${fase}
 - Tahun Pelajaran: ${year}
 - Alokasi Waktu Total: ${totalJp}
 - Nama Guru: ${teacher}
@@ -421,7 +423,7 @@ ${generalRules}
 - CP Per Elemen: ${cpElemen}
 
 STRUKTUR DOKUMEN HTML WAJIB (4 Bagian Wajib):
-1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-TP-${singkatanMapel}-${level.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
+1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-TP-${singkatanMapel}-${fase.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
 2. BAGIAN A — IDENTITAS (Tabel 2 Kolom)
 3. BAGIAN B — PANDUAN KODE TUJUAN PEMBELAJARAN (Sub B1 Format Kode box, Sub B2 Tabel Kode Elemen)
 4. BAGIAN C — DAFTAR TUJUAN PEMBELAJARAN (Tabel 6 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran | Aspek Kompetensi | Alokasi JP). Buat 8-12 TP berprinsip ABCD, KKO Bloom terukur, diawali "Murid mampu...". Total JP HARUS TEPAT SAMA dengan Alokasi Waktu Total (${totalJp}).
@@ -440,7 +442,7 @@ ${generalRules}
 - Satuan Pendidikan: ${schoolName}
 - Mata Pelajaran: ${subject}
 - Singkatan Mapel: ${singkatanMapel}
-- Fase / Kelas: ${level}
+- Fase Kurikulum: ${fase}
 - Tahun Pelajaran: ${year}
 - Alokasi Waktu Total: ${totalJp}
 - Nama Guru: ${teacher}
@@ -451,7 +453,7 @@ ${generalRules}
 - CP Per Elemen: ${cpElemen}
 
 STRUKTUR DOKUMEN HTML WAJIB (4 Bagian Wajib):
-1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-ATP-${singkatanMapel}-${level.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
+1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-ATP-${singkatanMapel}-${fase.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
 2. BAGIAN A — IDENTITAS (Tabel 4 kolom compact)
 3. BAGIAN B — ALUR URUTAN TUJUAN PEMBELAJARAN DALAM SATU FASE (Diagram visual Flexbox kotak kode TP dengan panah →)
 4. BAGIAN C — TABEL ALUR TUJUAN PEMBELAJARAN (Tabel 8 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran | Materi Pokok | Kompetensi & Variasi | 8 Dimensi Profil Lulusan | Alokasi JP | Semester)
@@ -463,7 +465,7 @@ KETENTUAN LAYOUT HTML:
 - CSS internal rapi, warna header #1a3a5c, @media print { @page { size: A4 portrait; margin: 1.5cm; } }.`;
   } else {
     // Prota, Prosem, KKTP, KKM, dll.
-    docPrompt = `Buatkan dokumen ${docType} untuk ${subject} tingkat ${level}.
+    docPrompt = `Buatkan dokumen ${docType} untuk ${subject} ${fase} — ${kelasRombel}.
 ${generalRules}
 Gunakan format HTML murni tanpa markdown, lengkapi kop sekolah dan tanda tangan guru/kepsek.`;
   }

@@ -64,7 +64,8 @@ export const AcpRenderer: React.FC<RendererProps> = ({ data, context }) => {
         <tbody>
           <tr><Td>Satuan Pendidikan</Td><Td><strong>{context.school?.schoolName}</strong></Td></tr>
           <tr><Td>Mata Pelajaran</Td><Td><strong>{context.curriculum?.subject}</strong></Td></tr>
-          <tr><Td>Fase / Kelas</Td><Td><strong>{context.curriculum?.level}</strong></Td></tr>
+          <tr><Td>Fase Kurikulum</Td><Td><strong>{context.curriculum?.fase || context.curriculum?.level}</strong></Td></tr>
+          <tr><Td>Kelas &amp; Rombel</Td><Td><strong>{context.curriculum?.kelasRombel || context.curriculum?.level}</strong></Td></tr>
           <tr><Td>Tahun Pelajaran</Td><Td><strong>{context.curriculum?.year}</strong></Td></tr>
           <tr><Td>Nama Guru</Td><Td><strong>{context.school?.teacher}</strong></Td></tr>
         </tbody>

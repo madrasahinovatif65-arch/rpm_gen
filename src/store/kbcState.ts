@@ -15,7 +15,9 @@ export interface KbcState {
   curriculum: {
     subject: string;
     singkatanMapel: string;
-    level: string;
+    level: string;       // DEPRECATED – keep for backward compat; use fase/kelasRombel
+    fase: string;        // Fase kurikulum untuk dokumen makro (ACP, TP, ATP, Prota, Prosem)
+    kelasRombel: string; // Kelas & Rombel spesifik untuk Modul Ajar & Asesmen
     year: string;
     totalJp: number;
     jpPerMinggu: number;
@@ -63,7 +65,9 @@ export const defaultKbcState: KbcState = {
   curriculum: {
     subject: "Akidah Akhlak",
     singkatanMapel: "AA",
-    level: "Fase A / Kelas 1",
+    level: "Fase A / Kelas 1", // kept for backward compat
+    fase: "Fase A",
+    kelasRombel: "Kelas 1",
     year: "2026/2027",
     totalJp: 72,
     jpPerMinggu: 2,
@@ -169,17 +173,16 @@ function debouncedSave(state: KbcState) {
 
 // Context Filtering for Module View
 export function buildModuleContext(state: KbcState) {
-  // In Phase 2 this will map tpId to actual TP text from canonical list.
-  // For now, it just passes the raw values so we can migrate UI first.
   return {
     ...state.module,
     schoolName: state.school.schoolName,
     kemenagOffice: state.school.kemenagOffice,
     subject: state.curriculum.subject,
-    level: state.curriculum.level,
+    level: state.curriculum.level,       // DEPRECATED: backward compat
+    fase: state.curriculum.fase,         // Fase A/B/C — untuk header dokumen makro
+    kelasRombel: state.curriculum.kelasRombel, // Kelas & Rombel — untuk Modul Ajar
     year: state.curriculum.year,
     teacher: state.school.teacher,
     principal: state.school.principal,
-    // (Other fields will be mapped from master TP data in phase 2)
   };
 }

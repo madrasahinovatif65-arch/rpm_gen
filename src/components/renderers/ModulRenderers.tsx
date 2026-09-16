@@ -26,7 +26,8 @@ export const ModulAjarRenderer: React.FC<RendererProps> = ({ umum, meetings, con
           <tr><Td>Penyusun</Td><Td><strong>{context.school?.teacher}</strong></Td></tr>
           <tr><Td>Satuan Pendidikan</Td><Td><strong>{context.school?.schoolName}</strong></Td></tr>
           <tr><Td>Mata Pelajaran</Td><Td><strong>{context.curriculum?.subject}</strong></Td></tr>
-          <tr><Td>Fase / Kelas</Td><Td><strong>{context.curriculum?.level}</strong></Td></tr>
+          <tr><Td>Fase</Td><Td><strong>{context.curriculum?.fase || context.curriculum?.level}</strong></Td></tr>
+          <tr><Td>Kelas &amp; Rombel</Td><Td><strong>{context.curriculum?.kelasRombel || context.curriculum?.level}</strong></Td></tr>
           <tr><Td>Tujuan Pembelajaran</Td><Td><strong>{context.module?.kodeTp}: {context.module?.rumusanTp}</strong></Td></tr>
           <tr><Td>Alokasi Waktu</Td><Td><strong>{context.module?.jumlahPertemuan} Pertemuan ({context.module?.jumlahPertemuan * context.module?.jpPerPertemuan} JP)</strong></Td></tr>
           <tr><Td>Model Pembelajaran</Td><Td><strong>{context.module?.learningModel}</strong></Td></tr>

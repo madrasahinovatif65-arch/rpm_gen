@@ -161,19 +161,18 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   // Auto-select CP Template jika Mapel dan Fase cocok
   React.useEffect(() => {
     if (!config?.cpTemplates) return;
-    const { subject, level } = state.curriculum;
-    if (!subject || !level) return;
+    const { subject, fase, level } = state.curriculum;
+    if (!subject) return;
     
-    // Fungsi pintar untuk mengekstrak kata "Fase X" (misal: "Fase A", "Fase B")
     const extractFase = (str: string) => {
       const match = str.match(/Fase\s+[A-F]/i);
       return match ? match[0].toUpperCase() : str.trim().toLowerCase();
     };
 
-    const targetFase = extractFase(level);
+    // Prioritas: gunakan field fase baru, fallback ke level lama
+    const targetFase = fase ? extractFase(fase) : extractFase(level);
     const targetSubject = subject.trim().toLowerCase();
 
-    // Cari template dengan Mapel sama dan Fase yang setara
     const matchingTemplate = config.cpTemplates.find(t => {
       const tSubj = (t.mataPelajaran || "").trim().toLowerCase();
       const tFase = extractFase(t.faseKelas || "");
@@ -181,7 +180,6 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     });
     
     if (matchingTemplate) {
-      // Cegah infinite loop jika data sudah sama
       if (state.cp.elemen !== matchingTemplate.elemen || state.cp.rasional !== matchingTemplate.rasional) {
          updateState(s => ({
             ...s,
@@ -203,7 +201,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.curriculum.subject, state.curriculum.level, config?.cpTemplates]);
+  }, [state.curriculum.subject, state.curriculum.fase, state.curriculum.level, config?.cpTemplates]);
 
   const baseFormData = {
     ...state.school,
@@ -791,23 +789,41 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             </div>
 
             <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Fase / Kelas</label>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                Fase Kurikulum
+                <span className="ml-1 text-[10px] font-normal text-slate-500">(untuk ACP, TP, ATP, Prota, Prosem)</span>
+              </label>
+              <select
+                value={formData.fase || ""}
+                onChange={(e) => {
+                  const fase = e.target.value;
+                  // keep legacy `level` in sync
+                  updateState(s => ({ ...s, curriculum: { ...s.curriculum, fase, level: fase + (s.curriculum.kelasRombel ? " / " + s.curriculum.kelasRombel : "") } }));
+                }}
+                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+              >
+                <option value="" disabled>Pilih Fase...</option>
+                <option value="Fase A">Fase A (Kelas 1–2)</option>
+                <option value="Fase B">Fase B (Kelas 3–4)</option>
+                <option value="Fase C">Fase C (Kelas 5–6)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                Kelas &amp; Rombel
+                <span className="ml-1 text-[10px] font-normal text-slate-500">(untuk Modul Ajar &amp; Asesmen)</span>
+              </label>
               <input
                 type="text"
-                list="fase-kelas-list"
-                value={formData.level}
-                onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
-                placeholder="Pilih atau ketik fase/kelas..."
+                value={formData.kelasRombel || ""}
+                onChange={(e) => {
+                  const kelasRombel = e.target.value;
+                  updateState(s => ({ ...s, curriculum: { ...s.curriculum, kelasRombel, level: (s.curriculum.fase || "") + (kelasRombel ? " / " + kelasRombel : "") } }));
+                }}
+                placeholder="Contoh: Kelas 4 / Rombel A"
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               />
-              <datalist id="fase-kelas-list">
-                <option value="Fase A / Kelas 1" />
-                <option value="Fase A / Kelas 2" />
-                <option value="Fase B / Kelas 3" />
-                <option value="Fase B / Kelas 4" />
-                <option value="Fase C / Kelas 5" />
-                <option value="Fase C / Kelas 6" />
-              </datalist>
             </div>
 
             <div>
