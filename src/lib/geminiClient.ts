@@ -341,9 +341,9 @@ export const generatePerangkatAjarAPI = async (docType: string, formData: any) =
   const schoolName = formData?.school || "SMA Negeri 1 Jambi";
   const subject = formData?.subject || "Bahasa Indonesia";
   const singkatanMapel = formData?.singkatanMapel || "BI";
-  const level = formData?.level || formData?.fase || "Fase A";         // DEPRECATED backward compat
-  const fase = formData?.fase || formData?.level || "Fase A";           // Untuk dokumen makro (ACP, TP, ATP, Prota, Prosem)
-  const kelasRombel = formData?.kelasRombel || formData?.level || "Kelas 1"; // Untuk Modul Ajar & Asesmen
+  const fase = formData?.fase || formData?.level || "Fase A";           // Untuk dokumen makro (ACP, TP, ATP, Prota, Prosem) — diset di Tab Administrasi
+  const kelasRombel = formData?.kelasRombel || "";                       // Untuk Modul Ajar & Asesmen — diset di Tab Modul via SIAKAD
+  const level = fase;                                                    // backward compat alias
   const year = formData?.year || "2026/2027";
   const totalJp = formData?.totalJp || "108 JP / Tahun";
   const jpPerMinggu = formData?.jpPerMinggu || "3 JP/Minggu";

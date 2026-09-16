@@ -791,14 +791,12 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
             <div>
               <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
                 Fase Kurikulum
-                <span className="ml-1 text-[10px] font-normal text-slate-500">(untuk ACP, TP, ATP, Prota, Prosem)</span>
               </label>
               <select
                 value={formData.fase || ""}
                 onChange={(e) => {
                   const fase = e.target.value;
-                  // keep legacy `level` in sync
-                  updateState(s => ({ ...s, curriculum: { ...s.curriculum, fase, level: fase + (s.curriculum.kelasRombel ? " / " + s.curriculum.kelasRombel : "") } }));
+                  updateState(s => ({ ...s, curriculum: { ...s.curriculum, fase, level: fase } }));
                 }}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
               >
@@ -807,23 +805,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 <option value="Fase B">Fase B (Kelas 3–4)</option>
                 <option value="Fase C">Fase C (Kelas 5–6)</option>
               </select>
-            </div>
-
-            <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                Kelas &amp; Rombel
-                <span className="ml-1 text-[10px] font-normal text-slate-500">(untuk Modul Ajar &amp; Asesmen)</span>
-              </label>
-              <input
-                type="text"
-                value={formData.kelasRombel || ""}
-                onChange={(e) => {
-                  const kelasRombel = e.target.value;
-                  updateState(s => ({ ...s, curriculum: { ...s.curriculum, kelasRombel, level: (s.curriculum.fase || "") + (kelasRombel ? " / " + kelasRombel : "") } }));
-                }}
-                placeholder="Contoh: Kelas 4 / Rombel A"
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-              />
+              <p className="mt-1 text-[10px] text-slate-400 italic">Kelas &amp; Rombel spesifik diatur di Tab Modul sesuai rombel yang diajar.</p>
             </div>
 
             <div>
