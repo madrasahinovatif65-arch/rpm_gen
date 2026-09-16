@@ -49,12 +49,12 @@ Mohon ekstrak dan sintesis data tersebut, lalu sajikan dalam bentuk **TABEL MULT
 (Sebutkan fase dan rentang kelas. Contoh: Fase B (Kelas 3-4))
 
 10. JP per Minggu
-(Pilih angka yang paling akurat berdasarkan rincian JP untuk fase ini:
+(PENTING: WAJIB HANYA TULISKAN 1 ANGKA BULAT. Jangan tambahkan kata 'JP', tulisan, atau catatan apapun. Jika mapel memiliki jumlah JP berbeda antar kelas dalam satu fase, pilih dan tuliskan angka yang PALING TINGGI.
 [ADMIN: PASTE TEKS RINCIAN JP DARI KAMUS REFERENSI DI SINI. JIKA MAPEL TIDAK ADA, GUNAKAN PARAMETER JUMLAH_JP DI ATAS]
 )
 
 11. Total JP
-(Berdasarkan JP per Minggu di atas, kalikan dengan [TOTAL_MINGGU_EFEKTIF] minggu efektif yang telah disebutkan di awal prompt. Contoh: Jika 5 JP dan 36 minggu efektif, maka Total JP = 180)
+(PENTING: WAJIB HANYA TULISKAN 1 ANGKA BULAT. Berdasarkan angka JP per Minggu di atas, kalikan dengan [TOTAL_MINGGU_EFEKTIF] minggu efektif yang telah disebutkan di awal prompt. Contoh: Jika 5 JP dan 36 minggu efektif, maka cukup tulis angka 180 tanpa tambahan teks apapun)
 
 12. Model Pembelajaran
 (PILIH HANYA SALAH SATU dari referensi wajib ini yang paling cocok: Discovery Learning, Problem Based Learning (PBL), Project Based Learning (PjBL), Inquiry Learning, Pembelajaran Berdiferensiasi, Cooperative Learning, Flipped Classroom, atau Teaching at the Right Level (TaRL). 
