@@ -186,10 +186,23 @@ const processQueue = async (formData: any) => {
   jobsRecord[jobId] = {
     ...job,
     status: "running",
-    progressMessage: `Memproses ${job.docType}...`,
+    progressMessage: `Memproses ${job.docType}... (0%)`,
     lastUpdated: Date.now()
   };
   notifyListeners();
+
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress += Math.floor(Math.random() * 5) + 2; // increments by 2-6% per tick
+    if (progress > 98) progress = 98; // cap at 98%
+    
+    if (jobsRecord[jobId] && jobsRecord[jobId].status === "running") {
+      jobsRecord[jobId].progressMessage = `Memproses ${job.docType}... (${progress}%)`;
+      notifyListeners();
+    } else {
+      clearInterval(progressInterval);
+    }
+  }, 1200);
 
   try {
     // Dynamic Cascading Context Injection (Single Source of Truth)
@@ -210,6 +223,7 @@ const processQueue = async (formData: any) => {
     }
 
     const res = await generatePerangkatAjarKBCAPI(job.docType, dynamicFormData);
+    clearInterval(progressInterval);
     if (res.status === "success" && res.data) {
       let finalData = res.data;
       
@@ -255,6 +269,7 @@ const processQueue = async (formData: any) => {
       throw new Error(res.message || "Gagal mendapatkan data valid.");
     }
   } catch (error: any) {
+    clearInterval(progressInterval);
     jobsRecord[jobId] = {
       ...jobsRecord[jobId],
       status: "failed",
