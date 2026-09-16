@@ -191,8 +191,8 @@ const processQueue = async (formData: any) => {
   };
   notifyListeners();
 
-  // No fake ticker anymore. We use real-time stream tracking below.  try {
-    // Dynamic Cascading Context Injection (Single Source of Truth)
+  // No fake ticker anymore. We use real-time stream tracking below.
+  try {
     const dynamicFormData = { ...formData };
     
     if (["atp", "prota", "prosem", "kktp"].includes(job.docType)) {
