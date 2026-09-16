@@ -193,6 +193,7 @@ const processQueue = async (formData: any) => {
 
   // No fake ticker anymore. We use real-time stream tracking below.
   try {
+    // Dynamic Cascading Context Injection (Single Source of Truth)
     const dynamicFormData = { ...formData };
     
     if (["atp", "prota", "prosem", "kktp"].includes(job.docType)) {
@@ -209,13 +210,31 @@ const processQueue = async (formData: any) => {
        }
     }
 
+    let dotCount = 0;
+    let hasStreamStarted = false;
+    const waitingInterval = setInterval(() => {
+      if (!hasStreamStarted && jobsRecord[jobId] && jobsRecord[jobId].status === "running") {
+        dotCount = (dotCount + 1) % 4;
+        const dots = ".".repeat(dotCount);
+        jobsRecord[jobId].progressMessage = `Menghubungkan ke AI${dots}`;
+        notifyListeners();
+      }
+    }, 500);
+
     const res = await generatePerangkatAjarKBCAPI(job.docType, dynamicFormData, (textSoFar) => {
+      hasStreamStarted = true;
       if (jobsRecord[jobId] && jobsRecord[jobId].status === "running") {
         const kb = (textSoFar.length / 1024).toFixed(1);
-        jobsRecord[jobId].progressMessage = `Menyusun konten... (${kb} KB)`;
+        let snippet = textSoFar.slice(-40).replace(/["{}\n\r\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
+        if (snippet.length > 25) snippet = "..." + snippet.slice(-25);
+        if (snippet.length === 0) snippet = "data...";
+        
+        jobsRecord[jobId].progressMessage = `Menulis: ${snippet} (${kb} KB)`;
         notifyListeners();
       }
     });
+    clearInterval(waitingInterval);
+
     if (res.status === "success" && res.data) {
       let finalData = res.data;
       
