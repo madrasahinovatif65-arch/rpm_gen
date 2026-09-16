@@ -1357,141 +1357,55 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900">
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Kantor Kemenag Kabupaten/Kota</label>
-                <input
-                  type="text"
-                  value={formDataModul.kemenagOffice}
-                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, kemenagOffice: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Nama Madrasah / Sekolah</label>
-                <input
-                  type="text"
-                  value={formDataModul.schoolName}
-                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, schoolName: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Alamat Lengkap Madrasah</label>
-                <input
-                  type="text"
-                  value={formDataModul.schoolAddress || ""}
-                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, schoolAddress: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Mata Pelajaran</label>
-                <select
-                  value={formDataModul.subject}
-                  onChange={(e) => {
-                    const subj = e.target.value;
-                    const mapelData = DATA_MAPEL_KEMENAG.find(m => m.namaMapel === subj);
-                    updateState(s => ({
-                      ...s,
-                      curriculum: {
-                        ...s.curriculum,
-                        subject: subj,
-                        singkatanMapel: mapelData ? mapelData.singkatan : s.curriculum.singkatanMapel
-                      }
-                    }));
-                  }}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
+            {/* ─── Ringkasan Identitas (Read-Only) ─── */}
+            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-extrabold text-slate-700 dark:text-slate-300 text-xs flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-emerald-600" />
+                  Identitas Dokumen
+                  <span className="font-normal text-slate-400">(ditarik dari Tab Administrasi)</span>
+                </h4>
+                <button
+                  type="button"
+                  onClick={() => setInputTab("admin")}
+                  className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 px-2.5 py-1 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition"
                 >
-                  <option value="">-- Pilih Mata Pelajaran --</option>
-                  {DATA_MAPEL_KEMENAG.map(mapel => (
-                    <option key={mapel.namaMapel} value={mapel.namaMapel}>{mapel.namaMapel}</option>
-                  ))}
-                </select>
+                  ← Edit di Administrasi
+                </button>
               </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                  Kelas (Pilih Rombel)
-                </label>
-                <select
-                  value={formDataModul.level}
-                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, level: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                >
-                  <option value="">-- Pilih Kelas --</option>
-                  {availableRombels.map(r => (
-                    <option key={r} value={r}>Kelas {r}</option>
-                  ))}
-                </select>
-                {isFetchingRombel && (
-                  <p className="text-[10px] text-emerald-600 mt-1 flex items-center">
-                    <Loader2 className="w-3 h-3 animate-spin mr-1" /> Menyinkronkan data rombel...
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Tahun Pelajaran</label>
-                <input
-                  type="text"
-                  value={formDataModul.year}
-                  onChange={(e) => updateState(s => ({ ...s, curriculum: { ...s.curriculum, year: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Nama Guru Penyusun</label>
-                <input
-                  type="text"
-                  value={formDataModul.teacher}
-                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, teacher: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">NIP Guru</label>
-                <input
-                  type="text"
-                  value={formDataModul.nipTeacher}
-                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, nipTeacher: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Kota & Tanggal TTD</label>
-                <input
-                  type="text"
-                  value={formDataModul.cityDate}
-                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, cityDate: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Nama Kepala Madrasah</label>
-                <input
-                  type="text"
-                  value={formDataModul.principal}
-                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, principal: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">NIP Kepala Madrasah</label>
-                <input
-                  type="text"
-                  value={formDataModul.nipPrincipal}
-                  onChange={(e) => updateState(s => ({ ...s, school: { ...s.school, nipPrincipal: e.target.value } }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold"
-                />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2 text-xs">
+                <div>
+                  <p className="text-slate-400 dark:text-slate-500">Madrasah</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-200 truncate">{formDataModul.schoolName || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 dark:text-slate-500">Mata Pelajaran</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-200 truncate">{formDataModul.subject || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 dark:text-slate-500">Fase</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-200">{(formDataModul as any).fase || formDataModul.level || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 dark:text-slate-500">Kelas &amp; Rombel</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-200">{(formDataModul as any).kelasRombel || formDataModul.level || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 dark:text-slate-500">Tahun Pelajaran</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-200">{formDataModul.year || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 dark:text-slate-500">Guru Penyusun</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-200 truncate">{formDataModul.teacher || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 dark:text-slate-500">Kepala Madrasah</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-200 truncate">{formDataModul.principal || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 dark:text-slate-500">Kota &amp; TTD</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-200 truncate">{formDataModul.cityDate || "—"}</p>
+                </div>
               </div>
             </div>
           </div>
