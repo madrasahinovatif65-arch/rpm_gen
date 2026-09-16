@@ -55,7 +55,7 @@ const AI_TOOLS_ITEMS = [
   { id: "cp_database", label: "Database CP Elemen", icon: Database, desc: "Kelola template Capaian Pembelajaran", badge: "Database" },
   { id: "modulai", label: "Modul Ajar AI", icon: Wand2, desc: "Susun Modul Ajar Deep Learning Kurikulum Merdeka", badge: "Deep Learning" },
   { id: "asistenai", label: "Asisten Guru AI", icon: Bot, desc: "Tanya jawab & konsultasi materi mengajar", badge: "Chatbot" },
-  { id: "lkpdai", label: "Generator LKPD AI", icon: Sparkles, desc: "Buat Lembar Kerja Peserta Didik interaktif", badge: "LKPD" },
+  { id: "lkpdai", label: "Generator LKPD AI", icon: Sparkles, desc: "Buat Lembar Kerja Murid interaktif", badge: "LKPD" },
   { id: "ailainnya", label: "Generator AI Lainnya", icon: Globe, desc: "Generator Soal, Silabus, Rubrik Asesmen & Media", badge: "Multi-Tool" },
 ];
 

@@ -81,7 +81,7 @@ export const defaultKbcState: KbcState = {
   module: {
     tpId: null,
     kodeTp: ["TP.AA.ELE.10.01"],
-    rumusanTp: ["Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci."],
+    rumusanTp: ["Murid mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci."],
     elemenCp: ["Akidah"],
     sintakModel: "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
     jumlahPertemuan: 3,

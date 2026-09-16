@@ -320,11 +320,11 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
     updateState(s => ({
       ...s,
       cp: {
-        rasional: "Mata pelajaran ini diarahkan untuk membentuk peserta didik yang berpengetahuan luas, berakhlak mulia, dan mampu berpikir kritis serta kreatif. Pembelajaran dirancang agar siswa dapat memahami, menganalisis, dan mengaplikasikan ilmu pengetahuan secara bermakna dalam kehidupan nyata yang moderat dan toleran.",
-        tujuanMapel: "Peserta didik diharapkan mampu menyelaraskan ilmu agama dengan kehidupan modern secara harmonis.",
+        rasional: "Mata pelajaran ini diarahkan untuk membentuk Murid yang berpengetahuan luas, berakhlak mulia, dan mampu berpikir kritis serta kreatif. Pembelajaran dirancang agar siswa dapat memahami, menganalisis, dan mengaplikasikan ilmu pengetahuan secara bermakna dalam kehidupan nyata yang moderat dan toleran.",
+        tujuanMapel: "Murid diharapkan mampu menyelaraskan ilmu agama dengan kehidupan modern secara harmonis.",
         karakteristikMapel: "Mengedepankan pemahaman literasi agama, integrasi kearifan lokal, dan pemikiran kritis progresif.",
-        cpFase: "Peserta didik menguasai fondasi utama ilmu secara komprehensif, mampu memecahkan masalah kontekstual, dan mempraktikkan toleransi aktif di tengah masyarakat.",
-        elemen: "Elemen Pemahaman Konsep: Peserta didik mampu menganalisis dan menjelaskan ruang lingkup materi secara mendalam dan komprehensif.\n\nElemen Keterampilan Proses: Peserta didik mampu mengamati, menanya, mengeksplorasi, merumuskan kesimpulan, serta mengkomunikasikan hasil karya secara lisan maupun tulisan."
+        cpFase: "Murid menguasai fondasi utama ilmu secara komprehensif, mampu memecahkan masalah kontekstual, dan mempraktikkan toleransi aktif di tengah masyarakat.",
+        elemen: "Elemen Pemahaman Konsep: Murid mampu menganalisis dan menjelaskan ruang lingkup materi secara mendalam dan komprehensif.\n\nElemen Keterampilan Proses: Murid mampu mengamati, menanya, mengeksplorasi, merumuskan kesimpulan, serta mengkomunikasikan hasil karya secara lisan maupun tulisan."
       }
     }));
   };
@@ -939,7 +939,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                   rows={4}
                   value={formData.cpRasional}
                   onChange={(e) => updateState(s => ({ ...s, cp: { ...s.cp, rasional: e.target.value } }))}
-                  placeholder="Tulis rasional mata pelajaran secara ringkas. Contoh: Mata pelajaran Akidah Akhlak bertujuan membentuk peserta didik yang beriman, berakhlak mulia, dan mampu mengamalkan nilai-nilai Islam dalam kehidupan sehari-hari..."
+                  placeholder="Tulis rasional mata pelajaran secara ringkas. Contoh: Mata pelajaran Akidah Akhlak bertujuan membentuk Murid yang beriman, berakhlak mulia, dan mampu mengamalkan nilai-nilai Islam dalam kehidupan sehari-hari..."
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-medium leading-relaxed placeholder:text-slate-400 placeholder:font-normal"
                 />
                 <p className="mt-1 text-[10px] text-slate-400 dark:text-slate-500 italic">

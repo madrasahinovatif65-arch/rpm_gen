@@ -145,14 +145,14 @@ ATURAN UTAMA:
      a. <h3>Pertemuan 1: [Judul/Topik Pertemuan]</h3>
      b. <h4>1. Kegiatan Pendahuluan (Durasi: X Menit)</h4>
         - <strong>Aktivitas Guru:</strong> (min 3-5 poin + contoh dialog guru)
-        - <strong>Aktivitas Peserta Didik:</strong> (min 3-5 poin)
+        - <strong>Aktivitas Murid:</strong> (min 3-5 poin)
      c. <h4>2. Kegiatan Inti - Deep Learning (Durasi: X Menit)</h4>
         - Jabarkan per Sintak Model (${formData.model}) yang mencakup 3 Fase Deep Learning: <strong>Memahami (Concept)</strong>, <strong>Mengaplikasi (Practice)</strong>, dan <strong>Merefleksi (Reflection)</strong>.
-        - Untuk setiap sintak: tuliskan <strong>Kegiatan Guru:</strong> (poin-poin + contoh dialog) dan <strong>Kegiatan Peserta Didik:</strong> (poin-poin aktif).
+        - Untuk setiap sintak: tuliskan <strong>Kegiatan Guru:</strong> (poin-poin + contoh dialog) dan <strong>Kegiatan Murid:</strong> (poin-poin aktif).
      d. <h4>3. Kegiatan Penutup (Durasi: X Menit)</h4>
-        - <strong>Aktivitas Guru & Peserta Didik:</strong> (Simpulan, Refleksi, Rencana Pertemuan Berikutnya).
+        - <strong>Aktivitas Guru & Murid:</strong> (Simpulan, Refleksi, Rencana Pertemuan Berikutnya).
 5. Untuk bagian A, C2, D, dan G tetap gunakan tabel HTML profesional agar data tersaji rapi.
-6. WAJIB BUAT LKPD (Lembar Kerja Peserta Didik) YANG SIAP PAKAI SECARA UTUH DAN LANGSUNG BISA DIKERJAKAN SISWA.
+6. WAJIB BUAT LKPD (Lembar Kerja Murid) YANG SIAP PAKAI SECARA UTUH DAN LANGSUNG BISA DIKERJAKAN SISWA.
 7. Cantumkan footer resmi di bagian bawah.`;
 
   const userPrompt = `DATA MODUL AJAR:
@@ -246,12 +246,12 @@ FORMAT WAJIB LAYOUT HTML:
   </tbody>
 </table>
 
-<h2>H. BAHAN AJAR & LKPD (LEMBAR KERJA PESERTA DIDIK) SIAP PAKAI</h2>
+<h2>H. BAHAN AJAR & LKPD (LEMBAR KERJA Murid) SIAP PAKAI</h2>
 <h3>1. Ringkasan Bahan Ajar Esensial</h3>
 <p>Materi pembelajaran lengkap yang dapat dibaca siswa.</p>
 
 <h3>2. LKPD Interaktif Siswa</h3>
-<p><strong>LEMBAR KERJA PESERTA DIDIK (LKPD)</strong></p>
+<p><strong>LEMBAR KERJA Murid (LKPD)</strong></p>
 <p>Nama Siswa: ................................................<br>Kelas: ${formData.kelas}<br>Mata Pelajaran: ${formData.mataPelajaran}<br>Topik: ${formData.topik}</p>
 <p><strong>Petunjuk Pengerjaan:</strong><br>1. Bacalah setiap instruksi dengan cermat.<br>2. Kerjakan soal & diskusikan bersama kelompokmu.<br>3. Tuliskan hasil analisis secara rinci pada kolom yang disediakan.</p>
 <p><strong>Soal & Aktivitas Studi Kasus:</strong></p>
@@ -351,11 +351,11 @@ export const generatePerangkatAjarAPI = async (docType: string, formData: any) =
   const principal = formData?.principal || "Dr. Ahmad Fauzi, M.Pd.";
   const nipPrincipal = formData?.nipPrincipal || "19720514 200003 1 002";
 
-  const cpRasional = formData?.cpRasional || "Pada akhir Fase E, peserta didik memiliki kemampuan berbahasa untuk berkomunikasi dan bernalar sesuai dengan tujuan, konteks sosial, akademis, dan dunia kerja.";
+  const cpRasional = formData?.cpRasional || "Pada akhir Fase E, Murid memiliki kemampuan berbahasa untuk berkomunikasi dan bernalar sesuai dengan tujuan, konteks sosial, akademis, dan dunia kerja.";
   const tujuanMapel = formData?.tujuanMapel || "";
   const karakteristikMapel = formData?.karakteristikMapel || "";
   const cpFase = formData?.cpFase || "";
-  const cpElemen = formData?.cpElemen || `Elemen 1 — Menyimak: Peserta didik mampu mengevaluasi dan mengkreasi informasi berupa gagasan dari berbagai tipe teks lisan.\nElemen 2 — Membaca dan Memirsa: Peserta didik mampu mengevaluasi informasi berupa gagasan dari teks deskripsi, laporan, narasi, eksplanasi, eksposisi.\nElemen 3 — Berbicara dan Mempresentasikan: Peserta didik mampu mengolah dan menyajikan gagasan untuk tujuan pengajuan usul dan solusi.\nElemen 4 — Menulis: Peserta didik mampu menulis gagasan tertulis secara logis, kritis, dan kreatif.`;
+  const cpElemen = formData?.cpElemen || `Elemen 1 — Menyimak: Murid mampu mengevaluasi dan mengkreasi informasi berupa gagasan dari berbagai tipe teks lisan.\nElemen 2 — Membaca dan Memirsa: Murid mampu mengevaluasi informasi berupa gagasan dari teks deskripsi, laporan, narasi, eksplanasi, eksposisi.\nElemen 3 — Berbicara dan Mempresentasikan: Murid mampu mengolah dan menyajikan gagasan untuk tujuan pengajuan usul dan solusi.\nElemen 4 — Menulis: Murid mampu menulis gagasan tertulis secara logis, kritis, dan kreatif.`;
 
   const generalRules = `
 KETENTUAN UTAMA GENERASI HTML ADMINISTRASI:
@@ -424,7 +424,7 @@ STRUKTUR DOKUMEN HTML WAJIB (4 Bagian Wajib):
 1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-TP-${singkatanMapel}-${level.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
 2. BAGIAN A — IDENTITAS (Tabel 2 Kolom)
 3. BAGIAN B — PANDUAN KODE TUJUAN PEMBELAJARAN (Sub B1 Format Kode box, Sub B2 Tabel Kode Elemen)
-4. BAGIAN C — DAFTAR TUJUAN PEMBELAJARAN (Tabel 6 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran | Aspek Kompetensi | Alokasi JP). Buat 8-12 TP berprinsip ABCD, KKO Bloom terukur, diawali "Peserta didik mampu...". Total JP HARUS TEPAT SAMA dengan Alokasi Waktu Total (${totalJp}).
+4. BAGIAN C — DAFTAR TUJUAN PEMBELAJARAN (Tabel 6 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran | Aspek Kompetensi | Alokasi JP). Buat 8-12 TP berprinsip ABCD, KKO Bloom terukur, diawali "Murid mampu...". Total JP HARUS TEPAT SAMA dengan Alokasi Waktu Total (${totalJp}).
 5. BAGIAN D — REKAPITULASI ALOKASI WAKTU PER ELEMEN (Tabel 5 kolom: No | Elemen CP | Jumlah TP | Total JP | Persentase)
 6. BAGIAN PENUTUP — TANDA TANGAN SEJAJAR KEPSEK & GURU DENGAN TABEL TAK TERLIHAT (BORDER 0).
 

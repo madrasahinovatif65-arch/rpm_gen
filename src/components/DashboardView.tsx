@@ -73,7 +73,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     {
       id: "lkpdai",
       title: "Generator LKPD AI",
-      desc: "Buat Lembar Kerja Peserta Didik interaktif.",
+      desc: "Buat Lembar Kerja Murid interaktif.",
       icon: Sparkles,
       badge: "LKPD",
       variant: "primary" as const,

@@ -22,7 +22,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
     learningModel = "",
     sintakModel = "1. Stimulasi/Pemberian Rangsangan, 2. Identifikasi Masalah, 3. Pengumpulan Data, 4. Pengolahan Data, 5. Pembuktian, 6. Penarikan Kesimpulan",
     kodeTp = "TP.AA.ELE.10.01",
-    rumusanTp = "Peserta didik mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
+    rumusanTp = "Murid mampu menganalisis konsep tauhid dan Asmaul Husna secara mendalam, serta menginternalisasi nilai kasih sayang Allah Swt. dalam kehidupan sehari-hari dan kearifan lokal Kerinci.",
     elemenCp = "Al-Qur'an Hadis",
     jumlahPertemuan = "3",
     jpPerPertemuan = "2",
@@ -113,17 +113,17 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
           <tr>
             <td ${tdCenter}>1</td>
             <td ${tdStyle}>Menumbuhkan pemahaman mendalam tentang prinsip-prinsip ${subject} yang bersumber dari wahyu ilahi dan akal sehat.</td>
-            <td ${tdStyle}>Peserta didik mampu menjelaskan dalil naqli dan aqli dengan tepat dan kontekstual.</td>
+            <td ${tdStyle}>Murid mampu menjelaskan dalil naqli dan aqli dengan tepat dan kontekstual.</td>
           </tr>
           <tr>
             <td ${tdCenter}>2</td>
             <td ${tdStyle}>Menginternalisasikan nilai kasih sayang (Rahmah), toleransi, dan kesantunan dalam pergaulan sosial maupun digital.</td>
-            <td ${tdStyle}>Peserta didik menunjukkan sikap santun (Ta'addub), keteladanan (Qudwah), dan gotong royong aktif di kelas.</td>
+            <td ${tdStyle}>Murid menunjukkan sikap santun (Ta'addub), keteladanan (Qudwah), dan gotong royong aktif di kelas.</td>
           </tr>
           <tr>
             <td ${tdCenter}>3</td>
             <td ${tdStyle}>Membiasakan nalar kritis dan inovatif (Tathawwur wa Ibtikār) dalam merespons tantangan zaman dan pelestarian lingkungan.</td>
-            <td ${tdStyle}>Peserta didik mampu merumuskan gagasan solutif berwawasan pelestarian alam dan kearifan lokal.</td>
+            <td ${tdStyle}>Murid mampu merumuskan gagasan solutif berwawasan pelestarian alam dan kearifan lokal.</td>
           </tr>
         </tbody>
       </table>
@@ -211,7 +211,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
             <td ${tdCenter}>1</td>
             <td ${tdCenter}><strong>${singkatanMapel}-E-AKD-001</strong></td>
             <td ${tdStyle}>Akidah</td>
-            <td ${tdStyle}>Peserta didik mampu menganalisis konsep tauhid dan hakikat Asmaul Husna secara komprehensif serta menginternalisasi kasih sayang Allah Swt.</td>
+            <td ${tdStyle}>Murid mampu menganalisis konsep tauhid dan hakikat Asmaul Husna secara komprehensif serta menginternalisasi kasih sayang Allah Swt.</td>
             <td ${tdStyle}>Cinta Allah & Rasul<br><em>PPRA: Ta'addub & Qudwah</em></td>
             <td ${tdCenter}>8 JP</td>
           </tr>
@@ -219,7 +219,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
             <td ${tdCenter}>2</td>
             <td ${tdStyle}><strong>${singkatanMapel}-E-AKD-002</strong></td>
             <td ${tdStyle}>Akidah</td>
-            <td ${tdStyle}>Peserta didik mampu mengevaluasi dalil aqli dan naqli tentang kekuasaan Allah dalam penciptaan alam semesta Kerinci.</td>
+            <td ${tdStyle}>Murid mampu mengevaluasi dalil aqli dan naqli tentang kekuasaan Allah dalam penciptaan alam semesta Kerinci.</td>
             <td ${tdStyle}>Cinta Ilmu & Cinta Alam<br><em>PPRA: Tawāzun & I'tidāl</em></td>
             <td ${tdCenter}>8 JP</td>
           </tr>
@@ -227,7 +227,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
             <td ${tdCenter}>3</td>
             <td ${tdStyle}><strong>${singkatanMapel}-E-AKH-001</strong></td>
             <td ${tdStyle}>Akhlak</td>
-            <td ${tdStyle}>Peserta didik mampu mengidentifikasi dan mempraktikkan sikap santun dan hormat kepada orang tua dan guru dalam keseharian.</td>
+            <td ${tdStyle}>Murid mampu mengidentifikasi dan mempraktikkan sikap santun dan hormat kepada orang tua dan guru dalam keseharian.</td>
             <td ${tdStyle}>Cinta Diri & Sesama<br><em>PPRA: Ta'addub & Qudwah</em></td>
             <td ${tdCenter}>8 JP</td>
           </tr>
@@ -235,7 +235,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
             <td ${tdCenter}>4</td>
             <td ${tdStyle}><strong>${singkatanMapel}-E-AKH-002</strong></td>
             <td ${tdStyle}>Akhlak</td>
-            <td ${tdStyle}>Peserta didik mampu menganalisis bahaya perilaku tercela (ghibah, fitnah, perundungan siber) serta merancang kampanye akhlak mulia.</td>
+            <td ${tdStyle}>Murid mampu menganalisis bahaya perilaku tercela (ghibah, fitnah, perundungan siber) serta merancang kampanye akhlak mulia.</td>
             <td ${tdStyle}>Cinta Sesama<br><em>PPRA: Musāwah & Tasāmuh</em></td>
             <td ${tdCenter}>10 JP</td>
           </tr>
@@ -243,7 +243,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
             <td ${tdCenter}>5</td>
             <td ${tdStyle}><strong>${singkatanMapel}-E-ADB-001</strong></td>
             <td ${tdStyle}>Adab</td>
-            <td ${tdStyle}>Peserta didik mampu menerapkan etika bermusyawarah dan menghargai perbedaan pendapat dalam forum kelas.</td>
+            <td ${tdStyle}>Murid mampu menerapkan etika bermusyawarah dan menghargai perbedaan pendapat dalam forum kelas.</td>
             <td ${tdStyle}>Cinta Bangsa & Negara<br><em>PPRA: Syūrā & Tasāmuh</em></td>
             <td ${tdCenter}>8 JP</td>
           </tr>
@@ -251,7 +251,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
             <td ${tdCenter}>6</td>
             <td ${tdStyle}><strong>${singkatanMapel}-E-ADB-002</strong></td>
             <td ${tdStyle}>Adab</td>
-            <td ${tdStyle}>Peserta didik mampu merancang aksi nyata kepedulian lingkungan madrasah berbasis nilai cinta lingkungan hidup (${topikLokal}).</td>
+            <td ${tdStyle}>Murid mampu merancang aksi nyata kepedulian lingkungan madrasah berbasis nilai cinta lingkungan hidup (${topikLokal}).</td>
             <td ${tdStyle}>Cinta Alam & Lingkungan<br><em>PPRA: Tathawwur wa Ibtikār</em></td>
             <td ${tdCenter}>10 JP</td>
           </tr>
@@ -259,7 +259,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
             <td ${tdCenter}>7</td>
             <td ${tdStyle}><strong>${singkatanMapel}-E-SOC-001</strong></td>
             <td ${tdStyle}>Sosial & Moderasi</td>
-            <td ${tdStyle}>Peserta didik mampu menganalisis prinsip moderasi beragama dan kerukunan antarumat beragama di Indonesia.</td>
+            <td ${tdStyle}>Murid mampu menganalisis prinsip moderasi beragama dan kerukunan antarumat beragama di Indonesia.</td>
             <td ${tdStyle}>Cinta Tanah Air<br><em>PPRA: Tawassuṭ & Muwaṭanah</em></td>
             <td ${tdCenter}>10 JP</td>
           </tr>
@@ -267,7 +267,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
             <td ${tdCenter}>8</td>
             <td ${tdStyle}><strong>${singkatanMapel}-E-SOC-002</strong></td>
             <td ${tdStyle}>Sosial & Proyek</td>
-            <td ${tdStyle}>Peserta didik mampu membuat portofolio aksi cinta madrasah dan karya kreatif pengamalan nilai PPRA.</td>
+            <td ${tdStyle}>Murid mampu membuat portofolio aksi cinta madrasah dan karya kreatif pengamalan nilai PPRA.</td>
             <td ${tdStyle}>Panca Cinta Komprehensif<br><em>PPRA: Tathawwur wa Ibtikār</em></td>
             <td ${tdCenter}>10 JP</td>
           </tr>
@@ -613,22 +613,22 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
       
       <p><strong>1. Pendahuluan (15 Menit) — Mindful Learning:</strong></p>
       <ul>
-        <li>Guru menyapa dengan salam hangat, doa khusyuk, dan memeriksa kesiapan fisik serta batin peserta didik (PC: Cinta Allah | PPRA: Ta'addub).</li>
+        <li>Guru menyapa dengan salam hangat, doa khusyuk, dan memeriksa kesiapan fisik serta batin Murid (PC: Cinta Allah | PPRA: Ta'addub).</li>
         <li>Guru memutar audio/video singkat keindahan alam Kerinci sebagai apersepsi mensyukuri nikmat Ilahi.</li>
         <li>Guru menyampaikan tujuan pembelajaran dan mengaitkannya dengan pentingnya menjadi pribadi teladan (Qudwah).</li>
       </ul>
 
       <p><strong>2. Kegiatan Inti (${Number(jpPerPertemuan) * 45 - 30} Menit) — Meaningful & Joyful Deep Learning:</strong></p>
       <ul>
-        <li><strong>Fase Memahami (Concept):</strong> Guru memberikan stimulasi studi kasus nyata mengenai keteladanan sosial dan fenomena alam. Peserta didik membaca lembar materi esensial secara kritis.</li>
-        <li><strong>Fase Mengaplikasi (Practice):</strong> Peserta didik membentuk kelompok diskusi (Syūrā) untuk menganalisis penerapan nilai kasih sayang dan merumuskan solusi studi kasus pada LKPD.</li>
+        <li><strong>Fase Memahami (Concept):</strong> Guru memberikan stimulasi studi kasus nyata mengenai keteladanan sosial dan fenomena alam. Murid membaca lembar materi esensial secara kritis.</li>
+        <li><strong>Fase Mengaplikasi (Practice):</strong> Murid membentuk kelompok diskusi (Syūrā) untuk menganalisis penerapan nilai kasih sayang dan merumuskan solusi studi kasus pada LKPD.</li>
         <li><strong>Fase Merefleksi (Reflection):</strong> Masing-masing kelompok mempresentasikan gagasan dengan santun. Guru memfasilitasi umpan balik konstruktif antar-kelompok (Musāwah & Tasāmuh).</li>
       </ul>
 
       <p><strong>3. Penutup (15 Menit):</strong></p>
       <ul>
-        <li>Guru bersama peserta didik menyimpulkan pesan esensial pembelajaran.</li>
-        <li>Peserta didik menuliskan 1 kalimat refleksi harian: "Apa wujud cinta kasih yang akan saya lakukan hari ini?".</li>
+        <li>Guru bersama Murid menyimpulkan pesan esensial pembelajaran.</li>
+        <li>Murid menuliskan 1 kalimat refleksi harian: "Apa wujud cinta kasih yang akan saya lakukan hari ini?".</li>
         <li>Doa penutup dan pesan kasih sayang guru kepada seluruh siswa.</li>
       </ul>
 
@@ -652,7 +652,7 @@ export function generateKbcDocumentFallback(docType: string, formData: any): str
     return `
       ${kopHtml}
       <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="margin: 0; color: #1a3a5c; font-size: 15pt; text-transform: uppercase;">LEMBAR KERJA PESERTA DIDIK (LKPD)</h2>
+        <h2 style="margin: 0; color: #1a3a5c; font-size: 15pt; text-transform: uppercase;">LEMBAR KERJA Murid (LKPD)</h2>
         <h3 style="margin: 4px 0 0 0; color: #475569; font-size: 12pt; font-weight: normal;">Kurikulum Berbasis Cinta (KBC) — Deep Learning</h3>
       </div>
 
@@ -849,10 +849,10 @@ export function generateMerdekaDocumentFallback(docType: string, formData: any):
           <tr><th ${thStyle} style="width:5%;">No</th><th ${thStyle} style="width:20%;">Elemen CP</th><th ${thStyle}>Deskripsi Capaian Pembelajaran</th><th ${thStyle} style="width:30%;">Kompetensi & Materi Esensial</th></tr>
         </thead>
         <tbody>
-          <tr><td ${tdCenter}>1</td><td ${tdStyle}><strong>Menyimak & Memahami</strong></td><td ${tdStyle}>Peserta didik mampu mengevaluasi dan mengkreasi informasi berupa gagasan dari teks lisan dan visual secara kritis.</td><td ${tdStyle}>Analisis Gagasan, Fakta vs Opini, Evaluasi Akurasi Informasi</td></tr>
-          <tr><td ${tdCenter}>2</td><td ${tdStyle}><strong>Membaca & Memirsa</strong></td><td ${tdStyle}>Peserta didik mampu memahami dan mengevaluasi makna tersurat dan tersirat dari berbagai teks informasional.</td><td ${tdStyle}>Struktur Teks, Ide Pokok, Makna Kontekstual, Inferensi Kritis</td></tr>
-          <tr><td ${tdCenter}>3</td><td ${tdStyle}><strong>Berbicara & Presentasi</strong></td><td ${tdStyle}>Peserta didik mampu menyajikan gagasan dan solusi perumusan masalah secara logis dan runtut.</td><td ${tdStyle}>Teknik Retorika, Argumentasi Ilmiah, Diskusi Terbuka</td></tr>
-          <tr><td ${tdCenter}>4</td><td ${tdStyle}><strong>Menulis & Berkreasi</strong></td><td ${tdStyle}>Peserta didik mampu menulis gagasan tertulis secara sistematis, kreatif, dan berkaidah baku.</td><td ${tdStyle}>Teks Eksposisi, Laporan Hasil Observasi, Teks Prosedur</td></tr>
+          <tr><td ${tdCenter}>1</td><td ${tdStyle}><strong>Menyimak & Memahami</strong></td><td ${tdStyle}>Murid mampu mengevaluasi dan mengkreasi informasi berupa gagasan dari teks lisan dan visual secara kritis.</td><td ${tdStyle}>Analisis Gagasan, Fakta vs Opini, Evaluasi Akurasi Informasi</td></tr>
+          <tr><td ${tdCenter}>2</td><td ${tdStyle}><strong>Membaca & Memirsa</strong></td><td ${tdStyle}>Murid mampu memahami dan mengevaluasi makna tersurat dan tersirat dari berbagai teks informasional.</td><td ${tdStyle}>Struktur Teks, Ide Pokok, Makna Kontekstual, Inferensi Kritis</td></tr>
+          <tr><td ${tdCenter}>3</td><td ${tdStyle}><strong>Berbicara & Presentasi</strong></td><td ${tdStyle}>Murid mampu menyajikan gagasan dan solusi perumusan masalah secara logis dan runtut.</td><td ${tdStyle}>Teknik Retorika, Argumentasi Ilmiah, Diskusi Terbuka</td></tr>
+          <tr><td ${tdCenter}>4</td><td ${tdStyle}><strong>Menulis & Berkreasi</strong></td><td ${tdStyle}>Murid mampu menulis gagasan tertulis secara sistematis, kreatif, dan berkaidah baku.</td><td ${tdStyle}>Teks Eksposisi, Laporan Hasil Observasi, Teks Prosedur</td></tr>
         </tbody>
       </table>
       ${ttdHtml}
@@ -871,13 +871,13 @@ export function generateMerdekaDocumentFallback(docType: string, formData: any):
           <tr><th ${thStyle} style="width:5%;">No</th><th ${thStyle} style="width:15%;">Kode TP</th><th ${thStyle} style="width:18%;">Elemen</th><th ${thStyle}>Rumusan Tujuan Pembelajaran</th><th ${thStyle} style="width:10%;">Alokasi JP</th></tr>
         </thead>
         <tbody>
-          <tr><td ${tdCenter}>1</td><td ${tdCenter}>${singkatanMapel}.E.01</td><td ${tdStyle}>Menyimak</td><td ${tdStyle}>Peserta didik mampu menganalisis ide pokok dan ide penjelas dari teks monolog/dialog lisan secara kritis.</td><td ${tdCenter}>12 JP</td></tr>
-          <tr><td ${tdCenter}>2</td><td ${tdCenter}>${singkatanMapel}.E.02</td><td ${tdStyle}>Membaca & Memirsa</td><td ${tdStyle}>Peserta didik mampu mengevaluasi akurasi informasi dan bias sudut pandang dari teks laporan hasil observasi.</td><td ${tdCenter}>16 JP</td></tr>
-          <tr><td ${tdCenter}>3</td><td ${tdCenter}>${singkatanMapel}.E.03</td><td ${tdStyle}>Membaca & Memirsa</td><td ${tdStyle}>Peserta didik mampu menginterpretasikan makna kata serapan dan istilah teknis ilmiah dalam artikel populer.</td><td ${tdCenter}>12 JP</td></tr>
-          <tr><td ${tdCenter}>4</td><td ${tdCenter}>${singkatanMapel}.E.04</td><td ${tdStyle}>Berbicara</td><td ${tdStyle}>Peserta didik mampu mempresentasikan hasil analisis teks eksposisi secara runtut, logis, dan percaya diri.</td><td ${tdCenter}>16 JP</td></tr>
-          <tr><td ${tdCenter}>5</td><td ${tdCenter}>${singkatanMapel}.E.05</td><td ${tdStyle}>Menulis</td><td ${tdStyle}>Peserta didik mampu menyusun draf teks laporan hasil observasi berbasis data empiris lapangan.</td><td ${tdCenter}>18 JP</td></tr>
-          <tr><td ${tdCenter}>6</td><td ${tdCenter}>${singkatanMapel}.E.06</td><td ${tdStyle}>Menulis</td><td ${tdStyle}>Peserta didik mampu menyunting dan mempublikasikan karya tulis ilmiah sederhana di media sekolah.</td><td ${tdCenter}>18 JP</td></tr>
-          <tr><td ${tdCenter}>7</td><td ${tdCenter}>${singkatanMapel}.E.07</td><td ${tdStyle}>Integratif</td><td ${tdStyle}>Peserta didik mampu merancang portofolio gelar karya literasi dan berpikir kritis komparatif.</td><td ${tdCenter}>16 JP</td></tr>
+          <tr><td ${tdCenter}>1</td><td ${tdCenter}>${singkatanMapel}.E.01</td><td ${tdStyle}>Menyimak</td><td ${tdStyle}>Murid mampu menganalisis ide pokok dan ide penjelas dari teks monolog/dialog lisan secara kritis.</td><td ${tdCenter}>12 JP</td></tr>
+          <tr><td ${tdCenter}>2</td><td ${tdCenter}>${singkatanMapel}.E.02</td><td ${tdStyle}>Membaca & Memirsa</td><td ${tdStyle}>Murid mampu mengevaluasi akurasi informasi dan bias sudut pandang dari teks laporan hasil observasi.</td><td ${tdCenter}>16 JP</td></tr>
+          <tr><td ${tdCenter}>3</td><td ${tdCenter}>${singkatanMapel}.E.03</td><td ${tdStyle}>Membaca & Memirsa</td><td ${tdStyle}>Murid mampu menginterpretasikan makna kata serapan dan istilah teknis ilmiah dalam artikel populer.</td><td ${tdCenter}>12 JP</td></tr>
+          <tr><td ${tdCenter}>4</td><td ${tdCenter}>${singkatanMapel}.E.04</td><td ${tdStyle}>Berbicara</td><td ${tdStyle}>Murid mampu mempresentasikan hasil analisis teks eksposisi secara runtut, logis, dan percaya diri.</td><td ${tdCenter}>16 JP</td></tr>
+          <tr><td ${tdCenter}>5</td><td ${tdCenter}>${singkatanMapel}.E.05</td><td ${tdStyle}>Menulis</td><td ${tdStyle}>Murid mampu menyusun draf teks laporan hasil observasi berbasis data empiris lapangan.</td><td ${tdCenter}>18 JP</td></tr>
+          <tr><td ${tdCenter}>6</td><td ${tdCenter}>${singkatanMapel}.E.06</td><td ${tdStyle}>Menulis</td><td ${tdStyle}>Murid mampu menyunting dan mempublikasikan karya tulis ilmiah sederhana di media sekolah.</td><td ${tdCenter}>18 JP</td></tr>
+          <tr><td ${tdCenter}>7</td><td ${tdCenter}>${singkatanMapel}.E.07</td><td ${tdStyle}>Integratif</td><td ${tdStyle}>Murid mampu merancang portofolio gelar karya literasi dan berpikir kritis komparatif.</td><td ${tdCenter}>16 JP</td></tr>
         </tbody>
         <tfoot>
           <tr style="background:#f1f5f9; font-weight:bold;">
@@ -934,7 +934,7 @@ export function generateModulAjarFallback(formData: any): string {
     subTopik = "Pengenalan Flowchart dan Pseudocode",
     jumlahPertemuan = "2",
     model = "Problem Based Learning (PBL)",
-    tujuan = "Peserta didik mampu memahami konsep logika algoritma, menyusun flowchart terstruktur, serta memecahkan masalah komputasional sederhana."
+    tujuan = "Murid mampu memahami konsep logika algoritma, menyusun flowchart terstruktur, serta memecahkan masalah komputasional sederhana."
   } = formData || {};
 
   const countPertemuan = Math.max(1, Math.min(5, parseInt(jumlahPertemuan) || 2));
@@ -948,17 +948,17 @@ export function generateModulAjarFallback(formData: any): string {
         <h4 style="margin:8px 0 4px 0; color:#334155;">1. Kegiatan Pendahuluan (15 Menit) — Mindful Learning</h4>
         <ul style="margin:4px 0 8px 20px; padding:0; line-height:1.6;">
           <li><strong>Aktivitas Guru:</strong> Guru membuka kelas dengan salam ramah, memeriksa kehadiran, dan memandu olah napas kesadaran penuh (Mindfulness) sebelum belajar. <em>"Selamat pagi anak-anak hebat, mari kita siapkan pikiran jernih untuk mengeksplorasi ilmu baru hari ini."</em></li>
-          <li><strong>Aktivitas Peserta Didik:</strong> Peserta didik menjawab salam, memusatkan fokus, dan menyimak apersepsi video/studi kasus menarik yang ditayangkan guru.</li>
+          <li><strong>Aktivitas Murid:</strong> Murid menjawab salam, memusatkan fokus, dan menyimak apersepsi video/studi kasus menarik yang ditayangkan guru.</li>
           <li><strong>Apersepsi & Motivasi:</strong> Guru menyampaikan pertanyaan pemantik kontekstual mengenai penerapan ${topik} dalam kehidupan sehari-hari.</li>
         </ul>
 
         <h4 style="margin:8px 0 4px 0; color:#334155;">2. Kegiatan Inti (60 Menit) — Meaningful & Joyful Deep Learning (${model})</h4>
         <ul style="margin:4px 0 8px 20px; padding:0; line-height:1.6;">
-          <li><strong>Fase 1 - Orientasi Masalah:</strong> Guru membagikan lembar kerja kasus nyata mengenai ${topik}. Peserta didik mengamati dan merumuskan pokok persoalan secara aktif.</li>
-          <li><strong>Fase 2 - Organisasi Belajar:</strong> Peserta didik membentuk kelompok heterogen beranggotakan 4 orang, membagi peran (ketua, pencatat data, presenter, verifikator).</li>
+          <li><strong>Fase 1 - Orientasi Masalah:</strong> Guru membagikan lembar kerja kasus nyata mengenai ${topik}. Murid mengamati dan merumuskan pokok persoalan secara aktif.</li>
+          <li><strong>Fase 2 - Organisasi Belajar:</strong> Murid membentuk kelompok heterogen beranggotakan 4 orang, membagi peran (ketua, pencatat data, presenter, verifikator).</li>
           <li><strong>Fase 3 - Penyelidikan Terbimbing:</strong> Guru berkeliling memberikan scaffolding bagi kelompok yang membutuhkan bimbingan, mendorong nalar kritis (HOTS), dan memfasilitasi kerja tim.</li>
           <li><strong>Fase 4 - Pengembangan & Penyajian Hasil:</strong> Setiap kelompok menyusun peta konsep/solusi di LKPD dan mempresentasikannya di depan kelas dengan percaya diri.</li>
-          <li><strong>Fase 5 - Evaluasi & Refleksi Bersama:</strong> Guru dan peserta didik memberikan apresiasi tepuk tangan meriah serta menyimpulkan konsep ilmiah yang benar.</li>
+          <li><strong>Fase 5 - Evaluasi & Refleksi Bersama:</strong> Guru dan Murid memberikan apresiasi tepuk tangan meriah serta menyimpulkan konsep ilmiah yang benar.</li>
         </ul>
 
         <h4 style="margin:8px 0 4px 0; color:#334155;">3. Kegiatan Penutup (15 Menit)</h4>
@@ -1006,12 +1006,12 @@ export function generateModulAjarFallback(formData: any): string {
       </table>
 
       <h2 style="color:#1a3a5c; border-bottom:2px solid #1a3a5c; padding-bottom:4px;">D. SKENARIO PENGALAMAN BELAJAR PERTEMUAN</h2>
-      <p style="font-style:italic; font-size:9pt; color:#64748b; margin-bottom:14px;">(Disusun terstruktur tanpa tabel dengan rincian langkah konkret guru dan peserta didik)</p>
+      <p style="font-style:italic; font-size:9pt; color:#64748b; margin-bottom:14px;">(Disusun terstruktur tanpa tabel dengan rincian langkah konkret guru dan Murid)</p>
       ${pertemuanSectionsHtml}
 
-      <h2 style="color:#1a3a5c; border-bottom:2px solid #1a3a5c; padding-bottom:4px;">E. LEMBAR KERJA PESERTA DIDIK (LKPD) SIAP PAKAI</h2>
+      <h2 style="color:#1a3a5c; border-bottom:2px solid #1a3a5c; padding-bottom:4px;">E. LEMBAR KERJA Murid (LKPD) SIAP PAKAI</h2>
       <div style="border:1px solid #cbd5e1; border-radius:8px; padding:16px; margin-bottom:24px; background:#fff;">
-        <h4 style="margin:0 0 8px 0; text-align:center; color:#1a3a5c;">LEMBAR KERJA PESERTA DIDIK (LKPD)</h4>
+        <h4 style="margin:0 0 8px 0; text-align:center; color:#1a3a5c;">LEMBAR KERJA Murid (LKPD)</h4>
         <p style="margin:0; font-size:9pt; text-align:center;">Mata Pelajaran: ${mataPelajaran} | Kelas: ${kelas} | Topik: ${topik}</p>
         <hr style="margin:10px 0; border:0; border-top:1px dashed #cbd5e1;">
         <p style="font-size:9pt;"><strong>Nama Kelompok:</strong> ..................................................... <strong>Anggota:</strong> 1. .................... 2. .................... 3. ....................</p>
@@ -1167,7 +1167,7 @@ Terkait: *"${message}"*
 
 Berikut rekomendasi solusi terstruktur:
 1. **Analisis Kebutuhan:** Pastikan tujuan pembelajaran terumuskan dengan indikator terukur (prinsip ABCD dan KKO Taksonomi Bloom / Kurikulum Merdeka).
-2. **Implementasi Kelas:** Gunakan pendekatan pembelajaran bermakna (Meaningful Learning) dengan mengaitkan materi ke fenomena nyata di sekitar peserta didik.
+2. **Implementasi Kelas:** Gunakan pendekatan pembelajaran bermakna (Meaningful Learning) dengan mengaitkan materi ke fenomena nyata di sekitar Murid.
 3. **Penguatan Karakter:** Integrasikan nilai keteladanan (Qudwah), kemandirian, dan adab sopan santun dalam setiap interaksi belajar.
 
 Silakan beri tahu saya jika Bapak/Ibu membutuhkan draf RPP/Modul, contoh soal HOTS, atau templat dokumen administrasi lainnya!`;

@@ -90,8 +90,8 @@ export const CPDatabaseView: React.FC<CPDatabaseViewProps> = ({ config, isAdmin 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.aoa_to_sheet([
       ["Nama Template", "Rasional Mapel", "Tujuan Mapel", "Karakteristik Mapel", "CP Fase Umum", "CP Per Elemen", "Mata Pelajaran (Opsional)", "Singkatan Mapel (Opsional)", "Fase / Kelas (Opsional)", "JP per Minggu (Opsional)", "Total JP (Opsional)", "Model Pembelajaran (Opsional)", "Metode Pembelajaran (Opsional)"],
-      ["CP Akidah Akhlak Fase B", "Mata pelajaran Akidah Akhlak bertujuan...", "Tujuan mapel ini adalah...", "Mempelajari aqidah dan akhlak...", "Pada akhir Fase B, peserta didik...", "Elemen Akidah: Peserta didik mampu...\n\nElemen Akhlak: ...", "Akidah Akhlak", "AA", "Fase B / Kelas 3", "2", "72", "Problem Based Learning (PBL)", "Diskusi"],
-      ["CP Fikih Fase C", "Mata pelajaran Fikih menekankan...", "Tujuan mapel ini adalah...", "Mempelajari ibadah dan muamalah...", "Pada akhir Fase C, peserta didik...", "Elemen Fikih Ibadah: ...\n\nElemen Fikih Muamalah: ...", "Fikih", "FI", "Fase C / Kelas 5", "2", "72", "Project Based Learning (PjBL)", "Role Playing"],
+      ["CP Akidah Akhlak Fase B", "Mata pelajaran Akidah Akhlak bertujuan...", "Tujuan mapel ini adalah...", "Mempelajari aqidah dan akhlak...", "Pada akhir Fase B, Murid...", "Elemen Akidah: Murid mampu...\n\nElemen Akhlak: ...", "Akidah Akhlak", "AA", "Fase B / Kelas 3", "2", "72", "Problem Based Learning (PBL)", "Diskusi"],
+      ["CP Fikih Fase C", "Mata pelajaran Fikih menekankan...", "Tujuan mapel ini adalah...", "Mempelajari ibadah dan muamalah...", "Pada akhir Fase C, Murid...", "Elemen Fikih Ibadah: ...\n\nElemen Fikih Muamalah: ...", "Fikih", "FI", "Fase C / Kelas 5", "2", "72", "Project Based Learning (PjBL)", "Role Playing"],
     ]);
     ws["!cols"] = [{ wch: 30 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 40 }, { wch: 60 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 30 }, { wch: 30 }];
     const wb = XLSX.utils.book_new();

@@ -37,7 +37,7 @@ Mohon ekstrak dan sintesis data tersebut, lalu sajikan dalam bentuk **TABEL MULT
 (PENTING: Anda WAJIB BERIMPROVISASI dengan menyintesis/merangkum intisari dari seluruh CP Elemen menjadi 1 paragraf padat. Jangan menyalin teks asli CP Umum secara verbatim meskipun tersedia di dokumen!)
 
 6. CP Per Elemen
-(PENTING: Gabungkan seluruh elemen yang ada dalam satu kotak/paragraf dengan format mutlak: NAMA_ELEMEN : DESKRIPSI_CP. Tiap elemen dipisah dengan baris baru. Contoh -> Fikih Ibadah : Peserta didik mampu... Teks deskripsi CP tiap elemen WAJIB VERBATIM / persis 100% dengan teks dokumen asli tanpa diringkas! CATATAN KHUSUS: Jika mapel memiliki elemen bernama "Keterampilan Proses", KECUALIKAN elemen tersebut dari daftar ini karena elemen tersebut bukan merupakan materi pokok/konten, melainkan hanya kompas panduan untuk memilih Model dan Metode Pembelajaran di kolom 12 & 13)
+(PENTING: Gabungkan seluruh elemen yang ada dalam satu kotak/paragraf dengan format mutlak: NAMA_ELEMEN : DESKRIPSI_CP. Tiap elemen dipisah dengan baris baru. Contoh -> Fikih Ibadah : Murid mampu... Teks deskripsi CP tiap elemen WAJIB VERBATIM / persis 100% dengan teks dokumen asli tanpa diringkas! CATATAN KHUSUS: Jika mapel memiliki elemen bernama "Keterampilan Proses", KECUALIKAN elemen tersebut dari daftar ini karena elemen tersebut bukan merupakan materi pokok/konten, melainkan hanya kompas panduan untuk memilih Model dan Metode Pembelajaran di kolom 12 & 13)
 
 7. Mata Pelajaran
 (Isi dengan [NAMA_MAPEL] yang telah saya sebutkan di atas)

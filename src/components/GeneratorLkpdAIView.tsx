@@ -28,7 +28,7 @@ export const GeneratorLkpdAIView: React.FC<GeneratorLkpdAIViewProps> = () => {
           </h2>
 
           <p className="text-slate-200 text-sm md:text-base leading-relaxed">
-            Layanan Generator Lembar Kerja Peserta Didik (LKPD) AI dialihkan langsung ke laman resmi Google Gemini AI terintegrasi di luar aplikasi. Klik tombol di bawah untuk membuka prompt dan templat LKPD otomatis.
+            Layanan Generator Lembar Kerja Murid (LKPD) AI dialihkan langsung ke laman resmi Google Gemini AI terintegrasi di luar aplikasi. Klik tombol di bawah untuk membuka prompt dan templat LKPD otomatis.
           </p>
 
           <div className="pt-2 flex flex-wrap gap-4">
