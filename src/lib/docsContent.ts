@@ -45,22 +45,25 @@ Mohon ekstrak dan sintesis data tersebut, lalu sajikan dalam bentuk **TABEL MULT
 8. Singkatan Mapel
 (Isi dengan [SINGKATAN_MAPEL] yang telah saya sebutkan di atas)
 
-9. Fase / Kelas
-(Sebutkan fase dan rentang kelas. Contoh: Fase B (Kelas 3-4))
+9. Fase Kurikulum
+(Sebutkan HANYA fase saja tanpa kelas. Contoh: "Fase A", "Fase B", atau "Fase C". Ini digunakan sebagai identitas dokumen arsip ACP/TP/ATP.)
 
-10. JP per Minggu
+10. Kelas & Rombel
+(Sebutkan rentang kelas dalam fase ini. Contoh: "Kelas 1-2", "Kelas 3-4", atau "Kelas 5-6". Ini digunakan sebagai identitas spesifik Modul Ajar.)
+
+11. JP per Minggu
 (PENTING: WAJIB HANYA TULISKAN 1 ANGKA BULAT. Jangan tambahkan kata 'JP', tulisan, atau catatan apapun. Jika mapel memiliki jumlah JP berbeda antar kelas dalam satu fase, pilih dan tuliskan angka yang PALING TINGGI.
 [ADMIN: PASTE TEKS RINCIAN JP DARI KAMUS REFERENSI DI SINI. JIKA MAPEL TIDAK ADA, GUNAKAN PARAMETER JUMLAH_JP DI ATAS]
 )
 
-11. Total JP
+12. Total JP
 (PENTING: WAJIB HANYA TULISKAN 1 ANGKA BULAT. Berdasarkan angka JP per Minggu di atas, kalikan dengan [TOTAL_MINGGU_EFEKTIF] minggu efektif yang telah disebutkan di awal prompt. Contoh: Jika 5 JP dan 36 minggu efektif, maka cukup tulis angka 180 tanpa tambahan teks apapun)
 
-12. Model Pembelajaran
+13. Model Pembelajaran
 (PILIH HANYA SALAH SATU dari referensi wajib ini yang paling cocok: Discovery Learning, Problem Based Learning (PBL), Project Based Learning (PjBL), Inquiry Learning, Pembelajaran Berdiferensiasi, Cooperative Learning, Flipped Classroom, atau Teaching at the Right Level (TaRL). 
 Catatan: Beri prioritas pada Inquiry/PBL jika mapel memiliki elemen 'Keterampilan Proses'. Jika tidak ada elemen tersebut, silakan berimprovisasi memilih model lain yang paling relevan dengan karakteristik kognitif/sikap mapel ini).
 
-13. Metode Pembelajaran
+14. Metode Pembelajaran
 (PILIH 2-3 dari referensi wajib ini yang paling cocok: Diskusi, Ceramah Interaktif, Tanya Jawab, Role Playing, Demonstrasi, Eksperimen Terbimbing, Kerja Kelompok, Presentasi, Observasi, Penugasan Proyek).
 
 PENTING: Pastikan kolom ke-6 (CP Per Elemen) murni menggunakan format NAMA_ELEMEN : DESKRIPSI_CP tanpa tabel tambahan. Wajib gunakan nama model dan metode sama persis dengan referensi wajib di atas.
@@ -208,8 +211,10 @@ Fase ini adalah tempat di mana Anda memproduksi dokumen secara berurutan. Anda w
 
 ### Tahap 2.1: Mengisi Identitas Dasar (Header)
 - Klik tombol **"Isi dari Profil"** agar nama sekolah, guru, dan tahun ajaran terisi otomatis.
-- Isi *Mata Pelajaran, Fase, Kelas*, dan **Alokasi Waktu Total (JP 1 Tahun)** serta **JP per Minggu**.
+- Isi **Mata Pelajaran**, **Fase Kurikulum** (pilih dropdown: Fase A/B/C), **Kelas & Rombel** (ketik spesifik, misal: "Kelas 4 / Rombel A"), dan **Alokasi Waktu Total (JP 1 Tahun)** serta **JP per Minggu**.
 > [!TIP]
+> **Fase Kurikulum** digunakan sebagai identitas arsip dokumen makro (ACP, TP, ATP, Prota, Prosem).
+> **Kelas & Rombel** digunakan sebagai identitas spesifik di Modul Ajar dan Asesmen — isi sesuai rombel yang Anda ampu.
 > Jika ada hari libur spesifik yang menghilangkan jadwal mengajar Anda, segera **kurangi** angka "Alokasi Waktu Total" dari angka ideal, agar pembagian Prosem nanti tidak memaksakan jam yang tidak ada.
 
 ### Tahap 2.2: Generate Dokumen (Lakukan Berurutan!)
