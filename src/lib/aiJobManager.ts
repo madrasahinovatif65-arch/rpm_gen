@@ -191,20 +191,7 @@ const processQueue = async (formData: any) => {
   };
   notifyListeners();
 
-  let progress = 0;
-  const progressInterval = setInterval(() => {
-    progress += Math.floor(Math.random() * 5) + 2; // increments by 2-6% per tick
-    if (progress > 98) progress = 98; // cap at 98%
-    
-    if (jobsRecord[jobId] && jobsRecord[jobId].status === "running") {
-      jobsRecord[jobId].progressMessage = `Memproses ${job.docType}... (${progress}%)`;
-      notifyListeners();
-    } else {
-      clearInterval(progressInterval);
-    }
-  }, 1200);
-
-  try {
+  // No fake ticker anymore. We use real-time stream tracking below.  try {
     // Dynamic Cascading Context Injection (Single Source of Truth)
     const dynamicFormData = { ...formData };
     
@@ -222,8 +209,13 @@ const processQueue = async (formData: any) => {
        }
     }
 
-    const res = await generatePerangkatAjarKBCAPI(job.docType, dynamicFormData);
-    clearInterval(progressInterval);
+    const res = await generatePerangkatAjarKBCAPI(job.docType, dynamicFormData, (textSoFar) => {
+      if (jobsRecord[jobId] && jobsRecord[jobId].status === "running") {
+        const kb = (textSoFar.length / 1024).toFixed(1);
+        jobsRecord[jobId].progressMessage = `Menyusun konten... (${kb} KB)`;
+        notifyListeners();
+      }
+    });
     if (res.status === "success" && res.data) {
       let finalData = res.data;
       
@@ -269,7 +261,6 @@ const processQueue = async (formData: any) => {
       throw new Error(res.message || "Gagal mendapatkan data valid.");
     }
   } catch (error: any) {
-    clearInterval(progressInterval);
     jobsRecord[jobId] = {
       ...jobsRecord[jobId],
       status: "failed",

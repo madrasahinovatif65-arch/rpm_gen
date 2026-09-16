@@ -25,7 +25,7 @@ export const getAiClient = () => {
 };
 
 // Helper for resilient Gemini API calls with model fallback and exponential retry
-const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any, config?: any) => {
+const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any, config?: any, onProgress?: (text: string) => void) => {
   if (!ai) {
     throw new Error("GEMINI_API_KEY tidak dikonfigurasi.");
   }
@@ -35,13 +35,29 @@ const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any, c
   for (const modelCandidate of modelCandidates) {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const response = await ai.models.generateContent({
-          model: modelCandidate,
-          contents,
-          config
-        });
-        if (response && response.text) {
-          return response;
+        if (onProgress) {
+          const responseStream = await ai.models.generateContentStream({
+            model: modelCandidate,
+            contents,
+            config
+          });
+          let fullText = "";
+          for await (const chunk of responseStream) {
+            if (chunk.text) {
+              fullText += chunk.text;
+              onProgress(fullText);
+            }
+          }
+          return { text: fullText };
+        } else {
+          const response = await ai.models.generateContent({
+            model: modelCandidate,
+            contents,
+            config
+          });
+          if (response && response.text) {
+            return response;
+          }
         }
       } catch (err: any) {
         lastError = err;
@@ -83,7 +99,14 @@ const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any, c
 };
 
 // Helper for JSON Generation with Zod Validation & Repair Loop
-export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPrompt: string, userPrompt: string, schema: ZodSchema<any>, maxRetries = 2) => {
+export const generateJsonWithRepair = async (
+  ai: GoogleGenAI | null, 
+  systemPrompt: string, 
+  userPrompt: string, 
+  schema: ZodSchema<any>, 
+  maxRetries = 2,
+  onProgress?: (text: string) => void
+) => {
   if (!ai) throw new Error("GEMINI_API_KEY tidak dikonfigurasi.");
   
   const jsonSchema = zodToJsonSchema(schema, "OutputSchema");
@@ -96,7 +119,8 @@ export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPromp
       const response = await generateContentWithRetry(
         ai, 
         [{ role: "user", parts: [{ text: currentPrompt }] }],
-        { responseMimeType: "application/json" }
+        { responseMimeType: "application/json" },
+        onProgress
       );
       let text = response?.text || "";
       text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -473,7 +497,7 @@ Gunakan format HTML murni tanpa markdown, lengkapi kop sekolah dan tanda tangan 
   try {
     const response = await generateContentWithRetry(ai, [
       { role: "user", parts: [{ text: docPrompt }] }
-    ]);
+    ], undefined, onProgress);
     let text = response?.text || "";
     text = text.replace(/```[a-zA-Z]*\n?/g, "").replace(/```/g, "").trim();
     if (text) {
@@ -487,7 +511,7 @@ Gunakan format HTML murni tanpa markdown, lengkapi kop sekolah dan tanda tangan 
 };
 
 
-export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any) => {
+export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any, onProgress?: (text: string) => void) => {
   const ai = getAiClient();
   
   let kaldikInfo = "";
@@ -728,7 +752,7 @@ Instruksi Khusus:
   }
 
   try {
-    const data = await generateJsonWithRepair(ai, generalKbcRules, userPrompt, schema, 2);
+    const data = await generateJsonWithRepair(ai, generalKbcRules, userPrompt, schema, 2, onProgress);
     // Temporary fallback for Phase 2: return JSON string wrapped in <pre> so UI can still render it without crashing
     const jsonHtml = `<div class="bg-slate-900 text-emerald-400 p-4 rounded-xl text-left font-mono text-xs overflow-x-auto whitespace-pre-wrap">${JSON.stringify(data, null, 2)}</div>`;
     return { status: "success", html: jsonHtml, data };
