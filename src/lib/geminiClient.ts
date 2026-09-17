@@ -430,50 +430,49 @@ KETENTUAN LAYOUT HTML:
   } else if (docType === "tp") {
 
     // PRE-PROCESSING: Pecah teks CP menjadi daftar sub-materi atomik
-    // Format input bisa dalam 1 baris tanpa newline: "Tajwid : ...benar.Al-Qur'an : ...Hadis : ..."
+    // Strategi: sisipkan newline sebelum header elemen, lalu proses per baris
     const parseAtomicTopics = (cpText: string): { elemen: string; topik: string }[] => {
       const result: { elemen: string; topik: string }[] = [];
       
-      // Step 1: Temukan semua posisi header elemen (pola: "NamaElemen :" atau "NamaElemen:")
-      // Deteksi berdasarkan kata yang diikuti tanda titik dua
-      const headerRegex = /(?:^|(?<=\.))\s*([A-Za-z][A-Za-z'\-\s]{1,25}?)\s*:/g;
+      // Step 1: Sisipkan newline sebelum setiap header elemen
+      // Pola: titik/akhir kalimat diikuti huruf kapital dan titik dua
+      // Contoh: "...benar.Al-Qur'an :" → "...benar.\nAl-Qur'an :"
+      const normalized = cpText
+        .replace(/\.([A-Z][A-Za-z'\-]*(?:\s+[A-Za-z'\-]+)?\s*:)/g, '.\n$1')
+        .trim();
       
-      const headers: { name: string; contentStart: number }[] = [];
-      let m: RegExpExecArray | null;
-      while ((m = headerRegex.exec(cpText)) !== null) {
-        headers.push({
-          name: m[1].trim(),
-          contentStart: m.index + m[0].length
-        });
-      }
+      // Step 2: Split per baris
+      const lines = normalized.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 3);
       
-      // Fallback: jika tidak ada header terdeteksi, olah seluruh teks sebagai 1 elemen
-      if (headers.length === 0) {
-        headers.push({ name: 'Umum', contentStart: 0 });
-      }
-      
-      // Step 2: Ambil konten tiap elemen (dari setelah header sampai header berikutnya)
-      headers.forEach((header, i) => {
-        const nextStart = i < headers.length - 1 ? headers[i + 1].contentStart - headers[i + 1].name.length - 2 : cpText.length;
-        let content = cpText.substring(header.contentStart, nextStart).trim();
+      lines.forEach((line: string) => {
+        // Cari pola "NamaElemen : konten"
+        const colonIdx = line.indexOf(':');
+        if (colonIdx === -1) return;
         
-        // Step 3: Pecah konten per koma dan titik koma
-        // Ubah "dan X" menjadi ", X" agar ikut terpisah
+        const potentialElemen = line.substring(0, colonIdx).trim();
+        // Elemen valid: 2-30 karakter, tidak mengandung tanda baca selain tanda kutip/hubung
+        if (potentialElemen.length < 2 || potentialElemen.length > 30) return;
+        
+        const elemenName = potentialElemen;
+        let content = line.substring(colonIdx + 1).trim();
+        
+        // Step 3: Normalisasi "dan X" → ", X" agar ikut terpisah
         content = content.replace(/\s+dan\s+(?=[A-Za-z'"])/g, ', ');
         
+        // Step 4: Split per koma dan titik koma
         const parts = content.split(/[,;]\s*/);
         
-        parts.forEach(part => {
-          // Hapus filler phrases di tengah/akhir string
+        parts.forEach((part: string) => {
+          // Hapus frase filler di akhir
           let clean = part
-            .replace(/\s*(sebagai bekal|agar dapat|dalam kehidupan|menjelaskan arti|untuk menerapkan|sehingga mampu|dalam praktik membaca)\b.*/i, '')
-            .replace(/^[\d\.\-–—\s]+/, '') // hapus awalan nomor/tanda
-            .replace(/\.$/, '')            // hapus titik di akhir
+            .replace(/\s*(sebagai bekal|agar dapat|dalam kehidupan|menjelaskan arti serta|untuk menerapkan|sehingga mampu|dalam praktik membaca|dengan baik)\b.*/i, '')
+            .replace(/^[\d\.\-\u2013\u2014\s]+/, '')
+            .replace(/\.$/, '')
             .trim();
           
-          // Filter: minimal 4 karakter, dan bukan kata filler
-          if (clean.length >= 4 && !clean.match(/^(murid|siswa|peserta didik|mereka|ia|dengan|benar|baik|arti|isi)\b/i)) {
-            result.push({ elemen: header.name, topik: clean });
+          // Hanya masukkan jika bermakna (>=4 karakter, bukan kata filler)
+          if (clean.length >= 4 && !clean.match(/^(murid|siswa|peserta didik|mereka|ia|dengan|benar|baik|serta|isi|dan|atau)\b/i)) {
+            result.push({ elemen: elemenName, topik: clean });
           }
         });
       });
@@ -727,6 +726,22 @@ Jika merancang Asesmen Berdiferensiasi (terutama Formatif/Sumatif/Proyek) yang m
     delete optimizedData.kemenagOffice;
     delete optimizedData.cityDate;
   }
+  // Untuk dokumen administrasi (TP, ATP, Prota, Prosem, KKTP),
+  // hapus field konteks modul yang tidak relevan agar tidak mengacaukan output
+  if (["tp", "atp", "prota", "prosem", "kktp"].includes(schemaKey)) {
+    delete optimizedData.topikLokal;
+    delete optimizedData.topik;
+    delete optimizedData.kodeTp;
+    delete optimizedData.metode;
+    delete optimizedData.jumlahPertemuan;
+    delete optimizedData.karakteristik;
+    delete optimizedData.asesmenKognitifDetail;
+    delete optimizedData.asesmenFormatifTarget;
+    delete optimizedData.asesmenFormatifDetail;
+    delete optimizedData.asesmenSumatifTarget;
+    delete optimizedData.asesmenSumatifDetail;
+    delete optimizedData.blockedWeeks;
+  }
 
   let userPrompt = `Buatkan konten JSON untuk dokumen ${docType} berdasarkan data berikut:\n${JSON.stringify(optimizedData, null, 2)}\n\nPastikan data terisi lengkap, akurat, dan kaya akan nilai PPRA & Panca Cinta Kemenag.`;
 
@@ -740,7 +755,7 @@ ${JSON.stringify(optimizedData, null, 2)}
 PENTING:
 - Fokus utama Anda adalah merumuskan (reasoning) materi pokok, kompetensi, dan memecah Capaian Pembelajaran.
 - ABAIKAN kalkulasi matematika presisi terkait "Alokasi JP" atau "kodeTp". JANGAN membatasi jumlah TP karena takut "kehabisan" Alokasi JP! Anda BEBAS membuat sebanyak mungkin TP untuk membedah HINGGA TUNTAS seluruh materi di CP tanpa menyembunyikan satupun topik. Sistem kami memiliki Data Normalizer yang akan mendistribusikan ulang angka JP secara otomatis berapapun jumlah TP yang Anda hasilkan. Isikan saja angka estimasi sembarang (misal 1 atau 2).
-- KONTEKS LOKAL (FP-PLO): Jika field "topikLokal" (Konteks Mikro/Meso/Makro/Nasional) terisi, pastikan TP/ATP atau instrumen asesmen memiliki *Indikator Kontekstualisasi Lokal* (mampu memberi contoh fenomena dari lingkungan yang dipilih) dan *Indikator Penarikan Kesimpulan* (mampu memberi solusi lokal).
+${optimizedData.topikLokal ? `- KONTEKS LOKAL (FP-PLO): Field topikLokal terisi dengan nilai "${optimizedData.topikLokal}". Pastikan TP/ATP memiliki Indikator Kontekstualisasi Lokal (memberi contoh dari lingkungan tersebut) dan Indikator Penarikan Kesimpulan (memberi solusi lokal). JANGAN menambah elemen baru bernama 'Konteks Lokal' — cukup sisipkan konteks ini ke dalam rumusan TP yang sudah ada.` : ''}
 - Pastikan setiap array terisi dengan struktur yang valid.
 ${schemaKey === "tp" ? `- KHUSUS UNTUK TP (MIMIC BEST PRACTICE GURU KBC):
   1. PEMECAHAN ATOMIK: Jika paragraf CP menyebutkan daftar materi yang dipisah koma (contoh: "hukum bacaan kalkalah, mad tabi'i, izhar..."), Anda WAJIB memecahnya menjadi 1 TP untuk SETIAP materi pokok tersebut. Jangan digabung! Hasilkan TP yang sangat granular.
