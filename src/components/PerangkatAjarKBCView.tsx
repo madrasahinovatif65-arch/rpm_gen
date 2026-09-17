@@ -444,22 +444,11 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
   };
 
   const handleGenerateAllDocs = async () => {
-    const types = docTypeList.map((d) => d.id);
+    const types = ["analisis_cp", "tp", "atp", "prota", "prosem", "kktp"];
     types.forEach(t => {
-      const isModulType = t === "modul_ajar" || t === "lkpd" || t === "rubrik";
-      const payloadData = isModulType ? formDataModul : formData;
-      
-      if (t === "modul_ajar") {
-        enqueueJob("modul_ajar_umum", "modul_ajar_umum", payloadData);
-        const jmlPertemuan = parseInt((payloadData.jumlahPertemuan || "1") as any, 10);
-        for (let i = 1; i <= jmlPertemuan; i++) {
-          enqueueJob(`modul_ajar_meeting_${i}`, `modul_ajar_meeting_${i}`, payloadData);
-        }
-      } else {
-        enqueueJob(t, t, payloadData);
-      }
+      enqueueJob(t, t, formData);
     });
-    notifySimpanSuccess("Ke-9 Dokumen telah ditambahkan ke antrean AI secara berurutan!");
+    notifySimpanSuccess("6 Dokumen Administrasi telah ditambahkan ke antrean AI secara berurutan!");
   };
 
   const handlePrintF4 = () => {
@@ -625,7 +614,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 Perangkat Ajar KBC AI
               </h1>
               <p className="max-w-xl text-sm leading-relaxed text-emerald-50 sm:text-base">
-                Generator 9 paket perangkat administrasi pembelajaran KBC, terintegrasi Panca Cinta Kemenag dan 10 Nilai PPRA.
+                Generator 6 paket perangkat administrasi pembelajaran KBC, terintegrasi Panca Cinta Kemenag dan 10 Nilai PPRA.
               </p>
             </div>
           </div>
@@ -651,7 +640,7 @@ export const PerangkatAjarKBCView: React.FC<PerangkatAjarKBCViewProps> = ({ conf
                 disabled={isGenerating}
                 className="w-full lg:w-auto"
               >
-                Generate 9 Dokumen KBC
+                Generate 6 Dokumen Administrasi
               </Button>
             )}
           </div>
