@@ -436,9 +436,9 @@ KETENTUAN LAYOUT HTML:
       
       // Step 1: Sisipkan newline sebelum setiap header elemen
       // Pola: titik/akhir kalimat diikuti huruf kapital dan titik dua
-      // Contoh: "...benar.Al-Qur'an :" → "...benar.\nAl-Qur'an :"
+      // PENTING: tangani apostrof Unicode (\u2018/\u2019) dan tanda hubung dalam nama elemen
       const normalized = cpText
-        .replace(/\.([A-Z][A-Za-z'\-]*(?:\s+[A-Za-z'\-]+)?\s*:)/g, '.\n$1')
+        .replace(/\.([A-Z][A-Za-z'\u2018\u2019\-]*(?:\s+[A-Za-z'\u2018\u2019\-]+)?\s*:)/g, '.\n$1')
         .trim();
       
       // Step 2: Split per baris
