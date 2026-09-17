@@ -1,5 +1,18 @@
 import { TpType, AtpType } from "./kbcSchemas";
 
+// Helper to determine how many years a phase covers
+const getPhaseMultiplier = (fase: string): number => {
+  const f = (fase || "").toUpperCase();
+  if (f.includes("FASE A") || f.includes("FASE B") || f.includes("FASE C") || f.includes("FASE F")) {
+    return 2;
+  } else if (f.includes("FASE D")) {
+    return 3;
+  } else if (f.includes("FASE E")) {
+    return 1;
+  }
+  return 2; // Default to 2 if unknown, matching SD/MI typical phases
+};
+
 export const normalizeTpData = (rawTpJson: TpType, formData: any): TpType => {
   if (!rawTpJson || !rawTpJson.daftarTp || !Array.isArray(rawTpJson.daftarTp)) {
     return rawTpJson;
@@ -7,7 +20,10 @@ export const normalizeTpData = (rawTpJson: TpType, formData: any): TpType => {
 
   const prefix = formData.singkatanMapel || "MAPEL";
   const level = formData.level || "Fase";
-  const totalJpInput = formData.totalJp || 0;
+  
+  // Kalikan JP tahunan dengan jumlah tahun dalam fase tersebut (misal x2 untuk Fase A)
+  const multiplier = getPhaseMultiplier(formData.fase);
+  const totalJpInput = (formData.totalJp || 0) * multiplier;
 
   // Hitung total JP yang diberikan AI
   let currentTotalJp = 0;
@@ -28,7 +44,7 @@ export const normalizeTpData = (rawTpJson: TpType, formData: any): TpType => {
     const cleanElemen = tp.elemen.substring(0, 3).toUpperCase(); 
     const generatedKode = `${prefix}-${level}-${cleanElemen}-${(index + 1).toString().padStart(3, '0')}`;
     
-    // Normalisasi Alokasi JP proporsional terhadap totalJp dari Form
+    // Normalisasi Alokasi JP proporsional terhadap totalJpInput
     let normalizedJp = 0;
     if (totalJpInput > 0) {
       if (index === rawTpJson.daftarTp.length - 1) {
@@ -57,10 +73,10 @@ export const normalizeAtpData = (rawAtpJson: AtpType, formData: any, tpData: TpT
     return rawAtpJson;
   }
   
-  const totalJpInput = formData.totalJp || 0;
-  const targetJpPerSemester = Math.ceil(totalJpInput / 2); // Asumsi 2 semester berimbang
+  const jpPerTahun = formData.totalJp || 0;
+  const targetJpPerSemester = Math.ceil(jpPerTahun / 2); // Asumsi 2 semester berimbang untuk 1 tahun
 
-  let accumulatedJp = 0;
+  const accumulatedJpPerKelas: Record<string, number> = {};
 
   const normalizedAlur = rawAtpJson.alur.map((atp, index) => {
     // Sinkronisasi data dari tpData jika ada
@@ -78,11 +94,18 @@ export const normalizeAtpData = (rawAtpJson: AtpType, formData: any, tpData: TpT
       }
     }
 
-    accumulatedJp += realJp;
+    const kelasStr = atp.kelas || "Umum";
+    if (!accumulatedJpPerKelas[kelasStr]) {
+      accumulatedJpPerKelas[kelasStr] = 0;
+    }
     
-    // Deterministic Semester Placement
+    // Simpan JP sebelum ditambahkan untuk menentukan semester, atau tambahkan lalu cek?
+    // Lebih presisi ditambahkan dulu
+    accumulatedJpPerKelas[kelasStr] += realJp;
+    
+    // Deterministic Semester Placement Per Kelas
     let semester = 1;
-    if (accumulatedJp > targetJpPerSemester) {
+    if (accumulatedJpPerKelas[kelasStr] > targetJpPerSemester) {
       semester = 2;
     }
 
