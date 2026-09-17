@@ -428,6 +428,49 @@ KETENTUAN LAYOUT HTML:
 - Hasilkan MURNI KODE HTML tanpa tanda markdown fence (\`\`\`html) dan tanpa teks tambahan lain.
 - Gunakan styling CSS internal yang bersih dengan font sans-serif, header tabel warna biru tua (#1a3a5c) teks putih, border tabel tipis, dan styling print @media print { @page { size: A4 portrait; margin: 1.5cm; } }.`;
   } else if (docType === "tp") {
+
+    // PRE-PROCESSING: Pecah CP menjadi daftar sub-materi atomik sebelum dikirim ke AI
+    // Ini memastikan AI tidak perlu menebak jumlah TP — kita yang menyiapkan daftarnya
+    const parseAtomicTopics = (cpText: string): { elemen: string; topik: string }[] => {
+      const result: { elemen: string; topik: string }[] = [];
+      
+      // Pisahkan per elemen (dengan pola "Elemen X:" atau baris baru ganda atau newline + huruf kapital)
+      const elemenBlocks = cpText.split(/(?=\n?[A-Za-z][A-Za-z\s]+:|\n\n)/g).filter(b => b.trim().length > 20);
+      
+      if (elemenBlocks.length <= 1) {
+        // Jika tidak ada struktur elemen, coba pisahkan langsung per koma/titik koma
+        const rawTopics = cpText.split(/[;]|,\s*(?=[A-Z])|(?:\.\s+(?=[A-Z]))/g);
+        rawTopics.forEach(t => {
+          const trimmed = t.replace(/^[-–—\d\.\s]+/, '').trim();
+          if (trimmed.length > 10) result.push({ elemen: 'Umum', topik: trimmed });
+        });
+      } else {
+        elemenBlocks.forEach(block => {
+          const colonIdx = block.indexOf(':');
+          const elemen = colonIdx > -1 ? block.substring(0, colonIdx).trim().replace(/^\n/, '') : 'Umum';
+          const content = colonIdx > -1 ? block.substring(colonIdx + 1) : block;
+          
+          // Pisah per koma, titik koma, atau "dan" yang memisahkan sub-materi
+          const subTopics = content.split(/,\s*|;\s*/g);
+          subTopics.forEach(t => {
+            const trimmed = t.replace(/^[-–—\d\.\s]+/, '').trim().replace(/\.$/, '');
+            if (trimmed.length > 8) result.push({ elemen: elemen, topik: trimmed });
+          });
+        });
+      }
+      
+      return result.length > 0 ? result : [{ elemen: 'Umum', topik: cpText.substring(0, 200) }];
+    };
+
+    const atomicTopics = parseAtomicTopics(cpElemen);
+    const totalTopics = atomicTopics.length;
+    const jpPerTp = Math.max(2, Math.round((totalJp || 72) / totalTopics));
+    
+    // Buat daftar bernomor yang siap pakai untuk AI
+    const numberedTopicList = atomicTopics.map((item, idx) => 
+      `  ${idx + 1}. [Elemen: ${item.elemen}] ${item.topik}`
+    ).join('\n');
+
     docPrompt = `Anda adalah asisten pembuatan perangkat administrasi pembelajaran Kurikulum Merdeka yang ahli dan berpengalaman. Tugas Anda adalah membuat dokumen **TUJUAN PEMBELAJARAN (TP)** yang lengkap, sistematis, profesional, dan siap cetak dalam format HTML.
 
 ${generalRules}
@@ -438,30 +481,30 @@ ${generalRules}
 - Singkatan Mapel: ${singkatanMapel}
 - Fase Kurikulum: ${fase}
 - Tahun Pelajaran: ${year}
-- Alokasi Waktu Total: ${totalJp}
+- Alokasi Waktu Total: ${totalJp} JP (untuk 1 fase penuh)
 - Nama Guru: ${teacher}
 - NIP Guru: ${nipTeacher}
 - Kota / Tanggal TTD: ${cityDate}
 - Nama Kepala Sekolah: ${principal}
 - NIP Kepala Sekolah: ${nipPrincipal}
-- CP Per Elemen: ${cpElemen}
 
-STRUKTUR DOKUMEN HTML WAJIB (4 Bagian Wajib):
+[DAFTAR MATERI POKOK YANG SUDAH DIPECAH ATOMIK — TOTAL ${totalTopics} TOPIK]:
+(Sistem telah memparsing CP dan menghasilkan ${totalTopics} sub-topik berikut. Anda WAJIB membuat TEPAT ${totalTopics} baris TP dalam tabel, satu baris per sub-topik di bawah ini, TANPA SKIP dan TANPA GABUNG):
+${numberedTopicList}
+
+STRUKTUR DOKUMEN HTML WAJIB:
 1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-TP-${singkatanMapel}-${fase.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
 2. BAGIAN A — IDENTITAS (Tabel 2 Kolom)
-3. BAGIAN B — PANDUAN KODE TUJUAN PEMBELAJARAN (Sub B1 Format Kode box, Sub B2 Tabel Kode Elemen)
+3. BAGIAN B — PANDUAN KODE TUJUAN PEMBELAJARAN
 4. BAGIAN C — DAFTAR TUJUAN PEMBELAJARAN (Tabel 6 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran | Aspek Kompetensi | Alokasi JP).
-   ATURAN KRITIS BAGIAN C (WAJIB DIPATUHI):
-   a. PEMECAHAN ATOMIK: Setiap sub-materi atau konsep dalam CP yang dipisahkan oleh KOMA atau TITIK KOMA HARUS dijadikan 1 TP TERPISAH. Contoh: CP "hukum bacaan kalkalah, mad tabi'i, izhar halqi, ikhfa' hakiki, idgam bigunnah, idgam bilagunnah, dan iqlab" WAJIB menghasilkan MINIMAL 7 TP berbeda — satu per satu konsep. JANGAN PERNAH menggabungkan 2 atau lebih konsep ke dalam satu TP!
-   b. TIDAK ADA BATAS JUMLAH TP: Hasilkan sebanyak TP yang diperlukan hingga SEMUA sub-materi di CP habis terbedah. Jika ada 10 sub-materi maka buat 10 TP. Jika ada 15 sub-materi buat 15 TP.
-   c. FORMAT RUMUSAN TP: Setiap TP diawali "Murid mampu [KKO Bloom spesifik] [1 sub-materi TUNGGAL]..., untuk menumbuhkan [Nilai DPL] dan mewujudkan [Nilai Panca Cinta]".
-   d. DISTRIBUSI JP: Bagi Total JP (${totalJp}) secara merata ke seluruh TP yang dihasilkan. Alokasi JP per TP boleh SAMA semua atau bervariasi sedikit asal totalnya TEPAT ${totalJp} JP.
+   ATURAN MUTLAK: Tabel HARUS memiliki TEPAT ${totalTopics} baris data (satu per sub-topik di atas). Ikuti urutannya. Setiap rumusan TP diawali "Murid mampu [KKO Bloom spesifik]..., untuk menumbuhkan [Nilai DPL] dan mewujudkan [Nilai Panca Cinta]". Alokasi JP tiap baris: ${jpPerTp} JP (total: ${totalJp} JP).
 5. BAGIAN D — REKAPITULASI ALOKASI WAKTU PER ELEMEN (Tabel 5 kolom: No | Elemen CP | Jumlah TP | Total JP | Persentase)
 6. BAGIAN PENUTUP — TANDA TANGAN SEJAJAR KEPSEK & GURU DENGAN TABEL TAK TERLIHAT (BORDER 0).
 
 KETENTUAN LAYOUT HTML:
 - Hasilkan MURNI KODE HTML tanpa markdown fence.
 - CSS internal rapi, warna header #1a3a5c, @media print { @page { size: A4 portrait; margin: 1.5cm; } }.`;
+
   } else if (docType === "atp") {
     docPrompt = `Anda adalah asisten pembuatan perangkat administrasi pembelajaran Kurikulum Merdeka yang ahli dan berpengalaman. Tugas Anda adalah membuat dokumen **ALUR TUJUAN PEMBELAJARAN (ATP)** yang lengkap, sistematis, profesional, dan siap cetak dalam format HTML.
 
