@@ -674,7 +674,19 @@ PENTING:
 - Pastikan setiap array terisi dengan struktur yang valid.
 ${schemaKey === "tp" ? `- KHUSUS UNTUK TP: WAJIB memecah (breakdown) paragraf CP dari tiap elemen menjadi Tujuan Pembelajaran (TP) yang SANGAT GRANULAR (kecil, spesifik, dan operasional) berdasarkan pembagian TOPIK atau MATERI POKOK. Hasilkan MINIMAL 3-5 TP PER ELEMEN! (Jika ada 3 elemen, berarti minimal harus ada 9-15 TP). JANGAN SEKALI-KALI hanya membuat 1 atau 2 TP per elemen! TP yang terlalu luas/generik dilarang keras. Gunakan KKO Taksonomi Bloom yang berjenjang (dari C1 hingga C6) pada setiap sub-topik.` : ""}
 ${schemaKey === "prosem" && Array.isArray(optimizedData.blockedWeeks) && optimizedData.blockedWeeks.length > 0 ? `- PERHATIAN KHUSUS UNTUK PROSEM: Guru telah memblokir/mengecualikan minggu-minggu berikut: ${optimizedData.blockedWeeks.join(", ")}. JANGAN mendistribusikan alokasi waktu/materi (Kosongkan/Tandai X) pada minggu-minggu tersebut karena libur personal/kegiatan lain.` : ""}
-- KHUSUS UNTUK ATP JIKA MELIBATKAN LEBIH DARI 1 KELAS (SATU FASE): Kamu WAJIB membaginya ke dalam kelas yang relevan (misal Kelas 1 dan Kelas 2). Kamu WAJIB mengisi properti "rasionalisasiKelas" dengan alasan logis pedagogik mengapa materi tersebut diletakkan di kelas tersebut, berdasarkan 4 tolok ukur: (1) Konkret ke Abstrak, (2) Hierarki/Prasyarat, (3) Cakupan Lingkungan (dekat ke jauh), atau (4) Gradasi Taksonomi Bloom (Kognitif C1-C6).`;
+${schemaKey === "atp" ? `- KHUSUS UNTUK ATP (SANGAT PENTING):
+  1. WAJIB MENYERTAKAN KESELURUHAN Tujuan Pembelajaran (TP) dari data mentah! DILARANG KERAS mengurangi, menghapus, menyingkat, atau menghilangkan TP apapun. Jika data mentah memiliki banyak TP, ATP Anda HARUS memiliki jumlah TP yang TEPAT SAMA. Tugas Anda hanya MENGURUTKAN KRONOLOGINYA (Sequencing).
+  2. Berdasarkan Fase yang dipilih (${optimizedData.fase || "Fase Umum"}), Anda WAJIB mendistribusikan TP tersebut ke dalam kelas yang benar: ${((f) => {
+    f = f.toUpperCase();
+    if (f.includes("FASE A")) return "Kelas 1 dan Kelas 2";
+    if (f.includes("FASE B")) return "Kelas 3 dan Kelas 4";
+    if (f.includes("FASE C")) return "Kelas 5 dan Kelas 6";
+    if (f.includes("FASE D")) return "Kelas 7, Kelas 8, dan Kelas 9";
+    if (f.includes("FASE E")) return "Kelas 10";
+    if (f.includes("FASE F")) return "Kelas 11 dan Kelas 12";
+    return "kelas yang relevan dengan fase tersebut";
+  })(optimizedData.fase || "")}.
+  3. Anda WAJIB mengisi "rasionalisasiKelas" secara spesifik mengapa TP tersebut ditaruh di kelas tersebut menggunakan 4 pilar pedagogi: (1) Konkret ke Abstrak, (2) Hierarki Prasyarat, (3) Proximity (Dekat ke Jauh), (4) Gradasi Kognitif (Bloom).` : ""}`;
   }
 
   // Context Builder untuk Modul Ajar Umum
