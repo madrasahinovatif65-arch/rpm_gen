@@ -429,35 +429,54 @@ KETENTUAN LAYOUT HTML:
 - Gunakan styling CSS internal yang bersih dengan font sans-serif, header tabel warna biru tua (#1a3a5c) teks putih, border tabel tipis, dan styling print @media print { @page { size: A4 portrait; margin: 1.5cm; } }.`;
   } else if (docType === "tp") {
 
-    // PRE-PROCESSING: Pecah CP menjadi daftar sub-materi atomik sebelum dikirim ke AI
-    // Ini memastikan AI tidak perlu menebak jumlah TP — kita yang menyiapkan daftarnya
+    // PRE-PROCESSING: Pecah teks CP menjadi daftar sub-materi atomik
+    // Format input bisa dalam 1 baris tanpa newline: "Tajwid : ...benar.Al-Qur'an : ...Hadis : ..."
     const parseAtomicTopics = (cpText: string): { elemen: string; topik: string }[] => {
       const result: { elemen: string; topik: string }[] = [];
       
-      // Pisahkan per elemen (dengan pola "Elemen X:" atau baris baru ganda atau newline + huruf kapital)
-      const elemenBlocks = cpText.split(/(?=\n?[A-Za-z][A-Za-z\s]+:|\n\n)/g).filter(b => b.trim().length > 20);
+      // Step 1: Temukan semua posisi header elemen (pola: "NamaElemen :" atau "NamaElemen:")
+      // Deteksi berdasarkan kata yang diikuti tanda titik dua
+      const headerRegex = /(?:^|(?<=\.))\s*([A-Za-z][A-Za-z'\-\s]{1,25}?)\s*:/g;
       
-      if (elemenBlocks.length <= 1) {
-        // Jika tidak ada struktur elemen, coba pisahkan langsung per koma/titik koma
-        const rawTopics = cpText.split(/[;]|,\s*(?=[A-Z])|(?:\.\s+(?=[A-Z]))/g);
-        rawTopics.forEach(t => {
-          const trimmed = t.replace(/^[-–—\d\.\s]+/, '').trim();
-          if (trimmed.length > 10) result.push({ elemen: 'Umum', topik: trimmed });
-        });
-      } else {
-        elemenBlocks.forEach(block => {
-          const colonIdx = block.indexOf(':');
-          const elemen = colonIdx > -1 ? block.substring(0, colonIdx).trim().replace(/^\n/, '') : 'Umum';
-          const content = colonIdx > -1 ? block.substring(colonIdx + 1) : block;
-          
-          // Pisah per koma, titik koma, atau "dan" yang memisahkan sub-materi
-          const subTopics = content.split(/,\s*|;\s*/g);
-          subTopics.forEach(t => {
-            const trimmed = t.replace(/^[-–—\d\.\s]+/, '').trim().replace(/\.$/, '');
-            if (trimmed.length > 8) result.push({ elemen: elemen, topik: trimmed });
-          });
+      const headers: { name: string; contentStart: number }[] = [];
+      let m: RegExpExecArray | null;
+      while ((m = headerRegex.exec(cpText)) !== null) {
+        headers.push({
+          name: m[1].trim(),
+          contentStart: m.index + m[0].length
         });
       }
+      
+      // Fallback: jika tidak ada header terdeteksi, olah seluruh teks sebagai 1 elemen
+      if (headers.length === 0) {
+        headers.push({ name: 'Umum', contentStart: 0 });
+      }
+      
+      // Step 2: Ambil konten tiap elemen (dari setelah header sampai header berikutnya)
+      headers.forEach((header, i) => {
+        const nextStart = i < headers.length - 1 ? headers[i + 1].contentStart - headers[i + 1].name.length - 2 : cpText.length;
+        let content = cpText.substring(header.contentStart, nextStart).trim();
+        
+        // Step 3: Pecah konten per koma dan titik koma
+        // Ubah "dan X" menjadi ", X" agar ikut terpisah
+        content = content.replace(/\s+dan\s+(?=[A-Za-z'"])/g, ', ');
+        
+        const parts = content.split(/[,;]\s*/);
+        
+        parts.forEach(part => {
+          // Hapus filler phrases di tengah/akhir string
+          let clean = part
+            .replace(/\s*(sebagai bekal|agar dapat|dalam kehidupan|menjelaskan arti|untuk menerapkan|sehingga mampu|dalam praktik membaca)\b.*/i, '')
+            .replace(/^[\d\.\-–—\s]+/, '') // hapus awalan nomor/tanda
+            .replace(/\.$/, '')            // hapus titik di akhir
+            .trim();
+          
+          // Filter: minimal 4 karakter, dan bukan kata filler
+          if (clean.length >= 4 && !clean.match(/^(murid|siswa|peserta didik|mereka|ia|dengan|benar|baik|arti|isi)\b/i)) {
+            result.push({ elemen: header.name, topik: clean });
+          }
+        });
+      });
       
       return result.length > 0 ? result : [{ elemen: 'Umum', topik: cpText.substring(0, 200) }];
     };
@@ -466,7 +485,10 @@ KETENTUAN LAYOUT HTML:
     const totalTopics = atomicTopics.length;
     const jpPerTp = Math.max(2, Math.round((totalJp || 72) / totalTopics));
     
-    // Buat daftar bernomor yang siap pakai untuk AI
+    // Debug log di console browser (bisa dilihat di DevTools)
+    console.log(`[TP Pre-processor] Berhasil memecah CP menjadi ${totalTopics} sub-topik atomik:`, atomicTopics);
+    
+    // Buat daftar bernomor untuk AI
     const numberedTopicList = atomicTopics.map((item, idx) => 
       `  ${idx + 1}. [Elemen: ${item.elemen}] ${item.topik}`
     ).join('\n');
