@@ -450,7 +450,12 @@ STRUKTUR DOKUMEN HTML WAJIB (4 Bagian Wajib):
 1. Kop Sekolah (TANPA LOGO) & Nomor Dokumen: No. Dok: ADM-TP-${singkatanMapel}-${fase.replace(/\s+/g, '')} / Rev: 00 / Tgl: ${year.slice(0, 4)}
 2. BAGIAN A — IDENTITAS (Tabel 2 Kolom)
 3. BAGIAN B — PANDUAN KODE TUJUAN PEMBELAJARAN (Sub B1 Format Kode box, Sub B2 Tabel Kode Elemen)
-4. BAGIAN C — DAFTAR TUJUAN PEMBELAJARAN (Tabel 6 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran | Aspek Kompetensi | Alokasi JP). Buat 8-12 TP berprinsip ABCD, KKO Bloom terukur, diawali "Murid mampu...". Total JP HARUS TEPAT SAMA dengan Alokasi Waktu Total (${totalJp}).
+4. BAGIAN C — DAFTAR TUJUAN PEMBELAJARAN (Tabel 6 kolom: No | Kode TP | Elemen CP | Tujuan Pembelajaran | Aspek Kompetensi | Alokasi JP).
+   ATURAN KRITIS BAGIAN C (WAJIB DIPATUHI):
+   a. PEMECAHAN ATOMIK: Setiap sub-materi atau konsep dalam CP yang dipisahkan oleh KOMA atau TITIK KOMA HARUS dijadikan 1 TP TERPISAH. Contoh: CP "hukum bacaan kalkalah, mad tabi'i, izhar halqi, ikhfa' hakiki, idgam bigunnah, idgam bilagunnah, dan iqlab" WAJIB menghasilkan MINIMAL 7 TP berbeda — satu per satu konsep. JANGAN PERNAH menggabungkan 2 atau lebih konsep ke dalam satu TP!
+   b. TIDAK ADA BATAS JUMLAH TP: Hasilkan sebanyak TP yang diperlukan hingga SEMUA sub-materi di CP habis terbedah. Jika ada 10 sub-materi maka buat 10 TP. Jika ada 15 sub-materi buat 15 TP.
+   c. FORMAT RUMUSAN TP: Setiap TP diawali "Murid mampu [KKO Bloom spesifik] [1 sub-materi TUNGGAL]..., untuk menumbuhkan [Nilai DPL] dan mewujudkan [Nilai Panca Cinta]".
+   d. DISTRIBUSI JP: Bagi Total JP (${totalJp}) secara merata ke seluruh TP yang dihasilkan. Alokasi JP per TP boleh SAMA semua atau bervariasi sedikit asal totalnya TEPAT ${totalJp} JP.
 5. BAGIAN D — REKAPITULASI ALOKASI WAKTU PER ELEMEN (Tabel 5 kolom: No | Elemen CP | Jumlah TP | Total JP | Persentase)
 6. BAGIAN PENUTUP — TANDA TANGAN SEJAJAR KEPSEK & GURU DENGAN TABEL TAK TERLIHAT (BORDER 0).
 
