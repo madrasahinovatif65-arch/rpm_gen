@@ -22,7 +22,7 @@ export const TpSchema = z.object({
   daftarTp: z.array(z.object({
     kodeTp: z.string(),
     elemen: z.string(),
-    rumusanTp: z.string(),
+    rumusanTp: z.string().describe("WAJIB ATOMIK: 1 TP HANYA UNTUK 1 MATERI SPESIFIK. DILARANG KERAS menggabungkan materi (misal: 'hukum A, B, dan C' HARUS dipecah jadi 3 TP berbeda)."),
     kompetensi: z.string(),
     integrasiNilai: z.string().describe("Integrasi Panca Cinta dan PPRA"),
     alokasiJp: z.number().describe("Estimasi JP untuk TP ini")
