@@ -669,7 +669,7 @@ ${JSON.stringify(optimizedData, null, 2)}
 
 PENTING:
 - Fokus utama Anda adalah merumuskan (reasoning) materi pokok, kompetensi, dan memecah Capaian Pembelajaran.
-- ABAIKAN kalkulasi matematika presisi terkait "Alokasi JP" atau "kodeTp" karena sistem kami memiliki Data Normalizer yang akan menimpa angka JP dan kode TP tersebut. Anda cukup memberi estimasi nilai (misal 1 atau 2).
+- ABAIKAN kalkulasi matematika presisi terkait "Alokasi JP" atau "kodeTp". JANGAN membatasi jumlah TP karena takut "kehabisan" Alokasi JP! Anda BEBAS membuat sebanyak mungkin TP untuk membedah HINGGA TUNTAS seluruh materi di CP tanpa menyembunyikan satupun topik. Sistem kami memiliki Data Normalizer yang akan mendistribusikan ulang angka JP secara otomatis berapapun jumlah TP yang Anda hasilkan. Isikan saja angka estimasi sembarang (misal 1 atau 2).
 - KONTEKS LOKAL (FP-PLO): Jika field "topikLokal" (Konteks Mikro/Meso/Makro/Nasional) terisi, pastikan TP/ATP atau instrumen asesmen memiliki *Indikator Kontekstualisasi Lokal* (mampu memberi contoh fenomena dari lingkungan yang dipilih) dan *Indikator Penarikan Kesimpulan* (mampu memberi solusi lokal).
 - Pastikan setiap array terisi dengan struktur yang valid.
 ${schemaKey === "tp" ? `- KHUSUS UNTUK TP (MIMIC BEST PRACTICE GURU KBC):
