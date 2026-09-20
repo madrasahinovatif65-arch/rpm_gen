@@ -1,121 +1,52 @@
 import { TpType, AtpType } from "./kbcSchemas";
+import { parseAtomicCpTopics } from "./atomicCpParser";
 
-// Helper to determine how many years a phase covers
 const getPhaseMultiplier = (fase: string): number => {
   const f = (fase || "").toUpperCase();
-  if (f.includes("FASE A") || f.includes("FASE B") || f.includes("FASE C") || f.includes("FASE F")) {
-    return 2;
-  } else if (f.includes("FASE D")) {
-    return 3;
-  } else if (f.includes("FASE E")) {
-    return 1;
-  }
-  return 2; // Default to 2 if unknown, matching SD/MI typical phases
+  if (f.includes("FASE A") || f.includes("FASE B") || f.includes("FASE C") || f.includes("FASE F")) return 2;
+  if (f.includes("FASE D")) return 3;
+  if (f.includes("FASE E")) return 1;
+  return 2;
 };
 
 export const normalizeTpData = (rawTpJson: TpType, formData: any): TpType => {
-  if (!rawTpJson || !rawTpJson.daftarTp || !Array.isArray(rawTpJson.daftarTp)) {
-    return rawTpJson;
-  }
-
+  if (!rawTpJson?.daftarTp || !Array.isArray(rawTpJson.daftarTp)) return rawTpJson;
+  const atomicTopics = parseAtomicCpTopics(formData.cpElemen || "");
   const prefix = formData.singkatanMapel || "MAPEL";
-  const level = formData.level || "Fase";
-  
-  // Kalikan JP tahunan dengan jumlah tahun dalam fase tersebut (misal x2 untuk Fase A)
+  const level = formData.level || formData.fase || "Fase";
   const multiplier = getPhaseMultiplier(formData.fase);
-  const totalJpInput = (formData.totalJp || 0) * multiplier;
+  const totalJpInput = Number(formData.totalJp || 0) * multiplier;
+  const currentTotalJp = Math.max(1, rawTpJson.daftarTp.reduce((sum, tp) => sum + (tp.alokasiJp || 0), 0));
+  let accumulated = 0;
 
-  // Hitung total JP yang diberikan AI
-  let currentTotalJp = 0;
-  rawTpJson.daftarTp.forEach(tp => {
-    currentTotalJp += (tp.alokasiJp || 0);
-  });
-
-  // Jika currentTotalJp 0, fallback supaya tidak dibagi nol
-  if (currentTotalJp === 0) {
-    currentTotalJp = 1;
-    rawTpJson.daftarTp.forEach(tp => tp.alokasiJp = 1);
-  }
-
-  let accumulatedNormalizedJp = 0;
-  
-  const normalizedDaftarTp = rawTpJson.daftarTp.map((tp, index) => {
-    // Determinisik Kode TP
-    const cleanElemen = tp.elemen.substring(0, 3).toUpperCase(); 
-    const generatedKode = `${prefix}-${level}-${cleanElemen}-${(index + 1).toString().padStart(3, '0')}`;
-    
-    // Normalisasi Alokasi JP proporsional terhadap totalJpInput
-    let normalizedJp = 0;
-    if (totalJpInput > 0) {
-      if (index === rawTpJson.daftarTp.length - 1) {
-        // Elemen terakhir mengambil sisa pembulatan
-        normalizedJp = totalJpInput - accumulatedNormalizedJp;
-      } else {
-        normalizedJp = Math.round((tp.alokasiJp / currentTotalJp) * totalJpInput);
-        accumulatedNormalizedJp += normalizedJp;
-      }
-    } else {
-      normalizedJp = tp.alokasiJp; // Fallback jika tidak ada totalJp
-    }
-
+  const daftarTp = rawTpJson.daftarTp.map((tp, index) => {
+    const source = atomicTopics[index];
+    const alokasiJp = totalJpInput > 0
+      ? index === rawTpJson.daftarTp.length - 1
+        ? Math.max(0, totalJpInput - accumulated)
+        : Math.max(1, Math.round(((tp.alokasiJp || 1) / currentTotalJp) * totalJpInput))
+      : (tp.alokasiJp || 1);
+    accumulated += index === rawTpJson.daftarTp.length - 1 ? 0 : alokasiJp;
     return {
       ...tp,
-      kodeTp: generatedKode,
-      alokasiJp: normalizedJp
+      kodeTp: `${prefix}-${level}-${tp.elemen.substring(0, 3).toUpperCase()}-${String(index + 1).padStart(3, "0")}`,
+      materiPokok: source?.topik || tp.materiPokok || tp.rumusanTp,
+      alokasiJp
     };
   });
 
-  return { ...rawTpJson, daftarTp: normalizedDaftarTp };
+  return { ...rawTpJson, daftarTp };
 };
 
 export const normalizeAtpData = (rawAtpJson: AtpType, formData: any, tpData: TpType | null): AtpType => {
-  if (!rawAtpJson || !rawAtpJson.alur || !Array.isArray(rawAtpJson.alur)) {
-    return rawAtpJson;
-  }
-  
-  const jpPerTahun = formData.totalJp || 0;
-  const targetJpPerSemester = Math.ceil(jpPerTahun / 2); // Asumsi 2 semester berimbang untuk 1 tahun
-
-  const accumulatedJpPerKelas: Record<string, number> = {};
-
-  const normalizedAlur = rawAtpJson.alur.map((atp, index) => {
-    // Sinkronisasi data dari tpData jika ada
-    let realJp = atp.alokasiJp || 0;
-    let finalKodeTp = atp.kodeTp;
-    
-    // Coba temukan TP ini di tpData berdasarkan rumusanTp atau urutan
-    if (tpData && tpData.daftarTp) {
-      const matchTp = tpData.daftarTp.find(t => t.rumusanTp.includes(atp.rumusanTp.substring(0, 20))) 
-        || tpData.daftarTp[index];
-      
-      if (matchTp) {
-        realJp = matchTp.alokasiJp;
-        finalKodeTp = matchTp.kodeTp;
-      }
-    }
-
-    const kelasStr = atp.kelas || "Umum";
-    if (!accumulatedJpPerKelas[kelasStr]) {
-      accumulatedJpPerKelas[kelasStr] = 0;
-    }
-    
-    // Simpan JP sebelum ditambahkan untuk menentukan semester, atau tambahkan lalu cek?
-    // Lebih presisi ditambahkan dulu
-    accumulatedJpPerKelas[kelasStr] += realJp;
-    
-    // Deterministic Semester Placement Per Kelas
-    let semester = 1;
-    if (accumulatedJpPerKelas[kelasStr] > targetJpPerSemester) {
-      semester = 2;
-    }
-
-    return {
-      ...atp,
-      kodeTp: finalKodeTp,
-      alokasiJp: realJp,
-      semester: semester
-    };
+  if (!rawAtpJson?.alur || !Array.isArray(rawAtpJson.alur)) return rawAtpJson;
+  const targetJpPerSemester = Math.ceil(Number(formData.totalJp || 0) / 2);
+  const accumulated: Record<string, number> = {};
+  const alur = rawAtpJson.alur.map((atp, index) => {
+    const match = tpData?.daftarTp?.find((tp) => tp.rumusanTp.includes(atp.rumusanTp.substring(0, 20))) || tpData?.daftarTp?.[index];
+    const kelas = atp.kelas || "Umum";
+    accumulated[kelas] = (accumulated[kelas] || 0) + (match?.alokasiJp || atp.alokasiJp || 0);
+    return { ...atp, kodeTp: match?.kodeTp || atp.kodeTp, materiPokok: match?.materiPokok || atp.materiPokok, alokasiJp: match?.alokasiJp || atp.alokasiJp, semester: accumulated[kelas] > targetJpPerSemester ? 2 : 1 };
   });
-
-  return { ...rawAtpJson, alur: normalizedAlur };
+  return { ...rawAtpJson, alur };
 };
