@@ -16,18 +16,16 @@ const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any, c
   if (!ai) throw new Error("GEMINI_API_KEY tidak dikonfigurasi.");
   const modelCandidates = ["gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-3.7-flash"];
   let lastError: any = null;
-  for (const modelCandidate of modelCandidates) {
+  for (const model of modelCandidates) {
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
         if (onProgress) {
-          const stream = await ai.models.generateContentStream({ model: modelCandidate, contents, config });
+          const stream = await ai.models.generateContentStream({ model, contents, config });
           let text = "";
-          for await (const chunk of stream) {
-            if (chunk.text) { text += chunk.text; onProgress(text); }
-          }
+          for await (const chunk of stream) { if (chunk.text) { text += chunk.text; onProgress(text); } }
           return { text };
         }
-        const response = await ai.models.generateContent({ model: modelCandidate, contents, config });
+        const response = await ai.models.generateContent({ model, contents, config });
         if (response?.text) return { text: response.text };
       } catch (error: any) {
         lastError = error;
@@ -45,8 +43,8 @@ const generateContentWithRetry = async (ai: GoogleGenAI | null, contents: any, c
 
 export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPrompt: string, userPrompt: string, schema: ZodSchema<any>, maxRetries = 2, onProgress?: (text: string) => void): Promise<any> => {
   if (!ai) throw new Error("GEMINI_API_KEY tidak dikonfigurasi.");
-  const schemaStr = JSON.stringify(zodToJsonSchema(schema, "OutputSchema"), null, 2);
-  let prompt = `${systemPrompt}\n\n${userPrompt}\n\nReturn ONLY valid JSON matching this schema:\n${schemaStr}`;
+  const schemaText = JSON.stringify(zodToJsonSchema(schema, "OutputSchema"), null, 2);
+  let prompt = `${systemPrompt}\n\n${userPrompt}\n\nReturn ONLY valid JSON matching this schema:\n${schemaText}`;
   for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
     const response = await generateContentWithRetry(ai, [{ role: "user", parts: [{ text: prompt }] }], { responseMimeType: "application/json" }, onProgress);
     const text = response.text.replace(/```json\s*|```/g, "").trim();
@@ -64,8 +62,8 @@ export const generateJsonWithRepair = async (ai: GoogleGenAI | null, systemPromp
 };
 
 export const generateModulAjarAPI = async (formData: any) => {
-  const ai = getAiClient();
   try {
+    const ai = getAiClient();
     if (!ai) throw new Error("AI unavailable");
     const response = await generateContentWithRetry(ai, [{ role: "user", parts: [{ text: `Buat modul ajar HTML murni berdasarkan data berikut:\n${JSON.stringify(formData, null, 2)}` }] }]);
     return { status: "success", html: response.text.replace(/```[a-zA-Z]*\s*|```/g, "").trim() };
@@ -117,10 +115,8 @@ export const generatePerangkatAjarKBCAPI = async (docType: string, formData: any
   if (schemaKey === "tp") {
     const cpText = String(optimizedData.cpElemen || optimizedData.cpText || optimizedData.cp || "");
     const atomicTopics = parseAtomicCpTopics(cpText);
-    const atomicBlock = atomicTopics.length
-      ? `\n\nSUB-TOPIK ATOMIK WAJIB:\n${atomicTopics.map((item, i) => `${i + 1}. [${item.elemen}] ${item.topik}`).join("\n")}`
-      : "";
-    prompt += `${atomicBlock}\n\nAturan TP: setiap sub-topik atomik wajib menjadi tepat satu TP; jangan menggabungkan materi atau kompetensi; setiap TP memiliki satu objek belajar dan satu kompetensi utama.`;
+    const atomicBlock = atomicTopics.length ? `\n\nSUB-TOPIK ATOMIK WAJIB:\n${atomicTopics.map((item, i) => `${i + 1}. [${item.elemen}] ${item.topik}`).join("\n")}` : "";
+    prompt += `${atomicBlock}\n\nAturan TP: setiap sub-topik atomik wajib menjadi tepat satu TP; jangan menggabungkan materi atau kompetensi; setiap TP memiliki satu objek belajar dan satu kompetensi utama.\n\nAturan integrasi nilai: setiap integrasiNilai WAJIB memuat secara eksplisit minimal 3 DPL, minimal 3 Panca Cinta/KBC, dan minimal 3 PPRA yang relevan. Gunakan format: DPL: ...; Panca Cinta/KBC: ...; PPRA: ...; Penerapan: ....`;
   }
 
   try {
