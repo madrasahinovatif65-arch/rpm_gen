@@ -4,60 +4,72 @@ export type AtomicCpTopic = {
 };
 
 const HEADER_PATTERN = /(?:^|[.!?])\s*([\p{L}][\p{L}\d'’‘&/()\- ]{1,48}?)\s*:\s*/gu;
-const VERB_GROUP = "menghafal|menulis|membaca|memahami|menjelaskan|mengidentifikasi|menyebutkan|menceritakan|menerapkan|mempraktikkan|mendemonstrasikan|menguraikan|menganalisis|mengklasifikasikan|mengkomunikasikan|menyimpulkan|mengartikan";
-const VERB_PATTERN = new RegExp(`(${VERB_GROUP})`, "iu");
+const TRAILING_CLAUSE_RE = /\s*(?:sebagai bekal|agar dapat|untuk menerapkan|dalam kehidupan(?:\s+sehari-hari)?|dalam praktik(?:\s+membaca)?|dengan baik(?:\s+dan\s+benar)?|serta\s+isi\s+kandungannya|menjelaskan\s+arti\s+serta|sehingga\s+mampu)[\s\S]*$/iu;
+const FILLER_WORDS = /^(?:murid|siswa|peserta didik|mereka|ia|dengan|benar|baik|serta|isi|kandungannya|atau|dan)$/iu;
+const LEADING_VERBS = /^(?:menerapkan|menghafal|menulis|membaca|memahami|menjelaskan|mengidentifikasi|menyebutkan|menunjukkan|menceritakan|mendemonstrasikan|menerangkan|menguraikan|menganalisis|mengklasifikasikan|mengkomunikasikan|mengaplikasikan|mempraktikkan|mengartikan|menyimpulkan|menanggapi)\s+/iu;
+const COMMON_PREFIX_RE = /^(?:hukum\s+bacaan|bacaan|hadis\s+tentang|surah(?:-surah)?\s+|arti\s+|isi\s+|makna\s+|pengertian\s+)/iu;
+const VERB_FOR_SPLIT = /\b(?:menerapkan|menghafal|menulis|membaca|memahami|menjelaskan|mengidentifikasi|menyebutkan|menceritakan|mendemonstrasikan|menerangkan|menguraikan|menganalisis|mengklasifikasikan|mengkomunikasikan|mengaplikasikan|mempraktikkan|mengartikan|menyimpulkan|menunjukkan)\b/iu;
 
-const normalizeMaterial = (value: string): string => value
-  .replace(/^\s*(?:\d+[.)-]\s*)+/u, "")
-  .replace(/^[\s\-–—]+/u, "")
-  .replace(/\s*(?:sebagai bekal|agar dapat|dalam kehidupan(?: sehari-hari)?|untuk menerapkan|sehingga mampu|dalam praktik membaca|dalam praktik|dengan baik dan benar|dengan baik)\b[\s\S]*$/iu, "")
-  .replace(/^hukum\s+bacaan\s+/iu, "")
-  .replace(/^bacaan\s+/iu, "")
-  .replace(/^hadis\s+tentang\s+/iu, "")
-  .replace(/^surah(?:-surah)?\s+/iu, "surah ")
-  .replace(/[.!?]+$/u, "")
-  .replace(/\s+/g, " ")
-  .trim();
+const normalizeMaterial = (value: string): string => {
+  let out = value
+    .replace(/^[\d.\-–—\s]+/u, "")
+    .replace(TRAILING_CLAUSE_RE, "")
+    .replace(LEADING_VERBS, "")
+    .replace(COMMON_PREFIX_RE, "")
+    .replace(/^\s*[-–—]\s*/u, "")
+    .replace(/[.!?]+$/u, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!out) return "";
+  if (FILLER_WORDS.test(out)) return "";
+  return out;
+};
 
 const splitCoordinatedVerbPairs = (value: string): string[] => {
   const text = value.trim();
   if (!text) return [];
-  const pairRegex = new RegExp(`^(.*?\b(?:${VERB_GROUP})\b)\s+dan\s+(?:(?:${VERB_GROUP})\s+)?(.+)$`, "iu");
-  const match = text.match(pairRegex);
+
+  const match = text.match(/^(.*?\b(?:menerapkan|menghafal|menulis|membaca|memahami|menjelaskan|mengidentifikasi|menyebutkan|menceritakan|mendemonstrasikan|menerangkan|menguraikan|menganalisis|mengklasifikasikan|mengkomunikasikan|mengaplikasikan|mempraktikkan|mengartikan|menyimpulkan|menunjukkan)\b)\s+dan\s+(?:(?:menerapkan|menghafal|menulis|membaca|memahami|menjelaskan|mengidentifikasi|menyebutkan|menceritakan|mendemonstrasikan|menerangkan|menguraikan|menganalisis|mengklasifikasikan|mengkomunikasikan|mengaplikasikan|mempraktikkan|mengartikan|menyimpulkan|menunjukkan)\s+)?(.+)$/iu);
+
   if (!match) return [text];
 
   const left = match[1].trim();
   const right = match[2].trim();
-  const leftHead = left.match(VERB_PATTERN)?.[0]?.toLowerCase() ?? "";
-  const rightHead = right.match(VERB_PATTERN)?.[0]?.toLowerCase() ?? "";
+  const leftHead = left.match(VERB_FOR_SPLIT)?.[0]?.trim() ?? "";
+  const rightHead = right.match(VERB_FOR_SPLIT)?.[0]?.trim() ?? "";
 
-  if (!leftHead || !rightHead || leftHead === rightHead) return [text];
+  if (!leftHead || !rightHead || leftHead.toLowerCase() === rightHead.toLowerCase()) {
+    return [text];
+  }
 
-  const objectPart = right.replace(new RegExp(`^${rightHead}\\s+`, "i"), "").trim();
-  return [
-    `${leftHead} ${objectPart}`.trim(),
-    `${rightHead} ${objectPart}`.trim()
-  ].filter(Boolean);
+  const leftClean = normalizeMaterial(left);
+  const rightClean = normalizeMaterial(right);
+  return [leftClean, rightClean].filter(Boolean);
 };
 
-const splitAtomicMaterialList = (sectionText: string): string[] => {
-  const cleaned = sectionText
-    .replace(/\s*;\s*/g, ",")
-    .replace(/\s*(?:,\s*dan\s+|\s+dan\s+)(?=\b(?:[A-Za-z])\b)/gi, ", ")
-    .trim();
+const splitAndList = (value: string): string[] => {
+  const text = value.trim();
+  if (!text) return [];
 
-  const baseItems = cleaned
-    .split(/\s*,\s*/u)
+  const parts = text
+    .split(/\s*,\s*|\s*;\s*/u)
     .map((part) => part.trim())
     .filter(Boolean);
 
   const result: string[] = [];
-  for (const item of baseItems) {
-    const expanded = splitCoordinatedVerbPairs(item);
-    for (const candidate of expanded) {
-      const normalized = normalizeMaterial(candidate);
-      if (normalized.length >= 3 && !/^(murid|siswa|peserta didik|mereka|ia|dengan|benar|baik|serta|isi|kandungannya|atau)$/iu.test(normalized)) {
-        result.push(normalized);
+  for (const rawPart of parts) {
+    const expanded = splitCoordinatedVerbPairs(rawPart);
+    for (const item of expanded) {
+      const splitByAnd = item.split(/\s+dan\s+(?=[A-Za-z])/u)
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+      for (const candidate of splitByAnd.length > 1 ? splitByAnd : [item]) {
+        const normalized = normalizeMaterial(candidate);
+        if (normalized.length >= 3 && !FILLER_WORDS.test(normalized)) {
+          result.push(normalized);
+        }
       }
     }
   }
@@ -65,18 +77,26 @@ const splitAtomicMaterialList = (sectionText: string): string[] => {
   return result;
 };
 
+const dedupe = (rows: AtomicCpTopic[]): AtomicCpTopic[] => {
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const key = `${row.elemen.toLowerCase()}::${row.topik.toLowerCase()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 /**
- * Memecah CP menjadi materi pokok atomik untuk pipeline TP.
- * Setiap elemen CP wajib diurai sampai level sub-materi tunggal, termasuk
- * daftar seperti "menghafal dan menulis hadis ...", "salat berjemaah,
- * persaudaraan, takwa, niat, dan silaturahmi".
+ * Memecah CP menjadi sub-materi atomik untuk pipeline TP.
+ * Setiap item hasilnya harus mewakili satu materi pokok tunggal dan bukan
+ * gabungan dari dua materi atau dua kompetensi.
  */
 export const parseAtomicCpTopics = (cpText: string): AtomicCpTopic[] => {
   if (!cpText?.trim()) return [];
 
   const input = cpText.replace(/\r\n?/g, "\n").trim();
   const headers = [...input.matchAll(HEADER_PATTERN)];
-
   const sections = headers.length > 0
     ? headers.map((match, index) => ({
         elemen: match[1].trim(),
@@ -88,14 +108,20 @@ export const parseAtomicCpTopics = (cpText: string): AtomicCpTopic[] => {
     : [{ elemen: "Umum", content: input }];
 
   const result: AtomicCpTopic[] = [];
+
   for (const section of sections) {
-    const items = splitAtomicMaterialList(section.content);
-    for (const item of items) {
-      if (!result.some((entry) => entry.elemen === section.elemen && entry.topik.toLowerCase() === item.toLowerCase())) {
-        result.push({ elemen: section.elemen, topik: item });
-      }
+    const content = section.content
+      .replace(/\s+/g, " ")
+      .replace(/\s*;\s*/g, ",")
+      .trim();
+
+    const parts = splitAndList(content);
+    for (const topic of parts) {
+      if (!topic || topic.length < 3) continue;
+      if (FILLER_WORDS.test(topic)) continue;
+      result.push({ elemen: section.elemen, topik: topic });
     }
   }
 
-  return result;
+  return dedupe(result);
 };
