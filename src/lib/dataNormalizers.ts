@@ -70,14 +70,37 @@ export const normalizeTpData = (rawTpJson: TpType, formData: any): TpType => {
 
 export const normalizeAtpData = (rawAtpJson: AtpType, formData: any, tpData: TpType | null): AtpType => {
   if (!rawAtpJson?.alur || !Array.isArray(rawAtpJson.alur)) return rawAtpJson;
-  const targetJpPerSemester = Math.ceil(Number(formData.totalJp || 0) / 2);
+
+  const phaseMultiplier = getPhaseMultiplier(formData.fase);
+  const jpPerTahun = Number(formData.totalJp || 0);
+
+  // JP per kelas = total jp 1 tahun (dibagi jumlah kelas dalam fase)
+  // Mis. Fase B (2 kelas): targetJpPerKelas = 72 JP
+  // Semester per kelas = 36 JP
+  const jpPerKelas = jpPerTahun; // totalJp sudah = 1 tahun = 1 kelas
+  const jpPerSemesterPerKelas = Math.ceil(jpPerKelas / 2);
+
   const accumulated: Record<string, number> = {};
+
   const alur = rawAtpJson.alur.map((atp, index) => {
     const match = tpData?.daftarTp?.find((tp) => tp.kodeTp === atp.kodeTp) || tpData?.daftarTp?.[index];
     const kelas = atp.kelas || "Umum";
     const realJp = match?.alokasiJp || atp.alokasiJp || 0;
+
     accumulated[kelas] = (accumulated[kelas] || 0) + realJp;
-    return { ...atp, kodeTp: match?.kodeTp || atp.kodeTp, materiPokok: match?.materiPokok || atp.materiPokok, alokasiJp: realJp, semester: accumulated[kelas] > targetJpPerSemester ? 2 : 1 };
+
+    // Semester ditentukan per kelas: jika JP terkumulasi di kelas ini melebihi setengah alokasi per kelas
+    const semester = accumulated[kelas] > jpPerSemesterPerKelas ? 2 : 1;
+
+    return {
+      ...atp,
+      kodeTp: match?.kodeTp || atp.kodeTp,
+      materiPokok: match?.materiPokok || atp.materiPokok,
+      alokasiJp: realJp,
+      semester
+    };
   });
+
   return { ...rawAtpJson, alur };
 };
+
